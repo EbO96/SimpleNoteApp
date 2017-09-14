@@ -10,7 +10,7 @@
         tools:context="app.note.simple.brulinski.sebastian.com.simplenoteapp.MainActivity">
 
         <android.support.v7.widget.Toolbar
-            android:id="@+id/my_main_toolbar"
+            android:id="@+id/toolbar"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginBottom="191dp"
@@ -24,6 +24,13 @@
             app:titleTextColor="@android:color/white">
 
         </android.support.v7.widget.Toolbar>
+
+        <android.support.v7.widget.RecyclerView
+            android:id="@+id/recycler_view"
+            android:layout_marginTop="?attr/actionBarSize"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+        </android.support.v7.widget.RecyclerView>
 
 
     </android.support.constraint.ConstraintLayout>
