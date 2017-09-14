@@ -7,11 +7,13 @@ import app.note.simple.brulinski.sebastian.com.simplenoteapp.databinding.Activit
 
 class MainActivity : AppCompatActivity() {
 
-    lateinit var binding : ActivityMainBinding
+    lateinit var binding: ActivityMainBinding
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = DataBindingUtil.setContentView(this, R.layout.activity_main)
+        setSupportActionBar(binding.myMainToolbar)
+
 
     }
 }
