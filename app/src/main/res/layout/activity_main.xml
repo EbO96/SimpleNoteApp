@@ -21,7 +21,8 @@
             app:layout_constraintLeft_toLeftOf="parent"
             app:layout_constraintRight_toRightOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:titleTextColor="@android:color/white">
+            android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"
+            app:popupTheme="@style/ThemeOverlay.AppCompat.Light">
 
         </android.support.v7.widget.Toolbar>
 
@@ -29,17 +30,17 @@
             android:id="@+id/recycler_view"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:layout_marginTop="?attr/actionBarSize"/>
+            android:layout_marginTop="?attr/actionBarSize" />
 
         <com.getbase.floatingactionbutton.FloatingActionButton
             android:id="@+id/main_fab"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            app:fab_size="normal"
-            android:src="@drawable/ic_add"
-            app:layout_constraintBottom_toBottomOf="parent"
-            android:layout_marginRight="16dp"
+            android:layout_width="56dp"
+            android:layout_height="56dp"
             android:layout_marginBottom="16dp"
+            android:layout_marginEnd="16dp"
+            app:fab_icon="@drawable/ic_add_white_24dp"
+            app:fab_size="normal"
+            app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintRight_toRightOf="parent" />
 
 

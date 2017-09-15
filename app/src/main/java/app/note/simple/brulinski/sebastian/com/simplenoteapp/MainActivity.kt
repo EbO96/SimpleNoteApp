@@ -4,6 +4,8 @@ import android.databinding.DataBindingUtil
 import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
 import android.support.v7.widget.GridLayoutManager
+import android.view.Menu
+import android.view.MenuInflater
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.databinding.ActivityMainBinding
 
 class MainActivity : AppCompatActivity() {
@@ -43,7 +45,14 @@ class MainActivity : AppCompatActivity() {
 
     }
 
-    private fun saveNoteInDatabase(title: String, note: String,  date: String) {
+    private fun saveNoteInDatabase(title: String, note: String, date: String) {
         database.addNote(title, note, date)
+    }
+
+    override fun onCreateOptionsMenu(menu: Menu?): Boolean {
+        var menuInflater: MenuInflater = menuInflater
+        menuInflater.inflate(R.menu.main_menu, menu)
+
+        return super.onCreateOptionsMenu(menu)
     }
 }
