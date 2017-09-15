@@ -43,8 +43,6 @@ class NotesListFragment : Fragment() {
         } catch (e: Exception) {
             e.printStackTrace()
         }
-
-
         return binding.root
     }
 }
