@@ -11,7 +11,8 @@ class MainActivity : AppCompatActivity() {
     lateinit var binding: ActivityMainBinding
     lateinit var itemsObject: ItemsHolder
     lateinit var itemsObjectsArray: ArrayList<ItemsHolder>
-    lateinit var myRecycler : MainRecyclerAdapter
+    lateinit var myRecycler: MainRecyclerAdapter
+    lateinit var database: LocalDatabase
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -25,9 +26,12 @@ class MainActivity : AppCompatActivity() {
         myRecycler = MainRecyclerAdapter(itemsObjectsArray)
         binding.recyclerView.adapter = myRecycler
 
+        database = LocalDatabase(this)
+
+
     }
 
-    private fun addNote(title : String, note : String){
+    private fun addNote(title: String, note: String) {
         itemsObject = ItemsHolder()
 
         itemsObject.title = title
@@ -36,5 +40,10 @@ class MainActivity : AppCompatActivity() {
         itemsObjectsArray.add(itemsObject)
 
         myRecycler.notifyDataSetChanged()
+
+    }
+
+    private fun saveNoteInDatabase(title: String, note: String,  date: String) {
+        database.addNote(title, note, date)
     }
 }
