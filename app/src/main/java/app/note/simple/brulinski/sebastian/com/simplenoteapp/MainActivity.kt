@@ -6,6 +6,7 @@ import android.support.v7.app.AppCompatActivity
 import android.support.v7.widget.GridLayoutManager
 import android.view.Menu
 import android.view.MenuInflater
+import android.widget.Toast
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.databinding.ActivityMainBinding
 
 class MainActivity : AppCompatActivity() {
@@ -19,6 +20,7 @@ class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = DataBindingUtil.setContentView(this, R.layout.activity_main)
+
         setSupportActionBar(binding.toolbar)
         binding.recyclerView.setHasFixedSize(true)
         binding.recyclerView.layoutManager = GridLayoutManager(this, 2)
@@ -30,7 +32,9 @@ class MainActivity : AppCompatActivity() {
 
         database = LocalDatabase(this)
 
-
+        binding.mainFab.setOnClickListener {
+            //Switch to add note fragment
+        }
     }
 
     private fun addNote(title: String, note: String) {
