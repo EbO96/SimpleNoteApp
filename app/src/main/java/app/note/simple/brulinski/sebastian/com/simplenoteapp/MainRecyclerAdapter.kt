@@ -7,7 +7,8 @@ import android.view.ViewGroup
 import android.widget.TextView
 
 
-class MainRecyclerAdapter(var itemsHolder: ArrayList<ItemsHolder>, var recyclerView: RecyclerView) : RecyclerView.Adapter<MainRecyclerAdapter.ViewHolder>() {
+class MainRecyclerAdapter(var itemsHolder: ArrayList<ItemsHolder>, var recyclerView: RecyclerView, var database: LocalDatabase) : RecyclerView.Adapter<MainRecyclerAdapter.ViewHolder>() {
+
 
     override fun onBindViewHolder(holder: ViewHolder?, position: Int) {
         val itemsHolder: ItemsHolder = itemsHolder[position]
@@ -15,15 +16,13 @@ class MainRecyclerAdapter(var itemsHolder: ArrayList<ItemsHolder>, var recyclerV
         holder?.title?.text = itemsHolder.title
         holder?.note?.text = itemsHolder.note
 
-        holder?.itemView?.setOnClickListener{
-            val pos : Int = recyclerView.getChildAdapterPosition(holder?.itemView)
-        }
-
         holder?.itemView?.setOnLongClickListener {
-            val pos : Int = recyclerView.getChildAdapterPosition(holder?.itemView)
+            val pos: Int = recyclerView.getChildAdapterPosition(holder.itemView)
+
+            database.deleteRow(this.itemsHolder.get(pos).title, this.itemsHolder.get(pos).note)
+
             this.itemsHolder.removeAt(pos)
             notifyItemRemoved(pos)
-//            notifyDataSetChanged()
             true
         }
     }
@@ -41,9 +40,6 @@ class MainRecyclerAdapter(var itemsHolder: ArrayList<ItemsHolder>, var recyclerV
     class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         val title = itemView.findViewById<TextView>(R.id.titleTextView)
         val note = itemView.findViewById<TextView>(R.id.noteTextView)
-        fun a(){
-
-        }
     }
 
 }

@@ -27,16 +27,17 @@ class NotesListFragment : Fragment() {
     override fun onCreateView(inflater: LayoutInflater?, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         binding = DataBindingUtil.inflate(inflater, R.layout.notes_list_fragment, container, false)
 
+        //Database
+        database = LocalDatabase(context)
+
+        //Recycler
         binding.recyclerView.setHasFixedSize(true)
         binding.recyclerView.layoutManager = LinearLayoutManager(context, LinearLayoutManager.VERTICAL, false)
         binding.recyclerView.itemAnimator = SlideInUpAnimator()
-        //Recycler
-        itemsObjectsArray = ArrayList()
-        myRecycler = MainRecyclerAdapter(itemsObjectsArray, binding.recyclerView)
-        binding.recyclerView.adapter = myRecycler
 
-        //Database
-        database = LocalDatabase(context)
+        itemsObjectsArray = ArrayList()
+        myRecycler = MainRecyclerAdapter(itemsObjectsArray, binding.recyclerView, database)
+        binding.recyclerView.adapter = myRecycler
 
         //Get notes
         getAndSetNotes()
