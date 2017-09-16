@@ -1,25 +1,35 @@
 package app.note.simple.brulinski.sebastian.com.simplenoteapp
 
 import android.support.v7.widget.RecyclerView
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
 
 
-class MainRecyclerAdapter(var itemsHolder: ArrayList<ItemsHolder>) : RecyclerView.Adapter<MainRecyclerAdapter.ViewHolder>() {
+class MainRecyclerAdapter(var itemsHolder: ArrayList<ItemsHolder>, var recyclerView: RecyclerView) : RecyclerView.Adapter<MainRecyclerAdapter.ViewHolder>() {
 
     override fun onBindViewHolder(holder: ViewHolder?, position: Int) {
-        holder?.bindItems(itemsHolder.get(position))
+        val itemsHolder: ItemsHolder = itemsHolder[position]
 
-        holder?.itemView?.setOnClickListener {
+        holder?.title?.text = itemsHolder.title
+        holder?.note?.text = itemsHolder.note
 
+        holder?.itemView?.setOnClickListener{
+            val pos : Int = recyclerView.getChildAdapterPosition(holder?.itemView)
+        }
+
+        holder?.itemView?.setOnLongClickListener {
+            val pos : Int = recyclerView.getChildAdapterPosition(holder?.itemView)
+            this.itemsHolder.removeAt(pos)
+            notifyItemRemoved(pos)
+//            notifyDataSetChanged()
+            true
         }
     }
 
     override fun onCreateViewHolder(parent: ViewGroup?, viewType: Int): ViewHolder {
-        var view: View = LayoutInflater.from(parent?.context).inflate(R.layout.item_card, parent, false)
+        val view = LayoutInflater.from(parent?.context).inflate(R.layout.item_card, parent, false)
         return ViewHolder(view)
     }
 
@@ -29,12 +39,11 @@ class MainRecyclerAdapter(var itemsHolder: ArrayList<ItemsHolder>) : RecyclerVie
     }
 
     class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
+        val title = itemView.findViewById<TextView>(R.id.titleTextView)
+        val note = itemView.findViewById<TextView>(R.id.noteTextView)
+        fun a(){
 
-        fun bindItems(itemsHolder: ItemsHolder) {
-            val title = itemView.findViewById<TextView>(R.id.titleTextView)
-            val note = itemView.findViewById<TextView>(R.id.noteTextView)
-            title.text = itemsHolder.title
-            note.text = itemsHolder.note
         }
     }
+
 }

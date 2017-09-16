@@ -4,12 +4,14 @@ import android.database.Cursor
 import android.databinding.DataBindingUtil
 import android.os.Bundle
 import android.support.v4.app.Fragment
+import android.support.v7.widget.DefaultItemAnimator
 import android.support.v7.widget.LinearLayoutManager
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.databinding.NotesListFragmentBinding
+import jp.wasabeef.recyclerview.animators.SlideInUpAnimator
 
 
 /**
@@ -26,11 +28,11 @@ class NotesListFragment : Fragment() {
         binding = DataBindingUtil.inflate(inflater, R.layout.notes_list_fragment, container, false)
 
         binding.recyclerView.setHasFixedSize(true)
-        binding.recyclerView.layoutManager = LinearLayoutManager(context)
-
+        binding.recyclerView.layoutManager = LinearLayoutManager(context, LinearLayoutManager.VERTICAL, false)
+        binding.recyclerView.itemAnimator = SlideInUpAnimator()
         //Recycler
         itemsObjectsArray = ArrayList()
-        myRecycler = MainRecyclerAdapter(itemsObjectsArray)
+        myRecycler = MainRecyclerAdapter(itemsObjectsArray, binding.recyclerView)
         binding.recyclerView.adapter = myRecycler
 
         //Database
@@ -51,8 +53,6 @@ class NotesListFragment : Fragment() {
             while (data.moveToNext()) {
                 title = data.getString(1)
                 note = data.getString(2)
-
-                Log.i("getAndSetNotes", title + "\n" + note)
 
                 itemsObjectsArray.add(ItemsHolder(title, note))
             }
