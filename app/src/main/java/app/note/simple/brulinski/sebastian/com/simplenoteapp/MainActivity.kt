@@ -26,6 +26,8 @@ class MainActivity : AppCompatActivity() {
         var NOTE_LIST_FRAGMENT_TAG: String = "NOTES"
         var CREATE_NOTE_FRAGMENT_TAG: String = "CREATE"
         var EDIT_NOTE_FRAGMENT_TAG: String = "EDIT"
+        var menuItemGrid: MenuItem? = null
+        var menuItemLinear: MenuItem? = null
     }
 
 
@@ -110,6 +112,9 @@ class MainActivity : AppCompatActivity() {
         var menuInflater: MenuInflater = menuInflater
         menuInflater.inflate(R.menu.main_menu, menu)
 
+        menuItemGrid = menu!!.findItem(R.id.main_menu_grid)
+        menuItemLinear = menu!!.findItem(R.id.main_menu_linear)
+
         return super.onCreateOptionsMenu(menu)
     }
 
@@ -147,6 +152,13 @@ class MainActivity : AppCompatActivity() {
                 setEditNoteFragment(title, note)
             }
         })
+    }
+
+    fun setToolbarItemsVisibility(visible: Boolean) {
+        if(menuItemGrid != null && menuInflater != null){
+            menuItemGrid!!.setVisible(visible)
+            menuItemLinear!!.setVisible(visible)
+        }
     }
 }
 

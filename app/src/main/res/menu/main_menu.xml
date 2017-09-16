@@ -11,11 +11,11 @@
         android:id="@+id/main_menu_grid"
         android:title="Grid"
         app:showAsAction="always"
-        android:icon="@drawable/ic_grid_on_white_24dp"/>
+        android:icon="@drawable/ic_grid_on_black_24dp"/>
 
     <item
         android:id="@+id/main_menu_linear"
         android:title="Linear"
         app:showAsAction="always"
-        android:icon="@drawable/ic_view_headline_white_24dp"/>
+        android:icon="@drawable/ic_view_headline_black_24dp"/>
 </menu>

@@ -6,6 +6,7 @@ import android.os.Bundle
 import android.support.v4.app.Fragment
 import android.support.v7.widget.GridLayoutManager
 import android.support.v7.widget.LinearLayoutManager
+import android.support.v7.widget.StaggeredGridLayoutManager
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -46,6 +47,8 @@ class NotesListFragment : Fragment() {
 
         (activity as MainActivity).editItem(this)
 
+        (activity as MainActivity).setToolbarItemsVisibility(true)
+
         //Database
         database = LocalDatabase(context)
 
@@ -58,7 +61,7 @@ class NotesListFragment : Fragment() {
 
         if (flag)
             binding.recyclerView.layoutManager = LinearLayoutManager(context, LinearLayoutManager.VERTICAL, false)
-        else binding.recyclerView.layoutManager = GridLayoutManager(context, 2)
+        else binding.recyclerView.layoutManager = StaggeredGridLayoutManager(2, StaggeredGridLayoutManager.VERTICAL)
 
         binding.recyclerView.itemAnimator = SlideInUpAnimator()
 
