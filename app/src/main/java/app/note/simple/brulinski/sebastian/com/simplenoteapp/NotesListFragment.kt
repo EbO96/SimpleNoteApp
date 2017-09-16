@@ -5,7 +5,6 @@ import android.databinding.DataBindingUtil
 import android.os.Bundle
 import android.support.v4.app.Fragment
 import android.support.v7.widget.LinearLayoutManager
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -37,7 +36,11 @@ class NotesListFragment : Fragment() {
         binding = DataBindingUtil.inflate(inflater, R.layout.notes_list_fragment, container, false)
 
         CurrentFragmentState.CURRENT = MainActivity.NOTE_LIST_FRAGMENT_TAG
-        Log.i("abcd", "fragment " + CurrentFragmentState.CURRENT)
+
+        (activity as MainActivity).supportActionBar?.setTitle(getString(R.string.notes))
+
+        (activity as MainActivity).editItem(this)
+
         //Database
         database = LocalDatabase(context)
 

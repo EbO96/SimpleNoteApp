@@ -10,7 +10,9 @@ class EditNoteFragment : CreateNoteFragment() {
 
     override fun onStart() {
         CurrentFragmentState.CURRENT = MainActivity.EDIT_NOTE_FRAGMENT_TAG
-        Log.i("abcd", "fragment " + CurrentFragmentState.CURRENT)
+
+        (activity as MainActivity).supportActionBar?.setTitle(getString(R.string.edit))
+
         title = arguments.getString("title")
         note = arguments.getString("note")
 

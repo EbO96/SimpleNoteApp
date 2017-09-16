@@ -2,12 +2,10 @@ package app.note.simple.brulinski.sebastian.com.simplenoteapp
 
 import android.databinding.DataBindingUtil
 import android.os.Bundle
-import android.os.PersistableBundle
 import android.support.v4.app.Fragment
 import android.support.v4.app.FragmentManager
 import android.support.v4.app.FragmentTransaction
 import android.support.v7.app.AppCompatActivity
-import android.util.Log
 import android.view.Menu
 import android.view.MenuInflater
 import android.view.View
@@ -17,14 +15,13 @@ class MainActivity : AppCompatActivity() {
 
     lateinit var binding: ActivityMainBinding
 
-    lateinit var currentFragment: Fragment
     lateinit var fm: FragmentManager
     lateinit var ft: FragmentTransaction
+    lateinit var noteFragment: Fragment
 
     companion object {
         var NOTE_LIST_FRAGMENT_TAG: String = "NOTES"
         var CREATE_NOTE_FRAGMENT_TAG: String = "CREATE"
-        var CREATE_NOTE_FRAGMENT_DESTROY_TAG: String = "CREATE_DESTROYED"
         var EDIT_NOTE_FRAGMENT_TAG: String = "EDIT"
     }
 
@@ -32,7 +29,6 @@ class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = DataBindingUtil.setContentView(this, R.layout.activity_main)
-
         setSupportActionBar(binding.toolbar)
 
         binding.mainFab.setOnClickListener {
@@ -43,40 +39,33 @@ class MainActivity : AppCompatActivity() {
         if (savedInstanceState == null)
             setNotesListFragment()
 
-        supportFragmentManager.addOnBackStackChangedListener {
-            if (CurrentFragmentState.CURRENT.equals(CREATE_NOTE_FRAGMENT_DESTROY_TAG)){
-                setNotesListFragment()
-            }
-
-        }
     }
 
     fun setNotesListFragment() {
+        supportActionBar?.setTitle(getString(R.string.notes))
         binding.mainFab.visibility = View.VISIBLE
 
         fm = supportFragmentManager
         ft = fm.beginTransaction()
 
         val notesListFragment: NotesListFragment = NotesListFragment()
-        currentFragment = notesListFragment
-
+        noteFragment = notesListFragment
         ft.replace(binding.mainContainer.id, notesListFragment, NOTE_LIST_FRAGMENT_TAG)
         ft.addToBackStack(null)
         ft.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN)
         ft.commit()
         fm.executePendingTransactions()
 
-        editItem()
     }
 
     fun setCreateNoteFragment() {
+        supportActionBar?.setTitle(getString(R.string.create))
         binding.mainFab.visibility = View.GONE
 
         fm = supportFragmentManager
         ft = fm.beginTransaction()
 
         val createNoteFragment: CreateNoteFragment = CreateNoteFragment()
-        currentFragment = createNoteFragment
 
         ft.replace(binding.mainContainer.id, createNoteFragment, CREATE_NOTE_FRAGMENT_TAG)
         ft.addToBackStack(null)
@@ -86,6 +75,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     fun setEditNoteFragment(title: String, note: String) {
+        supportActionBar?.setTitle(getString(R.string.edit))
         binding.mainFab.visibility = View.GONE
         val args: Bundle = Bundle()
 
@@ -97,7 +87,6 @@ class MainActivity : AppCompatActivity() {
 
         val editNoteFragment = EditNoteFragment()
         editNoteFragment.arguments = args
-        currentFragment = editNoteFragment
 
         ft.replace(binding.mainContainer.id, editNoteFragment, EDIT_NOTE_FRAGMENT_TAG)
         ft.addToBackStack(null)
@@ -122,24 +111,12 @@ class MainActivity : AppCompatActivity() {
         } else setNotesListFragment()
     }
 
-    fun editItem() {
-        (currentFragment as NotesListFragment).setOnEditModeListener(object : NotesListFragment.OnEditModeListener {
+    fun editItem(frag: NotesListFragment) {
+        frag.setOnEditModeListener(object : NotesListFragment.OnEditModeListener {
             override fun switch(title: String, note: String) {
                 setEditNoteFragment(title, note)
             }
-
         })
-    }
-
-
-    override fun onSaveInstanceState(outState: Bundle?) {
-        super.onSaveInstanceState(outState)
-        Log.i("abcd", "onSave " + CurrentFragmentState.CURRENT)
-    }
-
-    override fun onRestoreInstanceState(savedInstanceState: Bundle?, persistentState: PersistableBundle?) {
-        super.onRestoreInstanceState(savedInstanceState, persistentState)
-        Log.i("abcd", "onRestore")
     }
 }
 

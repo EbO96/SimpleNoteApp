@@ -20,8 +20,11 @@ open class CreateNoteFragment : Fragment() {
 
     override fun onCreateView(inflater: LayoutInflater?, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         binding = DataBindingUtil.inflate(inflater, R.layout.create_note_fragment, container, false)
+
         CurrentFragmentState.CURRENT = MainActivity.CREATE_NOTE_FRAGMENT_TAG
-        Log.i("abcd", "fragment " + CurrentFragmentState.CURRENT)
+
+        (activity as MainActivity).supportActionBar?.setTitle(getString(R.string.create))
+
         //Database statement
         binding.createNoteFab.setOnClickListener {
             saveNote(binding.createNoteTitleField.text.toString(), binding.createNoteNoteField.text.toString())
