@@ -105,7 +105,6 @@ class MainActivity : AppCompatActivity() {
         ft.commit()
         fm.executePendingTransactions()
 
-        listenForFinishEdit()
     }
 
 
@@ -132,18 +131,6 @@ class MainActivity : AppCompatActivity() {
         })
     }
 
-    fun listenForFinishEdit() {
-        try {
-            (currentFragment as EditNoteFragment).setOnFinishEditListener(object : EditNoteFragment.OnFinishEditListener {
-                override fun OnFinish() {
-                    setNotesListFragment()
-                }
-            })
-        } catch (e: Exception) {
-            e.printStackTrace()
-        }
-
-    }
 
     override fun onSaveInstanceState(outState: Bundle?) {
         super.onSaveInstanceState(outState)

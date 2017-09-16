@@ -4,15 +4,6 @@ import android.util.Log
 
 class EditNoteFragment : CreateNoteFragment() {
 
-    lateinit var onFinishEditListener_: OnFinishEditListener
-
-    interface OnFinishEditListener {
-        fun OnFinish()
-    }
-
-    fun setOnFinishEditListener(onFinishEditListener: OnFinishEditListener) {
-        this.onFinishEditListener_ = onFinishEditListener
-    }
 
     lateinit var title: String
     lateinit var note: String
@@ -34,7 +25,7 @@ class EditNoteFragment : CreateNoteFragment() {
         binding.createNoteFab.setOnClickListener {
             database.updateRow(title, note, binding.createNoteTitleField.text.toString(),
                     binding.createNoteNoteField.text.toString())
-            onFinishEditListener_.OnFinish()
+            (activity as MainActivity).onBackPressed()
         }
     }
 }
