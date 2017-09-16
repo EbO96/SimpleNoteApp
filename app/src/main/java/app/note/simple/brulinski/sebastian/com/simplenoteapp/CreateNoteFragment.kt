@@ -13,31 +13,25 @@ import java.text.SimpleDateFormat
 import java.util.*
 
 
-class CreateNoteFragment : Fragment() {
-
+open class CreateNoteFragment : Fragment() {
 
     lateinit var binding: CreateNoteFragmentBinding
     lateinit var database: LocalDatabase
 
-    override fun onCreateView(inflater: LayoutInflater?, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        binding = DataBindingUtil.inflate(inflater, R.layout.create_note_fragment, container, false)
-
-        //Database statement
-        database = LocalDatabase(context)
-        return binding.root
+    companion object {
+        var stateSaved: Boolean = false
     }
 
-    override fun onViewCreated(view: View?, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
-
+    override fun onCreateView(inflater: LayoutInflater?, container: ViewGroup?, savedInstanceState: Bundle?): View? {
+        binding = DataBindingUtil.inflate(inflater, R.layout.create_note_fragment, container, false)
+        CurrentFragmentState.CURRENT = MainActivity.CREATE_NOTE_FRAGMENT_TAG
+        Log.i("abcd", "fragment " + CurrentFragmentState.CURRENT)
+        //Database statement
         binding.createNoteFab.setOnClickListener {
             saveNote(binding.createNoteTitleField.text.toString(), binding.createNoteNoteField.text.toString())
         }
-    }
-
-    override fun onDestroy() {
-        activity.supportFragmentManager.beginTransaction().setTransition(FragmentTransaction.TRANSIT_FRAGMENT_CLOSE).commit()
-        super.onDestroy()
+        database = LocalDatabase(context)
+        return binding.root
     }
 
     fun saveNote(title: String, note: String) {
@@ -50,4 +44,10 @@ class CreateNoteFragment : Fragment() {
         val df = SimpleDateFormat("yyyy-MM-dd 'at' HH:mm:ss a")
         return df.format(calendar.getTime())
     }
+
+    override fun onSaveInstanceState(outState: Bundle?) {
+        super.onSaveInstanceState(outState)
+        stateSaved = true
+    }
+
 }

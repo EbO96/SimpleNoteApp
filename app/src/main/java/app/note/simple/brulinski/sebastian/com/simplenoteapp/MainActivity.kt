@@ -2,10 +2,12 @@ package app.note.simple.brulinski.sebastian.com.simplenoteapp
 
 import android.databinding.DataBindingUtil
 import android.os.Bundle
+import android.os.PersistableBundle
 import android.support.v4.app.Fragment
 import android.support.v4.app.FragmentManager
 import android.support.v4.app.FragmentTransaction
 import android.support.v7.app.AppCompatActivity
+import android.util.Log
 import android.view.Menu
 import android.view.MenuInflater
 import android.view.View
@@ -14,9 +16,17 @@ import app.note.simple.brulinski.sebastian.com.simplenoteapp.databinding.Activit
 class MainActivity : AppCompatActivity() {
 
     lateinit var binding: ActivityMainBinding
-    lateinit var NOTE_LIST_FRAGMENT_TAG: String
-    lateinit var CREATE_NOTE_FRAGMENT_TAG: String
+
     lateinit var currentFragment: Fragment
+    lateinit var fm: FragmentManager
+    lateinit var ft: FragmentTransaction
+
+    companion object {
+        var NOTE_LIST_FRAGMENT_TAG: String = "NOTES"
+        var CREATE_NOTE_FRAGMENT_TAG: String = "CREATE"
+        var EDIT_NOTE_FRAGMENT_TAG: String = "EDIT"
+    }
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -24,47 +34,71 @@ class MainActivity : AppCompatActivity() {
 
         setSupportActionBar(binding.toolbar)
 
-        NOTE_LIST_FRAGMENT_TAG = "NOTES"
-        CREATE_NOTE_FRAGMENT_TAG = "CREATE"
-
         binding.mainFab.setOnClickListener {
             //Switch to add note fragment
-            if (currentFragment.equals(supportFragmentManager.findFragmentByTag(NOTE_LIST_FRAGMENT_TAG)))
-                setCreateNoteFragment()
+            setCreateNoteFragment()
         }
+
         if (savedInstanceState == null)
             setNotesListFragment()
-        else setCreateNoteFragment()
+
     }
 
 
     fun setNotesListFragment() {
         binding.mainFab.visibility = View.VISIBLE
-        val fm: FragmentManager = supportFragmentManager
-        val ft: FragmentTransaction = fm.beginTransaction()
+
+        fm = supportFragmentManager
+        ft = fm.beginTransaction()
+
         val notesListFragment: NotesListFragment = NotesListFragment()
         currentFragment = notesListFragment
+
         ft.replace(binding.mainContainer.id, notesListFragment, NOTE_LIST_FRAGMENT_TAG)
         ft.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN)
         ft.commit()
         fm.executePendingTransactions()
+
+        editItem()
     }
 
     fun setCreateNoteFragment() {
         binding.mainFab.visibility = View.GONE
-        val fm: FragmentManager = supportFragmentManager
-        val ft: FragmentTransaction = fm.beginTransaction()
-        var createNoteFragment: CreateNoteFragment = CreateNoteFragment()
+
+        fm = supportFragmentManager
+        ft = fm.beginTransaction()
+
+        val createNoteFragment: CreateNoteFragment = CreateNoteFragment()
         currentFragment = createNoteFragment
+
         ft.replace(binding.mainContainer.id, createNoteFragment, CREATE_NOTE_FRAGMENT_TAG)
         ft.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN)
         ft.commit()
         fm.executePendingTransactions()
     }
 
-    fun removeFragment(fragment: Fragment) {
-        supportFragmentManager.beginTransaction().remove(fragment).commitAllowingStateLoss()
+    fun setEditNoteFragment(title: String, note: String) {
+        binding.mainFab.visibility = View.GONE
+        val args: Bundle = Bundle()
+
+        args.putString("title", title)
+        args.putString("note", note)
+
+        fm = supportFragmentManager
+        ft = fm.beginTransaction()
+
+        val editNoteFragment = EditNoteFragment()
+        editNoteFragment.arguments = args
+        currentFragment = editNoteFragment
+
+        ft.replace(binding.mainContainer.id, editNoteFragment, EDIT_NOTE_FRAGMENT_TAG)
+        ft.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN)
+        ft.commit()
+        fm.executePendingTransactions()
+
+        listenForFinishEdit()
     }
+
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
         var menuInflater: MenuInflater = menuInflater
@@ -74,15 +108,42 @@ class MainActivity : AppCompatActivity() {
     }
 
     override fun onBackPressed() {
-        if (currentFragment.equals(supportFragmentManager.findFragmentByTag(NOTE_LIST_FRAGMENT_TAG))){
+        if (CurrentFragmentState.CURRENT.equals(NOTE_LIST_FRAGMENT_TAG)) {
             supportFragmentManager.beginTransaction().setTransition(FragmentTransaction.TRANSIT_FRAGMENT_CLOSE).commit()
             this.finish()
-        }
-        else setNotesListFragment()
+        } else setNotesListFragment()
     }
 
-    fun saveNote(title: String, note: String) {
+    fun editItem() {
+        (currentFragment as NotesListFragment).setOnEditModeListener(object : NotesListFragment.OnEditModeListener {
+            override fun switch(title: String, note: String) {
+                setEditNoteFragment(title, note)
+            }
 
+        })
+    }
+
+    fun listenForFinishEdit() {
+        try {
+            (currentFragment as EditNoteFragment).setOnFinishEditListener(object : EditNoteFragment.OnFinishEditListener {
+                override fun OnFinish() {
+                    setNotesListFragment()
+                }
+            })
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
+
+    }
+
+    override fun onSaveInstanceState(outState: Bundle?) {
+        super.onSaveInstanceState(outState)
+        Log.i("abcd", "onSave " + CurrentFragmentState.CURRENT)
+    }
+
+    override fun onRestoreInstanceState(savedInstanceState: Bundle?, persistentState: PersistableBundle?) {
+        super.onRestoreInstanceState(savedInstanceState, persistentState)
+        Log.i("abcd", "onRestore")
     }
 }
 

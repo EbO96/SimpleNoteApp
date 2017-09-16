@@ -4,7 +4,6 @@ import android.database.Cursor
 import android.databinding.DataBindingUtil
 import android.os.Bundle
 import android.support.v4.app.Fragment
-import android.support.v7.widget.DefaultItemAnimator
 import android.support.v7.widget.LinearLayoutManager
 import android.util.Log
 import android.view.LayoutInflater
@@ -24,9 +23,21 @@ class NotesListFragment : Fragment() {
     lateinit var myRecycler: MainRecyclerAdapter
     lateinit var database: LocalDatabase
 
+    lateinit var onEditModeListener_: OnEditModeListener
+
+    interface OnEditModeListener {
+        fun switch(title: String, note: String)
+    }
+
+    fun setOnEditModeListener(onEditModeListener: OnEditModeListener) {
+        this.onEditModeListener_ = onEditModeListener
+    }
+
     override fun onCreateView(inflater: LayoutInflater?, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         binding = DataBindingUtil.inflate(inflater, R.layout.notes_list_fragment, container, false)
 
+        CurrentFragmentState.CURRENT = MainActivity.NOTE_LIST_FRAGMENT_TAG
+        Log.i("abcd", "fragment " + CurrentFragmentState.CURRENT)
         //Database
         database = LocalDatabase(context)
 
@@ -41,6 +52,9 @@ class NotesListFragment : Fragment() {
 
         //Get notes
         getAndSetNotes()
+
+        //Edit note listener
+        editNote()
 
         return binding.root
     }
@@ -62,5 +76,13 @@ class NotesListFragment : Fragment() {
             myRecycler.notifyDataSetChanged()
 
         }
+    }
+
+    fun editNote() {
+        myRecycler.setOnEditItemListener(object : MainRecyclerAdapter.OnEditItemListener {
+            override fun itemDetails(title: String, note: String) {
+                onEditModeListener_.switch(title, note)
+            }
+        })
     }
 }

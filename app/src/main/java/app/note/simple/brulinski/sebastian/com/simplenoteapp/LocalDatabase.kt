@@ -52,4 +52,13 @@ class LocalDatabase(context: Context) : SQLiteOpenHelper(context, "note.db", nul
         val whereClause = "${TITLE}=? AND ${NOTE}=? AND ${DATE}=?"
         database.delete(TABLE, whereClause, arrayOf(title, note, date))
     }
+
+    fun updateRow(title: String, note: String, newTitle: String, newNote: String) {
+        val database: SQLiteDatabase = readableDatabase
+        val content: ContentValues = ContentValues()
+        val whereClause = "${TITLE}=? AND ${NOTE}=?"
+        content.put(TITLE, newTitle)
+        content.put(NOTE, newNote)
+        database.update(TABLE, content, whereClause, arrayOf(title, note))
+    }
 }

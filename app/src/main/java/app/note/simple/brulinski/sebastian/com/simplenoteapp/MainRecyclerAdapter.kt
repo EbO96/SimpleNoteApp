@@ -9,6 +9,15 @@ import android.widget.TextView
 
 class MainRecyclerAdapter(var itemsHolder: ArrayList<ItemsHolder>, var recyclerView: RecyclerView, var database: LocalDatabase) : RecyclerView.Adapter<MainRecyclerAdapter.ViewHolder>() {
 
+    lateinit var onEditItemListener_: OnEditItemListener
+
+    interface OnEditItemListener {
+        fun itemDetails(title: String, note: String)
+    }
+
+    fun setOnEditItemListener(onEditItemListener: OnEditItemListener) {
+        this.onEditItemListener_ = onEditItemListener
+    }
 
     override fun onBindViewHolder(holder: ViewHolder?, position: Int) {
         val itemsHolder: ItemsHolder = itemsHolder[position]
@@ -16,8 +25,15 @@ class MainRecyclerAdapter(var itemsHolder: ArrayList<ItemsHolder>, var recyclerV
         holder?.title?.text = itemsHolder.title
         holder?.note?.text = itemsHolder.note
 
+        var pos: Int
+
+        holder?.itemView?.setOnClickListener {
+            pos = recyclerView.getChildAdapterPosition(holder.itemView)
+            onEditItemListener_.itemDetails(this.itemsHolder.get(pos).title, this.itemsHolder.get(pos).note)
+        }
+
         holder?.itemView?.setOnLongClickListener {
-            val pos: Int = recyclerView.getChildAdapterPosition(holder.itemView)
+            pos = recyclerView.getChildAdapterPosition(holder.itemView)
 
             database.deleteRow(this.itemsHolder.get(pos).title, this.itemsHolder.get(pos).note, this.itemsHolder.get(pos).date)
 
