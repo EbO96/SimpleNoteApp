@@ -1,6 +1,5 @@
 package app.note.simple.brulinski.sebastian.com.simplenoteapp
 
-import android.os.Bundle
 import android.util.Log
 
 class EditNoteFragment : CreateNoteFragment() {

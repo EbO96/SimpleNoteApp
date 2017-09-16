@@ -1,6 +1,5 @@
 package app.note.simple.brulinski.sebastian.com.simplenoteapp
 
-import android.app.FragmentTransaction
 import android.databinding.DataBindingUtil
 import android.os.Bundle
 import android.support.v4.app.Fragment
@@ -18,9 +17,6 @@ open class CreateNoteFragment : Fragment() {
     lateinit var binding: CreateNoteFragmentBinding
     lateinit var database: LocalDatabase
 
-    companion object {
-        var stateSaved: Boolean = false
-    }
 
     override fun onCreateView(inflater: LayoutInflater?, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         binding = DataBindingUtil.inflate(inflater, R.layout.create_note_fragment, container, false)
@@ -29,6 +25,7 @@ open class CreateNoteFragment : Fragment() {
         //Database statement
         binding.createNoteFab.setOnClickListener {
             saveNote(binding.createNoteTitleField.text.toString(), binding.createNoteNoteField.text.toString())
+            (activity as MainActivity).onBackPressed()
         }
         database = LocalDatabase(context)
         return binding.root
@@ -43,11 +40,6 @@ open class CreateNoteFragment : Fragment() {
 
         val df = SimpleDateFormat("yyyy-MM-dd 'at' HH:mm:ss a")
         return df.format(calendar.getTime())
-    }
-
-    override fun onSaveInstanceState(outState: Bundle?) {
-        super.onSaveInstanceState(outState)
-        stateSaved = true
     }
 
 }

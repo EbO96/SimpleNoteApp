@@ -24,6 +24,7 @@ class MainActivity : AppCompatActivity() {
     companion object {
         var NOTE_LIST_FRAGMENT_TAG: String = "NOTES"
         var CREATE_NOTE_FRAGMENT_TAG: String = "CREATE"
+        var CREATE_NOTE_FRAGMENT_DESTROY_TAG: String = "CREATE_DESTROYED"
         var EDIT_NOTE_FRAGMENT_TAG: String = "EDIT"
     }
 
@@ -42,8 +43,13 @@ class MainActivity : AppCompatActivity() {
         if (savedInstanceState == null)
             setNotesListFragment()
 
-    }
+        supportFragmentManager.addOnBackStackChangedListener {
+            if (CurrentFragmentState.CURRENT.equals(CREATE_NOTE_FRAGMENT_DESTROY_TAG)){
+                setNotesListFragment()
+            }
 
+        }
+    }
 
     fun setNotesListFragment() {
         binding.mainFab.visibility = View.VISIBLE
@@ -55,6 +61,7 @@ class MainActivity : AppCompatActivity() {
         currentFragment = notesListFragment
 
         ft.replace(binding.mainContainer.id, notesListFragment, NOTE_LIST_FRAGMENT_TAG)
+        ft.addToBackStack(null)
         ft.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN)
         ft.commit()
         fm.executePendingTransactions()
@@ -72,6 +79,7 @@ class MainActivity : AppCompatActivity() {
         currentFragment = createNoteFragment
 
         ft.replace(binding.mainContainer.id, createNoteFragment, CREATE_NOTE_FRAGMENT_TAG)
+        ft.addToBackStack(null)
         ft.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN)
         ft.commit()
         fm.executePendingTransactions()
@@ -92,6 +100,7 @@ class MainActivity : AppCompatActivity() {
         currentFragment = editNoteFragment
 
         ft.replace(binding.mainContainer.id, editNoteFragment, EDIT_NOTE_FRAGMENT_TAG)
+        ft.addToBackStack(null)
         ft.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN)
         ft.commit()
         fm.executePendingTransactions()
