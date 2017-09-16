@@ -2,6 +2,7 @@ package app.note.simple.brulinski.sebastian.com.simplenoteapp
 
 import android.content.ContentValues
 import android.content.Context
+import android.database.Cursor
 import android.database.sqlite.SQLiteDatabase
 import android.database.sqlite.SQLiteOpenHelper
 
@@ -36,5 +37,13 @@ class LocalDatabase(context: Context) : SQLiteOpenHelper(context, "note.db", nul
 
         database.insert(TABLE, null, content)
         database.close()
+    }
+
+    fun getAllNotes(): Cursor {
+        val database: SQLiteDatabase = readableDatabase
+        val query = "SELECT * FROM ${TABLE}"
+        val notes: Cursor = database.rawQuery(query, null)
+
+        return notes
     }
 }

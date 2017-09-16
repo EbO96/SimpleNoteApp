@@ -31,9 +31,6 @@ class MainActivity : AppCompatActivity() {
             //Switch to add note fragment
             if (currentFragment.equals(supportFragmentManager.findFragmentByTag(NOTE_LIST_FRAGMENT_TAG)))
                 setCreateNoteFragment()
-            else {
-
-            }
         }
         if (savedInstanceState == null)
             setNotesListFragment()
@@ -85,6 +82,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     fun saveNote(title: String, note: String) {
+
     }
 }
 

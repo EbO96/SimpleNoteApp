@@ -1,16 +1,21 @@
 package app.note.simple.brulinski.sebastian.com.simplenoteapp
 
 import android.support.v7.widget.RecyclerView
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
 
+
 class MainRecyclerAdapter(var itemsHolder: ArrayList<ItemsHolder>) : RecyclerView.Adapter<MainRecyclerAdapter.ViewHolder>() {
 
     override fun onBindViewHolder(holder: ViewHolder?, position: Int) {
-        holder!!.titleText.text = itemsHolder.get(position).title
-        holder!!.noteText.text = itemsHolder.get(position).note
+        holder?.bindItems(itemsHolder.get(position))
+
+        holder?.itemView?.setOnClickListener {
+
+        }
     }
 
     override fun onCreateViewHolder(parent: ViewGroup?, viewType: Int): ViewHolder {
@@ -18,16 +23,18 @@ class MainRecyclerAdapter(var itemsHolder: ArrayList<ItemsHolder>) : RecyclerVie
         return ViewHolder(view)
     }
 
+
     override fun getItemCount(): Int {
         return itemsHolder.size
     }
 
-    class ViewHolder(view: View) : RecyclerView.ViewHolder(view) {
-        val titleText: TextView = view.findViewById(R.id.titleTextView)
-        val noteText: TextView = view.findViewById(R.id.noteTextView)
+    class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
 
-        init {
-
+        fun bindItems(itemsHolder: ItemsHolder) {
+            val title = itemView.findViewById<TextView>(R.id.titleTextView)
+            val note = itemView.findViewById<TextView>(R.id.noteTextView)
+            title.text = itemsHolder.title
+            note.text = itemsHolder.note
         }
     }
 }
