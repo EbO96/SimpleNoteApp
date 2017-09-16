@@ -75,6 +75,9 @@ class NotesListFragment : Fragment() {
         //Edit note listener
         editNote()
 
+        //Deleted items listener
+        listenDeletedItems()
+
         return binding.root
     }
 
@@ -113,4 +116,13 @@ class NotesListFragment : Fragment() {
         super.onSaveInstanceState(outState)
         outState?.putBoolean("flag", flag)
     }
+
+    fun listenDeletedItems(){
+        myRecycler.setOnDeleteItemListener(object : MainRecyclerAdapter.OnDeleteItemListener{
+            override fun deletedItemDetails(title: String, note: String, date: String) {
+
+            }
+        })
+    }
+    
 }

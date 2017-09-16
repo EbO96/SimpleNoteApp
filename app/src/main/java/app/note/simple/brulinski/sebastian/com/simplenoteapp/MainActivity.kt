@@ -1,6 +1,8 @@
 package app.note.simple.brulinski.sebastian.com.simplenoteapp
 
+import android.app.Activity
 import android.content.Context
+import android.content.Intent
 import android.content.SharedPreferences
 import android.databinding.DataBindingUtil
 import android.os.Bundle
@@ -128,6 +130,9 @@ class MainActivity : AppCompatActivity() {
                 saveLayoutManagerStyle(true)
                 setNotesListFragment(true, true)
             }
+            R.id.main_menu_settings -> {
+                navigate<SettingsActivity>("")
+            }
         }
         return super.onOptionsItemSelected(item)
     }
@@ -159,6 +164,12 @@ class MainActivity : AppCompatActivity() {
             menuItemGrid!!.setVisible(visible)
             menuItemLinear!!.setVisible(visible)
         }
+    }
+
+    inline fun <reified T : Activity> Activity.navigate(id: String) {
+        val intent = Intent(this, T::class.java)
+        intent.putExtra("id", id)
+        startActivity(intent)
     }
 }
 

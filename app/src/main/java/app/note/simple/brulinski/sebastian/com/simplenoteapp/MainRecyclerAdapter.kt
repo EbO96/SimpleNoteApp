@@ -19,6 +19,17 @@ class MainRecyclerAdapter(var itemsHolder: ArrayList<ItemsHolder>, var recyclerV
         this.onEditItemListener_ = onEditItemListener
     }
 
+    lateinit var onDeleteItemListener_: OnDeleteItemListener
+
+    interface OnDeleteItemListener {
+        fun deletedItemDetails(title: String, note: String, date: String)
+    }
+
+    fun setOnDeleteItemListener(onDeleteItemListener: OnDeleteItemListener) {
+        this.onDeleteItemListener_ = onDeleteItemListener
+    }
+
+
     override fun onBindViewHolder(holder: ViewHolder?, position: Int) {
         val itemsHolder: ItemsHolder = itemsHolder[position]
 
@@ -35,8 +46,13 @@ class MainRecyclerAdapter(var itemsHolder: ArrayList<ItemsHolder>, var recyclerV
         holder?.itemView?.setOnLongClickListener {
             pos = recyclerView.getChildAdapterPosition(holder.itemView)
 
-            database.deleteRow(this.itemsHolder.get(pos).title, this.itemsHolder.get(pos).note, this.itemsHolder.get(pos).date)
+            val title: String = this.itemsHolder.get(pos).title
+            val note: String = this.itemsHolder.get(pos).note
+            val date: String = this.itemsHolder.get(pos).date
 
+            database.deleteRow(title, note, date)
+
+            onDeleteItemListener_.deletedItemDetails(title, note, date)
             this.itemsHolder.removeAt(pos)
             notifyItemRemoved(pos)
             true
