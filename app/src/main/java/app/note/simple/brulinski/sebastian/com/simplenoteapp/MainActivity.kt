@@ -16,7 +16,7 @@ class MainActivity : AppCompatActivity() {
     lateinit var binding: ActivityMainBinding
     lateinit var NOTE_LIST_FRAGMENT_TAG: String
     lateinit var CREATE_NOTE_FRAGMENT_TAG: String
-    lateinit var currentFragment : Fragment
+    lateinit var currentFragment: Fragment
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -27,21 +27,29 @@ class MainActivity : AppCompatActivity() {
         NOTE_LIST_FRAGMENT_TAG = "NOTES"
         CREATE_NOTE_FRAGMENT_TAG = "CREATE"
 
-        setNotesListFragment()
-
         binding.mainFab.setOnClickListener {
             //Switch to add note fragment
-            setCreateNoteFragment()
+            if (currentFragment.equals(supportFragmentManager.findFragmentByTag(NOTE_LIST_FRAGMENT_TAG)))
+                setCreateNoteFragment()
+            else {
+
+            }
         }
+        if (savedInstanceState == null)
+            setNotesListFragment()
+        else setCreateNoteFragment()
     }
+
 
     fun setNotesListFragment() {
         binding.mainFab.visibility = View.VISIBLE
         val fm: FragmentManager = supportFragmentManager
         val ft: FragmentTransaction = fm.beginTransaction()
-        var notesListFragment: NotesListFragment = NotesListFragment()
+        val notesListFragment: NotesListFragment = NotesListFragment()
         currentFragment = notesListFragment
-        ft.replace(binding.mainContainer.id, notesListFragment, NOTE_LIST_FRAGMENT_TAG).commit()
+        ft.replace(binding.mainContainer.id, notesListFragment, NOTE_LIST_FRAGMENT_TAG)
+        ft.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN)
+        ft.commit()
         fm.executePendingTransactions()
     }
 
@@ -51,7 +59,9 @@ class MainActivity : AppCompatActivity() {
         val ft: FragmentTransaction = fm.beginTransaction()
         var createNoteFragment: CreateNoteFragment = CreateNoteFragment()
         currentFragment = createNoteFragment
-        ft.replace(binding.mainContainer.id, createNoteFragment, CREATE_NOTE_FRAGMENT_TAG).commit()
+        ft.replace(binding.mainContainer.id, createNoteFragment, CREATE_NOTE_FRAGMENT_TAG)
+        ft.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN)
+        ft.commit()
         fm.executePendingTransactions()
     }
 
@@ -67,9 +77,14 @@ class MainActivity : AppCompatActivity() {
     }
 
     override fun onBackPressed() {
-        if(currentFragment.equals(supportFragmentManager.findFragmentByTag(NOTE_LIST_FRAGMENT_TAG)))
+        if (currentFragment.equals(supportFragmentManager.findFragmentByTag(NOTE_LIST_FRAGMENT_TAG))){
+            supportFragmentManager.beginTransaction().setTransition(FragmentTransaction.TRANSIT_FRAGMENT_CLOSE).commit()
             this.finish()
+        }
         else setNotesListFragment()
+    }
+
+    fun saveNote(title: String, note: String) {
     }
 }
 
