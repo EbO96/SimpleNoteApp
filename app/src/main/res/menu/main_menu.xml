@@ -6,4 +6,16 @@
         android:id="@+id/main_menu_settings"
         android:title="@string/settings"
         app:showAsAction="never"/>
+
+    <item
+        android:id="@+id/main_menu_grid"
+        android:title="Grid"
+        app:showAsAction="always"
+        android:icon="@drawable/ic_grid_on_white_24dp"/>
+
+    <item
+        android:id="@+id/main_menu_linear"
+        android:title="Linear"
+        app:showAsAction="always"
+        android:icon="@drawable/ic_view_headline_white_24dp"/>
 </menu>

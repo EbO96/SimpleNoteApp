@@ -4,6 +4,7 @@ import android.database.Cursor
 import android.databinding.DataBindingUtil
 import android.os.Bundle
 import android.support.v4.app.Fragment
+import android.support.v7.widget.GridLayoutManager
 import android.support.v7.widget.LinearLayoutManager
 import android.view.LayoutInflater
 import android.view.View
@@ -21,6 +22,10 @@ class NotesListFragment : Fragment() {
     lateinit var itemsObjectsArray: ArrayList<ItemsHolder>
     lateinit var myRecycler: MainRecyclerAdapter
     lateinit var database: LocalDatabase
+
+    companion object {
+        var flag: Boolean = true
+    }
 
     lateinit var onEditModeListener_: OnEditModeListener
 
@@ -46,7 +51,15 @@ class NotesListFragment : Fragment() {
 
         //Recycler
         binding.recyclerView.setHasFixedSize(true)
-        binding.recyclerView.layoutManager = LinearLayoutManager(context, LinearLayoutManager.VERTICAL, false)
+
+        if (savedInstanceState == null)
+            flag = arguments.getBoolean("flag", true)
+        else flag = savedInstanceState.getBoolean("flag")
+
+        if (flag)
+            binding.recyclerView.layoutManager = LinearLayoutManager(context, LinearLayoutManager.VERTICAL, false)
+        else binding.recyclerView.layoutManager = GridLayoutManager(context, 2)
+
         binding.recyclerView.itemAnimator = SlideInUpAnimator()
 
         itemsObjectsArray = ArrayList()
@@ -60,6 +73,10 @@ class NotesListFragment : Fragment() {
         editNote()
 
         return binding.root
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
     }
 
     fun getAndSetNotes() {
@@ -87,5 +104,10 @@ class NotesListFragment : Fragment() {
                 onEditModeListener_.switch(title, note)
             }
         })
+    }
+
+    override fun onSaveInstanceState(outState: Bundle?) {
+        super.onSaveInstanceState(outState)
+        outState?.putBoolean("flag", flag)
     }
 }

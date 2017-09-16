@@ -1,5 +1,7 @@
 package app.note.simple.brulinski.sebastian.com.simplenoteapp
 
+import android.content.Context
+import android.content.SharedPreferences
 import android.databinding.DataBindingUtil
 import android.os.Bundle
 import android.support.v4.app.Fragment
@@ -8,6 +10,7 @@ import android.support.v4.app.FragmentTransaction
 import android.support.v7.app.AppCompatActivity
 import android.view.Menu
 import android.view.MenuInflater
+import android.view.MenuItem
 import android.view.View
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.databinding.ActivityMainBinding
 
@@ -36,12 +39,16 @@ class MainActivity : AppCompatActivity() {
             setCreateNoteFragment()
         }
 
-        if (savedInstanceState == null)
-            setNotesListFragment()
-
+        if (savedInstanceState == null){
+            val sharedPref: SharedPreferences = this.getPreferences(Context.MODE_PRIVATE)
+            val flag: Boolean = sharedPref.getBoolean(getString(R.string.layout_manager_key), true)
+            setNotesListFragment(flag, false)
+        }
     }
 
-    fun setNotesListFragment() {
+    fun setNotesListFragment(flag: Boolean, changeLayoutManager: Boolean) {
+        val args: Bundle = Bundle()
+        args.putBoolean("flag", flag)
         supportActionBar?.setTitle(getString(R.string.notes))
         binding.mainFab.visibility = View.VISIBLE
 
@@ -49,10 +56,12 @@ class MainActivity : AppCompatActivity() {
         ft = fm.beginTransaction()
 
         val notesListFragment: NotesListFragment = NotesListFragment()
+        notesListFragment.arguments = args
         noteFragment = notesListFragment
         ft.replace(binding.mainContainer.id, notesListFragment, NOTE_LIST_FRAGMENT_TAG)
         ft.addToBackStack(null)
-        ft.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN)
+        if(!changeLayoutManager)
+            ft.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN)
         ft.commit()
         fm.executePendingTransactions()
 
@@ -104,11 +113,31 @@ class MainActivity : AppCompatActivity() {
         return super.onCreateOptionsMenu(menu)
     }
 
+    override fun onOptionsItemSelected(item: MenuItem?): Boolean {
+        when (item?.itemId) {
+            R.id.main_menu_grid -> {
+                val sharedPref: SharedPreferences = this.getPreferences(Context.MODE_PRIVATE)
+                val editor: SharedPreferences.Editor = sharedPref.edit()
+                editor.putBoolean(getString(R.string.layout_manager_key), false)
+                editor.apply()
+                setNotesListFragment(false, true)
+            }
+            R.id.main_menu_linear -> {
+                val sharedPref: SharedPreferences = this.getPreferences(Context.MODE_PRIVATE)
+                val editor: SharedPreferences.Editor = sharedPref.edit()
+                editor.putBoolean(getString(R.string.layout_manager_key), true)
+                editor.apply()
+                setNotesListFragment(true, true)
+            }
+        }
+        return super.onOptionsItemSelected(item)
+    }
+
     override fun onBackPressed() {
         if (CurrentFragmentState.CURRENT.equals(NOTE_LIST_FRAGMENT_TAG)) {
             supportFragmentManager.beginTransaction().setTransition(FragmentTransaction.TRANSIT_FRAGMENT_CLOSE).commit()
             this.finish()
-        } else setNotesListFragment()
+        } else setNotesListFragment(NotesListFragment.flag, false)
     }
 
     fun editItem(frag: NotesListFragment) {
