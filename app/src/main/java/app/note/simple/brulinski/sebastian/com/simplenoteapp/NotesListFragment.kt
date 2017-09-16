@@ -49,13 +49,15 @@ class NotesListFragment : Fragment() {
         val data: Cursor = database.getAllNotes()
         var title: String
         var note: String
+        var date: String
 
         if (data.count > 0) {
             while (data.moveToNext()) {
                 title = data.getString(1)
                 note = data.getString(2)
+                date = data.getString(3)
 
-                itemsObjectsArray.add(ItemsHolder(title, note))
+                itemsObjectsArray.add(ItemsHolder(title, note, date))
             }
             myRecycler.notifyDataSetChanged()
 

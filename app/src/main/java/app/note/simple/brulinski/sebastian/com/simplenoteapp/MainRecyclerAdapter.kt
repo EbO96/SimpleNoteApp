@@ -19,7 +19,7 @@ class MainRecyclerAdapter(var itemsHolder: ArrayList<ItemsHolder>, var recyclerV
         holder?.itemView?.setOnLongClickListener {
             val pos: Int = recyclerView.getChildAdapterPosition(holder.itemView)
 
-            database.deleteRow(this.itemsHolder.get(pos).title, this.itemsHolder.get(pos).note)
+            database.deleteRow(this.itemsHolder.get(pos).title, this.itemsHolder.get(pos).note, this.itemsHolder.get(pos).date)
 
             this.itemsHolder.removeAt(pos)
             notifyItemRemoved(pos)

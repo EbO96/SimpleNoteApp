@@ -9,6 +9,9 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.databinding.CreateNoteFragmentBinding
+import java.text.SimpleDateFormat
+import java.util.*
+
 
 class CreateNoteFragment : Fragment() {
 
@@ -38,7 +41,13 @@ class CreateNoteFragment : Fragment() {
     }
 
     fun saveNote(title: String, note: String) {
-        Log.i("saveNote", title+"\n"+note)
-        database.addNote(title, note, "")
+        database.addNote(title, note, getCurrentDateAndTime())
+    }
+
+    fun getCurrentDateAndTime(): String { //Get current time from system
+        val calendar = Calendar.getInstance()
+
+        val df = SimpleDateFormat("yyyy-MM-dd 'at' HH:mm:ss a")
+        return df.format(calendar.getTime())
     }
 }

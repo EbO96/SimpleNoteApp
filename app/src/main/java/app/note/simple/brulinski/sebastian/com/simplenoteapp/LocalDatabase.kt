@@ -47,9 +47,9 @@ class LocalDatabase(context: Context) : SQLiteOpenHelper(context, "note.db", nul
         return notes
     }
 
-    fun deleteRow(title: String, note: String) {
+    fun deleteRow(title: String, note: String, date: String) {
         val database: SQLiteDatabase = writableDatabase
-        val whereClause = "${TITLE}=? AND ${NOTE}=?"
-        database.delete(TABLE, whereClause, arrayOf(title, note))
+        val whereClause = "${TITLE}=? AND ${NOTE}=? AND ${DATE}=?"
+        database.delete(TABLE, whereClause, arrayOf(title, note, date))
     }
 }

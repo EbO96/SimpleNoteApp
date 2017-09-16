@@ -7,6 +7,7 @@ class ItemsHolder {
 
     var title: String = ""
     var note: String = ""
+    var date: String = ""
 
 
         get() = field
@@ -14,8 +15,9 @@ class ItemsHolder {
             field = value
         }
 
-    constructor(title: String, note: String) {
+    constructor(title: String, note: String, date: String) {
         this.title = title
         this.note = note
+        this.date = date
     }
 }
