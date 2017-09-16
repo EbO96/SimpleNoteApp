@@ -35,7 +35,7 @@ open class CreateNoteFragment : Fragment() {
     }
 
     fun saveNote(title: String, note: String) {
-        database.addNote(title, note, getCurrentDateAndTime())
+        database.addNote(title.trim(), note.trim(), getCurrentDateAndTime())
     }
 
     fun getCurrentDateAndTime(): String { //Get current time from system

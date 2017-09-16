@@ -39,7 +39,7 @@ class MainActivity : AppCompatActivity() {
             setCreateNoteFragment()
         }
 
-        if (savedInstanceState == null){
+        if (savedInstanceState == null) {
             val sharedPref: SharedPreferences = this.getPreferences(Context.MODE_PRIVATE)
             val flag: Boolean = sharedPref.getBoolean(getString(R.string.layout_manager_key), true)
             setNotesListFragment(flag, false)
@@ -60,7 +60,7 @@ class MainActivity : AppCompatActivity() {
         noteFragment = notesListFragment
         ft.replace(binding.mainContainer.id, notesListFragment, NOTE_LIST_FRAGMENT_TAG)
         ft.addToBackStack(null)
-        if(!changeLayoutManager)
+        if (!changeLayoutManager)
             ft.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN)
         ft.commit()
         fm.executePendingTransactions()
@@ -116,21 +116,22 @@ class MainActivity : AppCompatActivity() {
     override fun onOptionsItemSelected(item: MenuItem?): Boolean {
         when (item?.itemId) {
             R.id.main_menu_grid -> {
-                val sharedPref: SharedPreferences = this.getPreferences(Context.MODE_PRIVATE)
-                val editor: SharedPreferences.Editor = sharedPref.edit()
-                editor.putBoolean(getString(R.string.layout_manager_key), false)
-                editor.apply()
+                saveLayoutManagerStyle(false)
                 setNotesListFragment(false, true)
             }
             R.id.main_menu_linear -> {
-                val sharedPref: SharedPreferences = this.getPreferences(Context.MODE_PRIVATE)
-                val editor: SharedPreferences.Editor = sharedPref.edit()
-                editor.putBoolean(getString(R.string.layout_manager_key), true)
-                editor.apply()
+                saveLayoutManagerStyle(true)
                 setNotesListFragment(true, true)
             }
         }
         return super.onOptionsItemSelected(item)
+    }
+
+    fun saveLayoutManagerStyle(flag: Boolean) {
+        val sharedPref: SharedPreferences = this.getPreferences(Context.MODE_PRIVATE)
+        val editor: SharedPreferences.Editor = sharedPref.edit()
+        editor.putBoolean(getString(R.string.layout_manager_key), flag)
+        editor.apply()
     }
 
     override fun onBackPressed() {
