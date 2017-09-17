@@ -12,7 +12,7 @@ class MainRecyclerAdapter(var itemsHolder: ArrayList<ItemsHolder>, var recyclerV
     lateinit var onEditItemListener_: OnEditItemListener
 
     interface OnEditItemListener {
-        fun itemDetails(title: String, note: String)
+        fun itemDetails(title: String, note: String, position: Int)
     }
 
     fun setOnEditItemListener(onEditItemListener: OnEditItemListener) {
@@ -37,9 +37,9 @@ class MainRecyclerAdapter(var itemsHolder: ArrayList<ItemsHolder>, var recyclerV
         var note = itemsHolder.note
 
         if(title.length > 30)
-            title = title.substring(0, 30)
+            title = title.substring(0, 30) + "..."
         if(note.length > 260)
-            note = note.substring(0, 260)
+            note = note.substring(0, 260) +"..."
 
         holder?.title?.text = title
         holder?.note?.text = note
@@ -48,7 +48,7 @@ class MainRecyclerAdapter(var itemsHolder: ArrayList<ItemsHolder>, var recyclerV
 
         holder?.itemView?.setOnClickListener {
             pos = recyclerView.getChildAdapterPosition(holder.itemView)
-            onEditItemListener_.itemDetails(this.itemsHolder.get(pos).title, this.itemsHolder.get(pos).note)
+            onEditItemListener_.itemDetails(this.itemsHolder.get(pos).title, this.itemsHolder.get(pos).note, pos)
         }
 
         holder?.itemView?.setOnLongClickListener {

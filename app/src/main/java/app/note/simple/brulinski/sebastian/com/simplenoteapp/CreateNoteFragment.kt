@@ -40,11 +40,12 @@ open class CreateNoteFragment : Fragment() {
         database.addNote(title.trim(), note.trim(), getCurrentDateAndTime())
     }
 
-    fun getCurrentDateAndTime(): String { //Get current time from system
-        val calendar = Calendar.getInstance()
+    companion object {
+        fun getCurrentDateAndTime(): String { //Get current time from system
+            val calendar = Calendar.getInstance()
 
-        val df = SimpleDateFormat("yyyy-MM-dd 'at' HH:mm:ss a")
-        return df.format(calendar.getTime())
+            val df = SimpleDateFormat("yyyy-MM-dd 'at' HH:mm:ss a")
+            return df.format(calendar.getTime())
+        }
     }
-
 }

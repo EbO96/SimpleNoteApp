@@ -4,15 +4,14 @@ import android.database.Cursor
 import android.databinding.DataBindingUtil
 import android.os.Bundle
 import android.support.v4.app.Fragment
-import android.support.v7.widget.GridLayoutManager
 import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.StaggeredGridLayoutManager
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.databinding.NotesListFragmentBinding
 import jp.wasabeef.recyclerview.animators.SlideInUpAnimator
+import java.text.FieldPosition
 
 
 /**
@@ -32,7 +31,7 @@ class NotesListFragment : Fragment() {
     lateinit var onEditModeListener_: OnEditModeListener
 
     interface OnEditModeListener {
-        fun switch(title: String, note: String)
+        fun switch(title: String, note: String, position: Int)
     }
 
     fun setOnEditModeListener(onEditModeListener: OnEditModeListener) {
@@ -79,6 +78,9 @@ class NotesListFragment : Fragment() {
         //Deleted items listener
         listenDeletedItems()
 
+        //Listen for update
+        updateNoteList()
+
         return binding.root
     }
 
@@ -107,8 +109,8 @@ class NotesListFragment : Fragment() {
 
     fun editNote() {
         myRecycler.setOnEditItemListener(object : MainRecyclerAdapter.OnEditItemListener {
-            override fun itemDetails(title: String, note: String) {
-                onEditModeListener_.switch(title, note)
+            override fun itemDetails(title: String, note: String, position: Int) {
+                onEditModeListener_.switch(title, note, position)
             }
         })
     }
@@ -118,12 +120,21 @@ class NotesListFragment : Fragment() {
         outState?.putBoolean("flag", flag)
     }
 
-    fun listenDeletedItems(){
-        myRecycler.setOnDeleteItemListener(object : MainRecyclerAdapter.OnDeleteItemListener{
+    fun listenDeletedItems() {
+        myRecycler.setOnDeleteItemListener(object : MainRecyclerAdapter.OnDeleteItemListener {
             override fun deletedItemDetails(title: String, note: String, date: String) {
 
             }
         })
     }
-    
+
+    fun updateNoteList() {
+        (activity as MainActivity).setOnUpdateListListener(object : MainActivity.OnUpdateListListener {
+            override fun passData(title: String, note: String, position: Int) {
+                itemsObjectsArray.removeAt(position)
+                itemsObjectsArray.add(ItemsHolder(title, note, CreateNoteFragment.getCurrentDateAndTime()))
+                myRecycler.notifyDataSetChanged()
+            }
+        })
+    }
 }

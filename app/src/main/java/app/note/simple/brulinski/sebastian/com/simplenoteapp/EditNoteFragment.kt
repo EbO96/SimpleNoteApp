@@ -1,9 +1,16 @@
 package app.note.simple.brulinski.sebastian.com.simplenoteapp
 
-import android.util.Log
-
 class EditNoteFragment : CreateNoteFragment() {
 
+    lateinit var mSaveListener: OnSaveNoteListener
+
+    interface OnSaveNoteListener {
+        fun passData(title: String, note: String)
+    }
+
+    fun setOnSaveListener(mSaveListener: OnSaveNoteListener) {
+        this.mSaveListener = mSaveListener
+    }
 
     lateinit var title: String
     lateinit var note: String
@@ -30,7 +37,11 @@ class EditNoteFragment : CreateNoteFragment() {
         binding.createNoteFab.setOnClickListener {
             database.updateRow(title, note, binding.createNoteTitleField.text.toString(),
                     binding.createNoteNoteField.text.toString())
-            (activity as MainActivity).onBackPressed()
+            if (resources.getBoolean(R.bool.twoPaneMode))
+                mSaveListener.passData(binding.createNoteTitleField.text.toString(),
+                    binding.createNoteNoteField.text.toString())
+            else
+                (activity as MainActivity).onBackPressed()
         }
     }
 

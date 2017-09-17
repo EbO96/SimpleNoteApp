@@ -13,6 +13,7 @@ import android.view.MenuInflater
 import android.view.MenuItem
 import android.view.View
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.databinding.ActivityMainBinding
+import java.text.FieldPosition
 
 class MainActivity : AppCompatActivity() {
 
@@ -30,6 +31,16 @@ class MainActivity : AppCompatActivity() {
         var menuItemGrid: MenuItem? = null
         var menuItemLinear: MenuItem? = null
         var twoPaneMode: Boolean = false
+    }
+
+    lateinit var mUpdateListener: OnUpdateListListener
+
+    interface OnUpdateListListener {
+        fun passData(title: String, note: String, position: Int)
+    }
+
+    fun setOnUpdateListListener(mUpdateListener: OnUpdateListListener) {
+        this.mUpdateListener = mUpdateListener
     }
 
 
@@ -90,7 +101,7 @@ class MainActivity : AppCompatActivity() {
         fm.executePendingTransactions()
     }
 
-    fun setEditNoteFragment(title: String, note: String) {
+    fun setEditNoteFragment(title: String, note: String, position: Int) {
         supportActionBar?.setTitle(getString(R.string.edit))
         binding.mainFab.visibility = View.GONE
         val args: Bundle = Bundle()
@@ -116,9 +127,11 @@ class MainActivity : AppCompatActivity() {
         ft.commit()
         fm.executePendingTransactions()
 
+        listenEndOfEditing(editNoteFragment, position)
+
     }
 
-    private fun setNotePreviewFragment(title: String, note: String) {
+    private fun setNotePreviewFragment(title: String, note: String, position: Int) {
         binding.mainFab.visibility = View.GONE
 
         val args: Bundle = Bundle()
@@ -132,9 +145,12 @@ class MainActivity : AppCompatActivity() {
         ft = fm.beginTransaction()
 
         ft.replace(binding.mainContainerDetails!!.id, previewFragment, NOTE_PREVIEW_FRAGMENT_TAG)
+        ft.addToBackStack(NOTE_PREVIEW_FRAGMENT_TAG)
         ft.commit()
 
         fm.executePendingTransactions()
+
+        listenEditMode(previewFragment, position)
     }
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
@@ -180,10 +196,10 @@ class MainActivity : AppCompatActivity() {
 
     fun editItem(frag: NotesListFragment) {
         frag.setOnEditModeListener(object : NotesListFragment.OnEditModeListener {
-            override fun switch(title: String, note: String) {
+            override fun switch(title: String, note: String, position: Int) {
                 if (twoPaneMode)
-                    setNotePreviewFragment(title, note)
-                else setEditNoteFragment(title, note)
+                    setNotePreviewFragment(title, note, position)
+                else setEditNoteFragment(title, note, position)
             }
         })
     }
@@ -199,6 +215,22 @@ class MainActivity : AppCompatActivity() {
             menuItemGrid!!.setVisible(flag)
             menuItemLinear!!.setVisible(flag)
         }
+    }
+
+    fun listenEditMode(frag: NotePreviewFragment, position: Int) {
+        frag.setOnEditNoteListener(object : NotePreviewFragment.OnEditNoteListener {
+            override fun passData(title: String, note: String) {
+                setEditNoteFragment(title, note, position)
+            }
+        })
+    }
+
+    fun listenEndOfEditing(frag: EditNoteFragment, position: Int) {
+        frag.setOnSaveListener(object : EditNoteFragment.OnSaveNoteListener {
+            override fun passData(title: String, note: String) {
+                mUpdateListener.passData(title, note, position)
+            }
+        })
     }
 }
 

@@ -10,11 +10,20 @@ import app.note.simple.brulinski.sebastian.com.simplenoteapp.databinding.NotePre
 
 class NotePreviewFragment : Fragment() {
 
+    lateinit var mListener: OnEditNoteListener
+
+    interface OnEditNoteListener {
+        fun passData(title: String, note: String)
+    }
+
+    fun setOnEditNoteListener(mListener: OnEditNoteListener) {
+        this.mListener = mListener
+    }
+
     lateinit var binding: NotePreviewFragmentBinding
 
     override fun onCreateView(inflater: LayoutInflater?, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         binding = DataBindingUtil.inflate(inflater, R.layout.note_preview_fragment, container, false)
-
 
         return binding.root
     }
@@ -22,11 +31,14 @@ class NotePreviewFragment : Fragment() {
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
 
-        binding.previewTitleField.text = arguments.getString("title")
-        binding.previewNoteField.text = arguments.getString("note")
+        val title = arguments.getString("title")
+        val note = arguments.getString("note")
+
+        binding.previewTitleField.text = title
+        binding.previewNoteField.text = note
 
         binding.previewFab.setOnClickListener {
-
+            mListener.passData(title, note)
         }
     }
 
