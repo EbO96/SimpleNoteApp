@@ -52,7 +52,8 @@ class NotesListFragment : Fragment() {
 
         CurrentFragmentState.CURRENT = MainActivity.NOTE_LIST_FRAGMENT_TAG
 
-        (activity as MainActivity).supportActionBar?.setTitle(getString(R.string.notes))
+        if (!resources.getBoolean(R.bool.twoPaneMode))
+            (activity as MainActivity).supportActionBar?.setTitle(getString(R.string.notes))
 
         //Database
         database = LocalDatabase(context)
@@ -89,7 +90,7 @@ class NotesListFragment : Fragment() {
         listenDeletedItems()
 
         //Change layout manager
-        (activity as MainActivity).setOnChangeLayoutListener(object : MainActivity.OnChangeLayoutListener{
+        (activity as MainActivity).setOnChangeLayoutListener(object : MainActivity.OnChangeLayoutListener {
             override fun passData(flag: Boolean) {
                 if (flag)
                     binding.recyclerView.layoutManager = LinearLayoutManager(context, LinearLayoutManager.VERTICAL, false)

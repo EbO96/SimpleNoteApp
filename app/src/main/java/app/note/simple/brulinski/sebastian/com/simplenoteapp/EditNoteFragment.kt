@@ -18,14 +18,15 @@ class EditNoteFragment : CreateNoteFragment() {
     override fun onStart() {
         CurrentFragmentState.CURRENT = MainActivity.EDIT_NOTE_FRAGMENT_TAG
 
-        (activity as MainActivity).supportActionBar?.setTitle(getString(R.string.edit))
+        if (!resources.getBoolean(R.bool.twoPaneMode))
+            (activity as MainActivity).supportActionBar?.setTitle(getString(R.string.edit))
 
 
         title = arguments.getString("title")
         note = arguments.getString("note")
 
-        binding.createNoteTitleField.setText(title)
-        binding.createNoteNoteField.setText(note)
+        bindingFrag.createNoteTitleField.setText(title)
+        bindingFrag.createNoteNoteField.setText(note)
 
         fabListener()
 
@@ -33,12 +34,12 @@ class EditNoteFragment : CreateNoteFragment() {
     }
 
     fun fabListener() {
-        binding.createNoteFab.setOnClickListener {
-            database.updateRow(title, note, binding.createNoteTitleField.text.toString(),
-                    binding.createNoteNoteField.text.toString())
+        bindingFrag.createNoteFab.setOnClickListener {
+            database.updateRow(title, note, bindingFrag.createNoteTitleField.text.toString(),
+                    bindingFrag.createNoteNoteField.text.toString())
             if (resources.getBoolean(R.bool.twoPaneMode))
-                mSaveListener.passData(binding.createNoteTitleField.text.toString(),
-                    binding.createNoteNoteField.text.toString())
+                mSaveListener.passData(bindingFrag.createNoteTitleField.text.toString(),
+                        bindingFrag.createNoteNoteField.text.toString())
             else
                 (activity as MainActivity).onBackPressed()
         }

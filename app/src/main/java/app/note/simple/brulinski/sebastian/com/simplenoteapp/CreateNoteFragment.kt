@@ -15,30 +15,33 @@ import java.util.*
 
 open class CreateNoteFragment : Fragment() {
 
-    lateinit var binding: CreateNoteFragmentBinding
+    lateinit var bindingFrag: CreateNoteFragmentBinding
     lateinit var database: LocalDatabase
 
 
     override fun onCreateView(inflater: LayoutInflater?, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        binding = DataBindingUtil.inflate(inflater, R.layout.create_note_fragment, container, false)
+        bindingFrag = DataBindingUtil.inflate(inflater, R.layout.create_note_fragment, container, false)
 
         CurrentFragmentState.CURRENT = MainActivity.CREATE_NOTE_FRAGMENT_TAG
 
-        (activity as MainActivity).supportActionBar?.setTitle(getString(R.string.create))
+        if (!resources.getBoolean(R.bool.twoPaneMode))
+            (activity as MainActivity).supportActionBar?.setTitle(getString(R.string.create))
+
 
 
         //Database statement
-        binding.createNoteFab.setOnClickListener {
-            if (!TextUtils.isEmpty(binding.createNoteTitleField.text.toString().trim()) || !TextUtils.isEmpty(binding.createNoteNoteField.text.toString().trim()))
-                saveNote(binding.createNoteTitleField.text.toString(), binding.createNoteNoteField.text.toString())
+        bindingFrag.createNoteFab.setOnClickListener {
+            if (!TextUtils.isEmpty(bindingFrag.createNoteTitleField.text.toString().trim()) || !TextUtils.isEmpty(bindingFrag.createNoteNoteField.text.toString().trim()))
+                saveNote(bindingFrag.createNoteTitleField.text.toString(), bindingFrag.createNoteNoteField.text.toString())
 
             (activity as MainActivity).setNotesListFragment(activity.getPreferences(Activity.MODE_PRIVATE).getBoolean(getString(R.string.layout_manager_key), false), false)
-            if(resources.getBoolean(R.bool.twoPaneMode))
+            if (resources.getBoolean(R.bool.twoPaneMode))
                 (activity as MainActivity).binding.mainFab.visibility = View.GONE
             else (activity as MainActivity).binding.mainFab.visibility = View.VISIBLE
         }
         database = LocalDatabase(context)
-        return binding.root
+
+        return bindingFrag.root
     }
 
     fun saveNote(title: String, note: String) {
@@ -54,3 +57,5 @@ open class CreateNoteFragment : Fragment() {
         }
     }
 }
+
+

@@ -80,7 +80,6 @@ class MainActivity : AppCompatActivity() {
 
         val args: Bundle = Bundle()
         args.putBoolean("flag", flag)
-        supportActionBar?.setTitle(getString(R.string.notes))
         binding.mainFab.visibility = View.VISIBLE
 
         fm = supportFragmentManager
@@ -114,14 +113,12 @@ class MainActivity : AppCompatActivity() {
         ft.replace(binding.mainContainer.id, createNoteFragment, CREATE_NOTE_FRAGMENT_TAG)
         ft.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN)
         ft.commit()
-        //fm.executePendingTransactions()
     }
 
     fun setEditNoteFragment(title: String, note: String, position: Int) {
         if (!twoPaneMode)
             requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
 
-        supportActionBar?.setTitle(getString(R.string.edit))
         binding.mainFab.visibility = View.GONE
         val args: Bundle = Bundle()
 
@@ -144,7 +141,6 @@ class MainActivity : AppCompatActivity() {
             ft.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN)
 
         ft.commit()
-        //fm.executePendingTransactions()
 
         listenEndOfEditing(editNoteFragment, position)
 
@@ -165,8 +161,6 @@ class MainActivity : AppCompatActivity() {
 
         ft.replace(binding.mainContainerDetails!!.id, previewFragment, NOTE_PREVIEW_FRAGMENT_TAG)
         ft.commit()
-
-        //fm.executePendingTransactions()
 
         listenEditMode(previewFragment, position)
     }
@@ -204,8 +198,11 @@ class MainActivity : AppCompatActivity() {
 
             }
             R.id.main_menu_create_note -> {
-                if (!CurrentFragmentState.CURRENT.equals(CREATE_NOTE_FRAGMENT_TAG))
+                if (!CurrentFragmentState.CURRENT.equals(CREATE_NOTE_FRAGMENT_TAG)) {
                     setCreateNoteFragment()
+                    binding.mainFab.visibility = View.GONE
+                }
+
             }
         }
         return super.onOptionsItemSelected(item)
@@ -220,12 +217,7 @@ class MainActivity : AppCompatActivity() {
 
     override fun onBackPressed() {
         if (CurrentFragmentState.CURRENT.equals(NOTE_LIST_FRAGMENT_TAG) || twoPaneMode) {
-            if (twoPaneMode) {
-                //TODO
-            } else {
-                supportFragmentManager.beginTransaction().setTransition(FragmentTransaction.TRANSIT_FRAGMENT_CLOSE).commit()
-                this.finish()
-            }
+            this.finish()
         } else setNotesListFragment(NotesListFragment.flag, false)
     }
 
