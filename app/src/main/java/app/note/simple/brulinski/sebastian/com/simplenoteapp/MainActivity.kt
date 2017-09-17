@@ -66,7 +66,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     fun setNotesListFragment(flag: Boolean, changeLayoutManager: Boolean) {
-        requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_SENSOR
+        requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_USER
         val args: Bundle = Bundle()
         args.putBoolean("flag", flag)
         supportActionBar?.setTitle(getString(R.string.notes))
