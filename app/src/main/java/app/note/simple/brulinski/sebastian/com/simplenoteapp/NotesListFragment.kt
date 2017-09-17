@@ -7,6 +7,7 @@ import android.support.v4.app.Fragment
 import android.support.v7.widget.GridLayoutManager
 import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.StaggeredGridLayoutManager
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -77,6 +78,7 @@ class NotesListFragment : Fragment() {
 
         //Deleted items listener
         listenDeletedItems()
+        Log.i("fragState", "Notes" + this.isVisible.toString())
 
         return binding.root
     }

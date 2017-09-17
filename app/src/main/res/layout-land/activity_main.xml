@@ -22,7 +22,7 @@
 
         <FrameLayout
             android:id="@+id/main_container"
-            android:layout_width="match_parent"
+            android:layout_width="280dp"
             android:layout_height="match_parent"
             android:layout_marginTop="?attr/actionBarSize" />
 
@@ -30,6 +30,7 @@
             android:id="@+id/main_container_details"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
+            android:layout_toRightOf="@id/main_container"
             android:layout_marginTop="?attr/actionBarSize" />
 
         <com.getbase.floatingactionbutton.FloatingActionButton

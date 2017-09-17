@@ -8,7 +8,6 @@ import android.support.v4.app.Fragment
 import android.support.v4.app.FragmentManager
 import android.support.v4.app.FragmentTransaction
 import android.support.v7.app.AppCompatActivity
-import android.util.Log
 import android.view.Menu
 import android.view.MenuInflater
 import android.view.MenuItem
@@ -29,6 +28,7 @@ class MainActivity : AppCompatActivity() {
         var EDIT_NOTE_FRAGMENT_TAG: String = "EDIT"
         var menuItemGrid: MenuItem? = null
         var menuItemLinear: MenuItem? = null
+        var twoPaneMode: Boolean = false
     }
 
 
@@ -42,15 +42,13 @@ class MainActivity : AppCompatActivity() {
             setCreateNoteFragment()
         }
 
-        val twoPaneMode = resources.getBoolean(R.bool.twoPaneMode)
+        twoPaneMode = resources.getBoolean(R.bool.twoPaneMode)
 
-        //TODO detect screen orientation #twoPaneMode
         if (savedInstanceState == null) {
             val sharedPref: SharedPreferences = this.getPreferences(Context.MODE_PRIVATE)
             val flag: Boolean = sharedPref.getBoolean(getString(R.string.layout_manager_key), true)
             setNotesListFragment(flag, false)
         }
-
 
     }
 
@@ -67,9 +65,10 @@ class MainActivity : AppCompatActivity() {
         notesListFragment.arguments = args
         noteFragment = notesListFragment
         ft.replace(binding.mainContainer.id, notesListFragment, NOTE_LIST_FRAGMENT_TAG)
-        ft.addToBackStack(null)
-        if (!changeLayoutManager)
+
+        if (!changeLayoutManager || !twoPaneMode)
             ft.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN)
+
         ft.commit()
         fm.executePendingTransactions()
 
@@ -85,7 +84,6 @@ class MainActivity : AppCompatActivity() {
         val createNoteFragment: CreateNoteFragment = CreateNoteFragment()
 
         ft.replace(binding.mainContainer.id, createNoteFragment, CREATE_NOTE_FRAGMENT_TAG)
-        ft.addToBackStack(null)
         ft.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN)
         ft.commit()
         fm.executePendingTransactions()
@@ -105,9 +103,15 @@ class MainActivity : AppCompatActivity() {
         val editNoteFragment = EditNoteFragment()
         editNoteFragment.arguments = args
 
-        ft.replace(binding.mainContainer.id, editNoteFragment, EDIT_NOTE_FRAGMENT_TAG)
-        ft.addToBackStack(null)
-        ft.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN)
+        var containerId = binding.mainContainer.id
+        if (twoPaneMode)
+            containerId = binding.mainContainerDetails!!.id
+
+        ft.replace(containerId, editNoteFragment, EDIT_NOTE_FRAGMENT_TAG)
+
+        if (!twoPaneMode)
+            ft.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN)
+
         ft.commit()
         fm.executePendingTransactions()
 
@@ -164,9 +168,14 @@ class MainActivity : AppCompatActivity() {
     }
 
     fun setToolbarItemsVisibility(visible: Boolean) {
+        var flag = visible
+
+        if (twoPaneMode)
+            flag = twoPaneMode
+
         if (menuItemGrid != null && menuInflater != null) {
-            menuItemGrid!!.setVisible(visible)
-            menuItemLinear!!.setVisible(visible)
+            menuItemGrid!!.setVisible(flag)
+            menuItemLinear!!.setVisible(flag)
         }
     }
 }
