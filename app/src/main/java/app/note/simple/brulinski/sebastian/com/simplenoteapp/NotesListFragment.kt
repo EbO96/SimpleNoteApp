@@ -11,7 +11,6 @@ import android.view.View
 import android.view.ViewGroup
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.databinding.NotesListFragmentBinding
 import jp.wasabeef.recyclerview.animators.SlideInUpAnimator
-import java.text.FieldPosition
 
 
 /**
@@ -36,6 +35,16 @@ class NotesListFragment : Fragment() {
 
     fun setOnEditModeListener(onEditModeListener: OnEditModeListener) {
         this.onEditModeListener_ = onEditModeListener
+    }
+
+    lateinit var mClear: OnClearPreviewList
+
+    interface OnClearPreviewList {
+        fun clear()
+    }
+
+    fun setOnClearPreviewList(mClear: OnClearPreviewList) {
+        this.mClear = mClear
     }
 
     override fun onCreateView(inflater: LayoutInflater?, container: ViewGroup?, savedInstanceState: Bundle?): View? {
@@ -68,15 +77,25 @@ class NotesListFragment : Fragment() {
         //Get notes
         getAndSetNotes()
         (activity as MainActivity).editItem(this)
+        (activity as MainActivity).clearPreviewList(this)
 
         //Edit note listener
         editNote()
 
+        //Listen for update
+        updateNoteList()
+
         //Deleted items listener
         listenDeletedItems()
 
-        //Listen for update
-        updateNoteList()
+        //Change layout manager
+        (activity as MainActivity).setOnChangeLayoutListener(object : MainActivity.OnChangeLayoutListener{
+            override fun passData(flag: Boolean) {
+                if (flag)
+                    binding.recyclerView.layoutManager = LinearLayoutManager(context, LinearLayoutManager.VERTICAL, false)
+                else binding.recyclerView.layoutManager = StaggeredGridLayoutManager(2, StaggeredGridLayoutManager.VERTICAL)
+            }
+        })
 
         return binding.root
     }
@@ -120,7 +139,7 @@ class NotesListFragment : Fragment() {
     fun listenDeletedItems() {
         myRecycler.setOnDeleteItemListener(object : MainRecyclerAdapter.OnDeleteItemListener {
             override fun deletedItemDetails(title: String, note: String, date: String) {
-
+                mClear.clear()
             }
         })
     }

@@ -9,6 +9,7 @@ import android.support.v4.app.Fragment
 import android.support.v4.app.FragmentManager
 import android.support.v4.app.FragmentTransaction
 import android.support.v7.app.AppCompatActivity
+import android.util.Log
 import android.view.Menu
 import android.view.MenuInflater
 import android.view.MenuItem
@@ -44,6 +45,15 @@ class MainActivity : AppCompatActivity() {
         this.mUpdateListener = mUpdateListener
     }
 
+    lateinit var mLayoutListener: OnChangeLayoutListener
+
+    interface OnChangeLayoutListener {
+        fun passData(flag: Boolean)
+    }
+
+    fun setOnChangeLayoutListener(mLayoutListener: OnChangeLayoutListener) {
+        this.mLayoutListener = mLayoutListener
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -67,6 +77,7 @@ class MainActivity : AppCompatActivity() {
 
     fun setNotesListFragment(flag: Boolean, changeLayoutManager: Boolean) {
         requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_USER
+
         val args: Bundle = Bundle()
         args.putBoolean("flag", flag)
         supportActionBar?.setTitle(getString(R.string.notes))
@@ -153,7 +164,6 @@ class MainActivity : AppCompatActivity() {
         ft = fm.beginTransaction()
 
         ft.replace(binding.mainContainerDetails!!.id, previewFragment, NOTE_PREVIEW_FRAGMENT_TAG)
-        ft.addToBackStack(NOTE_PREVIEW_FRAGMENT_TAG)
         ft.commit()
 
         //fm.executePendingTransactions()
@@ -184,17 +194,18 @@ class MainActivity : AppCompatActivity() {
         when (item?.itemId) {
             R.id.main_menu_grid -> {
                 saveLayoutManagerStyle(false)
-                setNotesListFragment(false, true)
+                mLayoutListener.passData(false)
             }
             R.id.main_menu_linear -> {
                 saveLayoutManagerStyle(true)
-                setNotesListFragment(true, true)
+                mLayoutListener.passData(true)
             }
             R.id.main_menu_settings -> {
 
             }
             R.id.main_menu_create_note -> {
-
+                if (!CurrentFragmentState.CURRENT.equals(CREATE_NOTE_FRAGMENT_TAG))
+                    setCreateNoteFragment()
             }
         }
         return super.onOptionsItemSelected(item)
@@ -209,8 +220,12 @@ class MainActivity : AppCompatActivity() {
 
     override fun onBackPressed() {
         if (CurrentFragmentState.CURRENT.equals(NOTE_LIST_FRAGMENT_TAG) || twoPaneMode) {
-            supportFragmentManager.beginTransaction().setTransition(FragmentTransaction.TRANSIT_FRAGMENT_CLOSE).commit()
-            this.finish()
+            if (twoPaneMode) {
+                //TODO
+            } else {
+                supportFragmentManager.beginTransaction().setTransition(FragmentTransaction.TRANSIT_FRAGMENT_CLOSE).commit()
+                this.finish()
+            }
         } else setNotesListFragment(NotesListFragment.flag, false)
     }
 
@@ -240,8 +255,25 @@ class MainActivity : AppCompatActivity() {
         frag.setOnSaveListener(object : EditNoteFragment.OnSaveNoteListener {
             override fun passData(title: String, note: String) {
                 mUpdateListener.passData(title, note, position)
+                setNotePreviewFragment(title, note, position)
             }
         })
+    }
+
+    fun clearPreviewList(frag: NotesListFragment) {
+        frag.setOnClearPreviewList(object : NotesListFragment.OnClearPreviewList {
+            override fun clear() {
+                Log.i("clear", "cleared")
+                val fragment = supportFragmentManager.findFragmentByTag(NOTE_PREVIEW_FRAGMENT_TAG)
+                if (fragment != null && fragment.isVisible)
+                    supportFragmentManager.beginTransaction().remove(fragment).commitNow()
+
+            }
+        })
+    }
+
+    fun changeRecyclerLayout() {
+
     }
 }
 

@@ -1,9 +1,10 @@
 package app.note.simple.brulinski.sebastian.com.simplenoteapp
 
+import android.app.Activity
 import android.databinding.DataBindingUtil
 import android.os.Bundle
 import android.support.v4.app.Fragment
-import android.util.Log
+import android.text.TextUtils
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -28,8 +29,13 @@ open class CreateNoteFragment : Fragment() {
 
         //Database statement
         binding.createNoteFab.setOnClickListener {
-            saveNote(binding.createNoteTitleField.text.toString(), binding.createNoteNoteField.text.toString())
-            (activity as MainActivity).onBackPressed()
+            if (!TextUtils.isEmpty(binding.createNoteTitleField.text.toString().trim()) || !TextUtils.isEmpty(binding.createNoteNoteField.text.toString().trim()))
+                saveNote(binding.createNoteTitleField.text.toString(), binding.createNoteNoteField.text.toString())
+
+            (activity as MainActivity).setNotesListFragment(activity.getPreferences(Activity.MODE_PRIVATE).getBoolean(getString(R.string.layout_manager_key), false), false)
+            if(resources.getBoolean(R.bool.twoPaneMode))
+                (activity as MainActivity).binding.mainFab.visibility = View.GONE
+            else (activity as MainActivity).binding.mainFab.visibility = View.VISIBLE
         }
         database = LocalDatabase(context)
         return binding.root
