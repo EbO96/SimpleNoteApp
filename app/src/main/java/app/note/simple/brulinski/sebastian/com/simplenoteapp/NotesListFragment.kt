@@ -78,7 +78,6 @@ class NotesListFragment : Fragment() {
 
         //Deleted items listener
         listenDeletedItems()
-        Log.i("fragState", "Notes" + this.isVisible.toString())
 
         return binding.root
     }

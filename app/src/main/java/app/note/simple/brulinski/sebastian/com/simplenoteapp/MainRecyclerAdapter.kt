@@ -33,8 +33,16 @@ class MainRecyclerAdapter(var itemsHolder: ArrayList<ItemsHolder>, var recyclerV
     override fun onBindViewHolder(holder: ViewHolder?, position: Int) {
         val itemsHolder: ItemsHolder = itemsHolder[position]
 
-        holder?.title?.text = itemsHolder.title
-        holder?.note?.text = itemsHolder.note
+        var title = itemsHolder.title
+        var note = itemsHolder.note
+
+        if(title.length > 30)
+            title = title.substring(0, 30)
+        if(note.length > 260)
+            note = note.substring(0, 260)
+
+        holder?.title?.text = title
+        holder?.note?.text = note
 
         var pos: Int
 

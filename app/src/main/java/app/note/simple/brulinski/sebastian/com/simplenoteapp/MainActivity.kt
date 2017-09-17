@@ -26,6 +26,7 @@ class MainActivity : AppCompatActivity() {
         var NOTE_LIST_FRAGMENT_TAG: String = "NOTES"
         var CREATE_NOTE_FRAGMENT_TAG: String = "CREATE"
         var EDIT_NOTE_FRAGMENT_TAG: String = "EDIT"
+        var NOTE_PREVIEW_FRAGMENT_TAG: String = "PREVIEW"
         var menuItemGrid: MenuItem? = null
         var menuItemLinear: MenuItem? = null
         var twoPaneMode: Boolean = false
@@ -117,6 +118,24 @@ class MainActivity : AppCompatActivity() {
 
     }
 
+    private fun setNotePreviewFragment(title: String, note: String) {
+        binding.mainFab.visibility = View.GONE
+
+        val args: Bundle = Bundle()
+        args.putString("title", title)
+        args.putString("note", note)
+
+        val previewFragment = NotePreviewFragment()
+        previewFragment.arguments = args
+
+        fm = supportFragmentManager
+        ft = fm.beginTransaction()
+
+        ft.replace(binding.mainContainerDetails!!.id, previewFragment, NOTE_PREVIEW_FRAGMENT_TAG)
+        ft.commit()
+
+        fm.executePendingTransactions()
+    }
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
         var menuInflater: MenuInflater = menuInflater
@@ -153,7 +172,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     override fun onBackPressed() {
-        if (CurrentFragmentState.CURRENT.equals(NOTE_LIST_FRAGMENT_TAG)) {
+        if (CurrentFragmentState.CURRENT.equals(NOTE_LIST_FRAGMENT_TAG) || twoPaneMode) {
             supportFragmentManager.beginTransaction().setTransition(FragmentTransaction.TRANSIT_FRAGMENT_CLOSE).commit()
             this.finish()
         } else setNotesListFragment(NotesListFragment.flag, false)
@@ -162,10 +181,13 @@ class MainActivity : AppCompatActivity() {
     fun editItem(frag: NotesListFragment) {
         frag.setOnEditModeListener(object : NotesListFragment.OnEditModeListener {
             override fun switch(title: String, note: String) {
-                setEditNoteFragment(title, note)
+                if (twoPaneMode)
+                    setNotePreviewFragment(title, note)
+                else setEditNoteFragment(title, note)
             }
         })
     }
+
 
     fun setToolbarItemsVisibility(visible: Boolean) {
         var flag = visible

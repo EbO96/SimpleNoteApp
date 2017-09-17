@@ -22,7 +22,7 @@ class EditNoteFragment : CreateNoteFragment() {
         binding.createNoteNoteField.setText(note)
 
         fabListener()
-        Log.i("fragState", "Edit" + this.isVisible.toString())
+
         super.onStart()
     }
 
@@ -33,4 +33,5 @@ class EditNoteFragment : CreateNoteFragment() {
             (activity as MainActivity).onBackPressed()
         }
     }
+
 }
