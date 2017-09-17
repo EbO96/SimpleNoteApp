@@ -8,6 +8,12 @@
         app:showAsAction="never"/>
 
     <item
+        android:id="@+id/main_menu_create_note"
+        android:title="Create note"
+        app:showAsAction="always"
+        android:icon="@drawable/ic_add_black_24dp"/>
+
+    <item
         android:id="@+id/main_menu_grid"
         android:title="Grid"
         app:showAsAction="always"
@@ -18,4 +24,5 @@
         android:title="Linear"
         app:showAsAction="always"
         android:icon="@drawable/ic_view_headline_black_24dp"/>
+
 </menu>

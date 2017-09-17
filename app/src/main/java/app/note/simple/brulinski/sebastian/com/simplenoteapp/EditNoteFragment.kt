@@ -20,7 +20,6 @@ class EditNoteFragment : CreateNoteFragment() {
 
         (activity as MainActivity).supportActionBar?.setTitle(getString(R.string.edit))
 
-        (activity as MainActivity).setToolbarItemsVisibility(false)
 
         title = arguments.getString("title")
         note = arguments.getString("note")

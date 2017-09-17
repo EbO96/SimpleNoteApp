@@ -25,7 +25,6 @@ open class CreateNoteFragment : Fragment() {
 
         (activity as MainActivity).supportActionBar?.setTitle(getString(R.string.create))
 
-        (activity as MainActivity).setToolbarItemsVisibility(false)
 
         //Database statement
         binding.createNoteFab.setOnClickListener {

@@ -30,6 +30,7 @@ class MainActivity : AppCompatActivity() {
         var NOTE_PREVIEW_FRAGMENT_TAG: String = "PREVIEW"
         var menuItemGrid: MenuItem? = null
         var menuItemLinear: MenuItem? = null
+        var menuItemCreateNote: MenuItem? = null
         var twoPaneMode: Boolean = false
     }
 
@@ -102,7 +103,7 @@ class MainActivity : AppCompatActivity() {
         ft.replace(binding.mainContainer.id, createNoteFragment, CREATE_NOTE_FRAGMENT_TAG)
         ft.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN)
         ft.commit()
-        fm.executePendingTransactions()
+        //fm.executePendingTransactions()
     }
 
     fun setEditNoteFragment(title: String, note: String, position: Int) {
@@ -132,7 +133,7 @@ class MainActivity : AppCompatActivity() {
             ft.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN)
 
         ft.commit()
-        fm.executePendingTransactions()
+        //fm.executePendingTransactions()
 
         listenEndOfEditing(editNoteFragment, position)
 
@@ -155,7 +156,7 @@ class MainActivity : AppCompatActivity() {
         ft.addToBackStack(NOTE_PREVIEW_FRAGMENT_TAG)
         ft.commit()
 
-        fm.executePendingTransactions()
+        //fm.executePendingTransactions()
 
         listenEditMode(previewFragment, position)
     }
@@ -166,6 +167,15 @@ class MainActivity : AppCompatActivity() {
 
         menuItemGrid = menu!!.findItem(R.id.main_menu_grid)
         menuItemLinear = menu!!.findItem(R.id.main_menu_linear)
+        menuItemCreateNote = menu!!.findItem(R.id.main_menu_create_note)
+
+        val paneModeFlag = resources.getBoolean(R.bool.twoPaneMode)
+
+        menuItemCreateNote!!.setVisible(paneModeFlag)
+
+        if (paneModeFlag)
+            binding.mainFab.visibility = View.GONE
+        else binding.mainFab.visibility = View.VISIBLE
 
         return super.onCreateOptionsMenu(menu)
     }
@@ -181,6 +191,9 @@ class MainActivity : AppCompatActivity() {
                 setNotesListFragment(true, true)
             }
             R.id.main_menu_settings -> {
+
+            }
+            R.id.main_menu_create_note -> {
 
             }
         }
@@ -202,6 +215,10 @@ class MainActivity : AppCompatActivity() {
     }
 
     fun editItem(frag: NotesListFragment) {
+        if (resources.getBoolean(R.bool.twoPaneMode) && frag.itemsObjectsArray.size != 0) {
+            setNotePreviewFragment(frag.itemsObjectsArray.get(0).title, frag.itemsObjectsArray.get(0).note, 0)
+        }
+
         frag.setOnEditModeListener(object : NotesListFragment.OnEditModeListener {
             override fun switch(title: String, note: String, position: Int) {
                 if (twoPaneMode)
@@ -209,18 +226,6 @@ class MainActivity : AppCompatActivity() {
                 else setEditNoteFragment(title, note, position)
             }
         })
-    }
-
-    fun setToolbarItemsVisibility(visible: Boolean) {
-        var flag = visible
-
-        if (twoPaneMode)
-            flag = twoPaneMode
-
-        if (menuItemGrid != null && menuInflater != null) {
-            menuItemGrid!!.setVisible(flag)
-            menuItemLinear!!.setVisible(flag)
-        }
     }
 
     fun listenEditMode(frag: NotePreviewFragment, position: Int) {

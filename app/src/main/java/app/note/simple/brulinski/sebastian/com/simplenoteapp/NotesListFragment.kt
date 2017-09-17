@@ -45,10 +45,6 @@ class NotesListFragment : Fragment() {
 
         (activity as MainActivity).supportActionBar?.setTitle(getString(R.string.notes))
 
-        (activity as MainActivity).editItem(this)
-
-        (activity as MainActivity).setToolbarItemsVisibility(true)
-
         //Database
         database = LocalDatabase(context)
 
@@ -71,6 +67,7 @@ class NotesListFragment : Fragment() {
 
         //Get notes
         getAndSetNotes()
+        (activity as MainActivity).editItem(this)
 
         //Edit note listener
         editNote()
