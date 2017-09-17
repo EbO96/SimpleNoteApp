@@ -2,6 +2,7 @@ package app.note.simple.brulinski.sebastian.com.simplenoteapp
 
 import android.content.Context
 import android.content.SharedPreferences
+import android.content.pm.ActivityInfo
 import android.databinding.DataBindingUtil
 import android.os.Bundle
 import android.support.v4.app.Fragment
@@ -13,7 +14,6 @@ import android.view.MenuInflater
 import android.view.MenuItem
 import android.view.View
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.databinding.ActivityMainBinding
-import java.text.FieldPosition
 
 class MainActivity : AppCompatActivity() {
 
@@ -65,6 +65,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     fun setNotesListFragment(flag: Boolean, changeLayoutManager: Boolean) {
+        requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_SENSOR
         val args: Bundle = Bundle()
         args.putBoolean("flag", flag)
         supportActionBar?.setTitle(getString(R.string.notes))
@@ -87,6 +88,9 @@ class MainActivity : AppCompatActivity() {
     }
 
     fun setCreateNoteFragment() {
+        if (!twoPaneMode)
+            requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
+
         supportActionBar?.setTitle(getString(R.string.create))
         binding.mainFab.visibility = View.GONE
 
@@ -102,6 +106,9 @@ class MainActivity : AppCompatActivity() {
     }
 
     fun setEditNoteFragment(title: String, note: String, position: Int) {
+        if (!twoPaneMode)
+            requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
+
         supportActionBar?.setTitle(getString(R.string.edit))
         binding.mainFab.visibility = View.GONE
         val args: Bundle = Bundle()
@@ -203,7 +210,6 @@ class MainActivity : AppCompatActivity() {
             }
         })
     }
-
 
     fun setToolbarItemsVisibility(visible: Boolean) {
         var flag = visible
