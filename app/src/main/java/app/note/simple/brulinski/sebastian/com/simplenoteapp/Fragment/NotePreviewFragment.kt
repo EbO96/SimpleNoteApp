@@ -13,6 +13,9 @@ class NotePreviewFragment : Fragment() {
 
     lateinit var mListener: OnEditNoteListener
 
+        var itemPosition = 0
+
+
     interface OnEditNoteListener {
         fun passData(title: String, note: String)
     }
@@ -34,13 +37,15 @@ class NotePreviewFragment : Fragment() {
 
         val title = arguments.getString("title")
         val note = arguments.getString("note")
+        itemPosition = arguments.getInt("position")
 
         binding.previewTitleField.text = title
         binding.previewNoteField.text = note
 
-        binding.previewFab.setOnClickListener {
-            mListener.passData(title, note)
-        }
+        //TODO FAB
+//        binding.previewFab.setOnClickListener {
+//            mListener.passData(title, note)
+//        }
     }
 
 }

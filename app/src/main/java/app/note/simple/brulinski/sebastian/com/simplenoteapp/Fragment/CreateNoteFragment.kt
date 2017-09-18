@@ -1,6 +1,5 @@
 package app.note.simple.brulinski.sebastian.com.simplenoteapp.Fragment
 
-import android.app.Activity
 import android.databinding.DataBindingUtil
 import android.os.Bundle
 import android.support.v4.app.Fragment
@@ -28,21 +27,6 @@ open class CreateNoteFragment : Fragment() {
 
         CurrentFragmentState.CURRENT = MainActivity.CREATE_NOTE_FRAGMENT_TAG
 
-        if (!resources.getBoolean(R.bool.twoPaneMode))
-            (activity as MainActivity).supportActionBar?.setTitle(getString(R.string.create))
-
-
-
-        //Database statement
-        bindingFrag.createNoteFab.setOnClickListener {
-            if (!TextUtils.isEmpty(bindingFrag.createNoteTitleField.text.toString().trim()) || !TextUtils.isEmpty(bindingFrag.createNoteNoteField.text.toString().trim()))
-                saveNote(bindingFrag.createNoteTitleField.text.toString(), bindingFrag.createNoteNoteField.text.toString())
-
-            (activity as MainActivity).setNotesListFragment(activity.getPreferences(Activity.MODE_PRIVATE).getBoolean(getString(R.string.layout_manager_key), false), false)
-            if (resources.getBoolean(R.bool.twoPaneMode))
-                (activity as MainActivity).binding.mainFab.visibility = View.GONE
-            else (activity as MainActivity).binding.mainFab.visibility = View.VISIBLE
-        }
         database = LocalDatabase(context)
 
         return bindingFrag.root
@@ -59,6 +43,13 @@ open class CreateNoteFragment : Fragment() {
             val df = SimpleDateFormat("yyyy-MM-dd 'at' HH:mm:ss a")
             return df.format(calendar.getTime())
         }
+    }
+
+    override fun onDestroyView() {
+        if ((!TextUtils.isEmpty(bindingFrag.createNoteTitleField.text.toString().trim()) || !TextUtils.isEmpty(bindingFrag.createNoteNoteField.text.toString().trim())) &&
+                CurrentFragmentState.CURRENT.equals(MainActivity.CREATE_NOTE_FRAGMENT_TAG) && !CurrentFragmentState.backPressed)
+            saveNote(bindingFrag.createNoteTitleField.text.toString(), bindingFrag.createNoteNoteField.text.toString())
+        super.onDestroyView()
     }
 }
 

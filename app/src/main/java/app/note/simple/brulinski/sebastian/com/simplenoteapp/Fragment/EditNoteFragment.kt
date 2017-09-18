@@ -1,8 +1,7 @@
 package app.note.simple.brulinski.sebastian.com.simplenoteapp.Fragment
 
-import app.note.simple.brulinski.sebastian.com.simplenoteapp.HelperClass.CurrentFragmentState
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.Activity.MainActivity
-import app.note.simple.brulinski.sebastian.com.simplenoteapp.R
+import app.note.simple.brulinski.sebastian.com.simplenoteapp.HelperClass.CurrentFragmentState
 
 class EditNoteFragment : CreateNoteFragment() {
 
@@ -18,35 +17,25 @@ class EditNoteFragment : CreateNoteFragment() {
 
     lateinit var title: String
     lateinit var note: String
+    var position = 0
 
     override fun onStart() {
         CurrentFragmentState.CURRENT = MainActivity.EDIT_NOTE_FRAGMENT_TAG
 
-        if (!resources.getBoolean(R.bool.twoPaneMode))
-            (activity as MainActivity).supportActionBar?.setTitle(getString(R.string.edit))
-
-
         title = arguments.getString("title")
         note = arguments.getString("note")
+        position = arguments.getInt("position")
 
         bindingFrag.createNoteTitleField.setText(title)
         bindingFrag.createNoteNoteField.setText(note)
 
-        fabListener()
+        (activity as MainActivity).setOnUpdateListListener(object : MainActivity.OnUpdateListListener {
+            override fun passData(title: String, note: String, position: Int) {
+                database.updateRow(title, note, bindingFrag.createNoteTitleField.text.toString(),
+                        bindingFrag.createNoteNoteField.text.toString())
+            }
+        })
 
         super.onStart()
     }
-
-    fun fabListener() {
-        bindingFrag.createNoteFab.setOnClickListener {
-            database.updateRow(title, note, bindingFrag.createNoteTitleField.text.toString(),
-                    bindingFrag.createNoteNoteField.text.toString())
-            if (resources.getBoolean(R.bool.twoPaneMode))
-                mSaveListener.passData(bindingFrag.createNoteTitleField.text.toString(),
-                        bindingFrag.createNoteNoteField.text.toString())
-            else
-                (activity as MainActivity).onBackPressed()
-        }
-    }
-
 }

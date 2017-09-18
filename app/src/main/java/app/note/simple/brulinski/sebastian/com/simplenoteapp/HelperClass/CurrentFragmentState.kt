@@ -6,6 +6,7 @@ package app.note.simple.brulinski.sebastian.com.simplenoteapp.HelperClass
 class CurrentFragmentState {
 
     companion object {
-        var CURRENT: String = "NONE"
+        var CURRENT = "NONE"
+        var backPressed = false
     }
 }

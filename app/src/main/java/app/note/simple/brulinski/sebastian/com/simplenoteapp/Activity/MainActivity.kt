@@ -2,7 +2,6 @@ package app.note.simple.brulinski.sebastian.com.simplenoteapp.Activity
 
 import android.content.Context
 import android.content.SharedPreferences
-import android.content.pm.ActivityInfo
 import android.databinding.DataBindingUtil
 import android.os.Bundle
 import android.support.v4.app.Fragment
@@ -13,12 +12,12 @@ import android.util.Log
 import android.view.Menu
 import android.view.MenuInflater
 import android.view.MenuItem
-import android.view.View
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.Fragment.CreateNoteFragment
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.Fragment.EditNoteFragment
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.Fragment.NotePreviewFragment
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.Fragment.NotesListFragment
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.HelperClass.CurrentFragmentState
+import app.note.simple.brulinski.sebastian.com.simplenoteapp.HelperClass.LayoutManagerStyle
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.R
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.databinding.ActivityMainBinding
 
@@ -29,6 +28,7 @@ class MainActivity : AppCompatActivity() {
     lateinit var fm: FragmentManager
     lateinit var ft: FragmentTransaction
     lateinit var noteFragment: Fragment
+    lateinit var managerStyle: LayoutManagerStyle
 
     companion object {
         var NOTE_LIST_FRAGMENT_TAG: String = "NOTES" //Fragment TAG
@@ -43,7 +43,7 @@ class MainActivity : AppCompatActivity() {
 
     /*
     mUpdateListener - it is a interface between MainActivity and NoteListFragment. Used to
-    update RecyclerView
+    update RecyclerView items after edit
      */
     lateinit var mUpdateListener: OnUpdateListListener
 
@@ -55,6 +55,10 @@ class MainActivity : AppCompatActivity() {
         this.mUpdateListener = mUpdateListener
     }
 
+    /*
+    mLayoutListener - it is a interface between MainActivity and NoteListFragment. Used to
+    change layout manager
+     */
     lateinit var mLayoutListener: OnChangeLayoutListener
 
     interface OnChangeLayoutListener {
@@ -65,71 +69,81 @@ class MainActivity : AppCompatActivity() {
         this.mLayoutListener = mLayoutListener
     }
 
+    /*
+    There we starts...
+     */
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = DataBindingUtil.setContentView(this, R.layout.activity_main)
         setSupportActionBar(binding.toolbar)
 
-        binding.mainFab.setOnClickListener {
-            //Switch to add note fragment
-            setCreateNoteFragment()
-        }
+        managerStyle = LayoutManagerStyle(this)
 
+        /*
+        After when user rotate phone the onCreate is called again and we save screen orientation state to this value
+         */
         twoPaneMode = resources.getBoolean(R.bool.twoPaneMode)
 
+        /*
+        Set main fragment  (NoteListFragment.kt) manually  only once when saveInstanceState is null
+        At the same time we getting layout manager type from SharedPreferences
+         */
         if (savedInstanceState == null) {
-            val sharedPref: SharedPreferences = this.getPreferences(Context.MODE_PRIVATE)
-            val flag: Boolean = sharedPref.getBoolean(getString(R.string.layout_manager_key), true)
-            setNotesListFragment(flag, false)
+            setNotesListFragment()
         }
 
-    }
+        floatingActionButtonListener() //Listen for floating action button actions and click
 
-    fun setNotesListFragment(flag: Boolean, changeLayoutManager: Boolean) {
-        requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_USER
+    } //END OF onCreate(...)
 
-        val args: Bundle = Bundle()
-        args.putBoolean("flag", flag)
-        binding.mainFab.visibility = View.VISIBLE
-
+    /*
+    This function replace another fragment in FrameLayout container by our main Fragment (NoteListFragment.kt - display our notes)
+     */
+    fun setNotesListFragment() {
         fm = supportFragmentManager
         ft = fm.beginTransaction()
 
         val notesListFragment: NotesListFragment = NotesListFragment()
-        notesListFragment.arguments = args
+
         noteFragment = notesListFragment
+        ft.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_FADE)
         ft.replace(binding.mainContainer.id, notesListFragment, NOTE_LIST_FRAGMENT_TAG)
 
-        if (!changeLayoutManager || !twoPaneMode)
+        if (!twoPaneMode) //Off fragment transition when user is in landscape mode
             ft.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN)
+
+        ft.addToBackStack(NOTE_LIST_FRAGMENT_TAG)
 
         ft.commit()
         fm.executePendingTransactions()
 
     }
 
+    /*
+    Fragment used to create new note
+     */
     fun setCreateNoteFragment() {
         if (!twoPaneMode)
-            requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
-
-        supportActionBar?.setTitle(getString(R.string.create))
-        binding.mainFab.visibility = View.GONE
+            supportActionBar?.setTitle(getString(R.string.create))
 
         fm = supportFragmentManager
         ft = fm.beginTransaction()
 
         val createNoteFragment: CreateNoteFragment = CreateNoteFragment()
 
+        ft.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_FADE)
         ft.replace(binding.mainContainer.id, createNoteFragment, CREATE_NOTE_FRAGMENT_TAG)
-        ft.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN)
+        ft.addToBackStack(CREATE_NOTE_FRAGMENT_TAG)
         ft.commit()
     }
 
+    /*
+    This fragment is setting only from preview mode (NotePreviewFragment.kt)
+     */
     fun setEditNoteFragment(title: String, note: String, position: Int) {
         if (!twoPaneMode)
-            requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
+            supportActionBar?.setTitle(getString(R.string.edit))
 
-        binding.mainFab.visibility = View.GONE
         val args: Bundle = Bundle()
 
         args.putString("title", title)
@@ -141,27 +155,32 @@ class MainActivity : AppCompatActivity() {
         val editNoteFragment = EditNoteFragment()
         editNoteFragment.arguments = args
 
+
         var containerId = binding.mainContainer.id
         if (twoPaneMode)
             containerId = binding.mainContainerDetails!!.id
 
+        ft.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_FADE)
         ft.replace(containerId, editNoteFragment, EDIT_NOTE_FRAGMENT_TAG)
 
-        if (!twoPaneMode)
-            ft.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN)
+        ft.addToBackStack(EDIT_NOTE_FRAGMENT_TAG)
 
         ft.commit()
 
         listenEndOfEditing(editNoteFragment, position)
-
     }
 
+    /*
+    This fragment is setting when user click RecyclerView item
+     */
     private fun setNotePreviewFragment(title: String, note: String, position: Int) {
-        binding.mainFab.visibility = View.GONE
+
+        binding.mainFab.setIconDrawable(resources.getDrawable(R.drawable.ic_mode_edit_white_24dp))
 
         val args: Bundle = Bundle()
         args.putString("title", title)
         args.putString("note", note)
+        args.putInt("position", position)
 
         val previewFragment = NotePreviewFragment()
         previewFragment.arguments = args
@@ -169,10 +188,17 @@ class MainActivity : AppCompatActivity() {
         fm = supportFragmentManager
         ft = fm.beginTransaction()
 
-        ft.replace(binding.mainContainerDetails!!.id, previewFragment, NOTE_PREVIEW_FRAGMENT_TAG)
+        var containerID = binding.mainContainer!!.id
+        if (twoPaneMode)
+            containerID = binding.mainContainerDetails!!.id
+
+        ft.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_FADE)
+        ft.replace(containerID, previewFragment, NOTE_PREVIEW_FRAGMENT_TAG)
+
+        ft.addToBackStack(NOTE_PREVIEW_FRAGMENT_TAG)
         ft.commit()
 
-        listenEditMode(previewFragment, position)
+        //listenEditMode(previewFragment, position)
     }
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
@@ -186,10 +212,6 @@ class MainActivity : AppCompatActivity() {
         val paneModeFlag = resources.getBoolean(R.bool.twoPaneMode)
 
         menuItemCreateNote!!.setVisible(paneModeFlag)
-
-        if (paneModeFlag)
-            binding.mainFab.visibility = View.GONE
-        else binding.mainFab.visibility = View.VISIBLE
 
         return super.onCreateOptionsMenu(menu)
     }
@@ -210,7 +232,6 @@ class MainActivity : AppCompatActivity() {
             R.id.main_menu_create_note -> {
                 if (!CurrentFragmentState.CURRENT.equals(CREATE_NOTE_FRAGMENT_TAG)) {
                     setCreateNoteFragment()
-                    binding.mainFab.visibility = View.GONE
                 }
 
             }
@@ -226,9 +247,23 @@ class MainActivity : AppCompatActivity() {
     }
 
     override fun onBackPressed() {
-        if (CurrentFragmentState.CURRENT.equals(NOTE_LIST_FRAGMENT_TAG) || twoPaneMode) {
-            this.finish()
-        } else setNotesListFragment(NotesListFragment.flag, false)
+        CurrentFragmentState.backPressed = true
+        if (supportFragmentManager.backStackEntryCount > 1)
+            supportFragmentManager.popBackStack()
+        else this.finish()
+
+        val frag = supportFragmentManager.findFragmentById(binding.mainContainer.id)
+
+        if (frag is CreateNoteFragment && frag.tag.equals(CREATE_NOTE_FRAGMENT_TAG)) {
+            binding.mainFab.setIconDrawable(resources.getDrawable(R.drawable.ic_add_white_24dp))
+
+        } else if (frag is EditNoteFragment) { //Update RecyclerView item and return to NoteListFragment
+            binding.mainFab.setIconDrawable(resources.getDrawable(R.drawable.ic_mode_edit_white_24dp))
+
+
+        } else if (frag is NotePreviewFragment) {
+            binding.mainFab.setIconDrawable(resources.getDrawable(R.drawable.ic_add_white_24dp))
+        }
     }
 
     fun editItem(frag: NotesListFragment) {
@@ -238,9 +273,12 @@ class MainActivity : AppCompatActivity() {
 
         frag.setOnEditModeListener(object : NotesListFragment.OnEditModeListener {
             override fun switch(title: String, note: String, position: Int) {
-                if (twoPaneMode)
-                    setNotePreviewFragment(title, note, position)
-                else setEditNoteFragment(title, note, position)
+//                if (twoPaneMode)
+//                    setNotePreviewFragment(title, note, position)
+//                else setEditNoteFragment(title, note, position)
+
+                setNotePreviewFragment(title, note, position)
+
             }
         })
     }
@@ -275,7 +313,38 @@ class MainActivity : AppCompatActivity() {
     }
 
     fun changeRecyclerLayout() {
+        mLayoutListener.passData(managerStyle.flag)
+    }
 
+    fun floatingActionButtonListener() {
+        binding.mainFab!!.setOnClickListener {
+            CurrentFragmentState.backPressed = false
+
+            if (twoPaneMode) {
+
+            } else {
+                val frag = supportFragmentManager.findFragmentById(binding.mainContainer.id)
+
+                if (frag is NotesListFragment) {
+                    binding.mainFab.setIconDrawable(resources.getDrawable(R.drawable.ic_done_white_24dp))
+                    setCreateNoteFragment()
+                } else if (frag is CreateNoteFragment && frag.tag.equals(CREATE_NOTE_FRAGMENT_TAG)) {
+                    binding.mainFab.setIconDrawable(resources.getDrawable(R.drawable.ic_add_white_24dp))
+                    supportFragmentManager.popBackStack()
+                } else if (frag is EditNoteFragment) { //Update RecyclerView item and return to NoteListFragment
+                    binding.mainFab.setIconDrawable(resources.getDrawable(R.drawable.ic_add_white_24dp))
+                    for (x in 1..2) {
+                        supportFragmentManager.popBackStack()
+                    }
+                    mUpdateListener.passData(frag.title, frag.note, frag.position)
+
+                } else if (frag is NotePreviewFragment) {
+                    binding.mainFab.setIconDrawable(resources.getDrawable(R.drawable.ic_done_white_24dp))
+                    setEditNoteFragment(frag.binding.previewTitleField.text.toString(),
+                            frag.binding.previewNoteField.text.toString(), frag.itemPosition)
+                }
+            }
+        }
     }
 }
 

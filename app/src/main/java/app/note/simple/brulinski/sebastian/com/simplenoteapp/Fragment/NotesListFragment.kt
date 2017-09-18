@@ -6,14 +6,16 @@ import android.os.Bundle
 import android.support.v4.app.Fragment
 import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.StaggeredGridLayoutManager
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import app.note.simple.brulinski.sebastian.com.simplenoteapp.*
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.Activity.MainActivity
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.Database.LocalDatabase
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.HelperClass.CurrentFragmentState
+import app.note.simple.brulinski.sebastian.com.simplenoteapp.HelperClass.LayoutManagerStyle
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.Holder.ItemsHolder
+import app.note.simple.brulinski.sebastian.com.simplenoteapp.R
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.RecyclerView.MainRecyclerAdapter
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.databinding.NotesListFragmentBinding
 import jp.wasabeef.recyclerview.animators.SlideInUpAnimator
@@ -28,10 +30,8 @@ class NotesListFragment : Fragment() {
     lateinit var itemsObjectsArray: ArrayList<ItemsHolder>
     lateinit var myRecycler: MainRecyclerAdapter
     lateinit var database: LocalDatabase
-
-    companion object {
-        var flag: Boolean = true
-    }
+    lateinit var layoutStyle: LayoutManagerStyle
+    var styleFlag: Boolean = true
 
     lateinit var onEditModeListener_: OnEditModeListener
 
@@ -56,10 +56,13 @@ class NotesListFragment : Fragment() {
     override fun onCreateView(inflater: LayoutInflater?, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         binding = DataBindingUtil.inflate(inflater, R.layout.notes_list_fragment, container, false)
 
+        Log.i("frag", "create")
         CurrentFragmentState.CURRENT = MainActivity.NOTE_LIST_FRAGMENT_TAG
 
         if (!resources.getBoolean(R.bool.twoPaneMode))
             (activity as MainActivity).supportActionBar?.setTitle(getString(R.string.notes))
+
+        //(activity as MainActivity).changeRecyclerLayout()
 
         //Database
         database = LocalDatabase(context)
@@ -67,11 +70,11 @@ class NotesListFragment : Fragment() {
         //Recycler
         binding.recyclerView.setHasFixedSize(true)
 
-        if (savedInstanceState == null)
-            flag = arguments.getBoolean("flag", true)
-        else flag = savedInstanceState.getBoolean("flag")
+        layoutStyle = LayoutManagerStyle(this.activity)
 
-        if (flag)
+        styleFlag = layoutStyle.flag
+
+        if (styleFlag)
             binding.recyclerView.layoutManager = LinearLayoutManager(context, LinearLayoutManager.VERTICAL, false)
         else binding.recyclerView.layoutManager = StaggeredGridLayoutManager(2, StaggeredGridLayoutManager.VERTICAL)
 
@@ -83,6 +86,7 @@ class NotesListFragment : Fragment() {
 
         //Get notes
         getAndSetNotes()
+
         (activity as MainActivity).editItem(this)
         (activity as MainActivity).clearPreviewList(this)
 
@@ -98,17 +102,14 @@ class NotesListFragment : Fragment() {
         //Change layout manager
         (activity as MainActivity).setOnChangeLayoutListener(object : MainActivity.OnChangeLayoutListener {
             override fun passData(flag: Boolean) {
-                if (flag)
+                if (flag) {
+                    styleFlag = flag
                     binding.recyclerView.layoutManager = LinearLayoutManager(context, LinearLayoutManager.VERTICAL, false)
-                else binding.recyclerView.layoutManager = StaggeredGridLayoutManager(2, StaggeredGridLayoutManager.VERTICAL)
+                } else binding.recyclerView.layoutManager = StaggeredGridLayoutManager(2, StaggeredGridLayoutManager.VERTICAL)
             }
         })
 
         return binding.root
-    }
-
-    override fun onDestroyView() {
-        super.onDestroyView()
     }
 
     fun getAndSetNotes() {
@@ -126,7 +127,6 @@ class NotesListFragment : Fragment() {
                 itemsObjectsArray.add(ItemsHolder(title, note, date))
             }
             myRecycler.notifyDataSetChanged()
-
         }
     }
 
@@ -140,7 +140,7 @@ class NotesListFragment : Fragment() {
 
     override fun onSaveInstanceState(outState: Bundle?) {
         super.onSaveInstanceState(outState)
-        outState?.putBoolean("flag", flag)
+        outState?.putBoolean("flag", layoutStyle.flag)
     }
 
     fun listenDeletedItems() {
@@ -154,9 +154,14 @@ class NotesListFragment : Fragment() {
     fun updateNoteList() {
         (activity as MainActivity).setOnUpdateListListener(object : MainActivity.OnUpdateListListener {
             override fun passData(title: String, note: String, position: Int) {
+                Log.i("frag", "update")
                 itemsObjectsArray.set(position, ItemsHolder(title, note, CreateNoteFragment.getCurrentDateAndTime()))
                 myRecycler.notifyDataSetChanged()
             }
         })
+    }
+
+    override fun onResume() {
+        super.onResume()
     }
 }

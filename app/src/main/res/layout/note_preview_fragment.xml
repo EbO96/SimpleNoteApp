@@ -41,15 +41,15 @@
 
         </ScrollView>
 
-        <com.getbase.floatingactionbutton.FloatingActionButton
-            android:id="@+id/preview_fab"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            app:fab_size="normal"
-            android:layout_alignParentBottom="true"
-            android:layout_alignParentRight="true"
-            android:layout_margin="16dp"
-            app:fab_icon="@drawable/ic_mode_edit_white_24dp"/>
+        <!--<com.getbase.floatingactionbutton.FloatingActionButton-->
+            <!--android:id="@+id/preview_fab"-->
+            <!--android:layout_width="wrap_content"-->
+            <!--android:layout_height="wrap_content"-->
+            <!--app:fab_size="normal"-->
+            <!--android:layout_alignParentBottom="true"-->
+            <!--android:layout_alignParentRight="true"-->
+            <!--android:layout_margin="16dp"-->
+            <!--app:fab_icon="@drawable/ic_mode_edit_white_24dp"/>-->
 
     </RelativeLayout>
 </layout>
