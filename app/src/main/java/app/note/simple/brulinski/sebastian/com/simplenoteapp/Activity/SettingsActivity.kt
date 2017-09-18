@@ -1,7 +1,8 @@
-package app.note.simple.brulinski.sebastian.com.simplenoteapp
+package app.note.simple.brulinski.sebastian.com.simplenoteapp.Activity
 
 import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
+import app.note.simple.brulinski.sebastian.com.simplenoteapp.R
 
 class SettingsActivity : AppCompatActivity() {
 

@@ -1,4 +1,8 @@
-package app.note.simple.brulinski.sebastian.com.simplenoteapp
+package app.note.simple.brulinski.sebastian.com.simplenoteapp.Fragment
+
+import app.note.simple.brulinski.sebastian.com.simplenoteapp.HelperClass.CurrentFragmentState
+import app.note.simple.brulinski.sebastian.com.simplenoteapp.Activity.MainActivity
+import app.note.simple.brulinski.sebastian.com.simplenoteapp.R
 
 class EditNoteFragment : CreateNoteFragment() {
 

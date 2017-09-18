@@ -1,4 +1,4 @@
-package app.note.simple.brulinski.sebastian.com.simplenoteapp
+package app.note.simple.brulinski.sebastian.com.simplenoteapp.Holder
 
 /**
  * Created by sebas on 14.09.2017.

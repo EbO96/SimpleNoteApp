@@ -1,4 +1,4 @@
-package app.note.simple.brulinski.sebastian.com.simplenoteapp
+package app.note.simple.brulinski.sebastian.com.simplenoteapp.HelperClass
 
 /**
  * Created by sebas on 16.09.2017.

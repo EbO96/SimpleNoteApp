@@ -1,10 +1,13 @@
-package app.note.simple.brulinski.sebastian.com.simplenoteapp
+package app.note.simple.brulinski.sebastian.com.simplenoteapp.RecyclerView
 
 import android.support.v7.widget.RecyclerView
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
+import app.note.simple.brulinski.sebastian.com.simplenoteapp.Database.LocalDatabase
+import app.note.simple.brulinski.sebastian.com.simplenoteapp.Holder.ItemsHolder
+import app.note.simple.brulinski.sebastian.com.simplenoteapp.R
 
 
 class MainRecyclerAdapter(var itemsHolder: ArrayList<ItemsHolder>, var recyclerView: RecyclerView, var database: LocalDatabase) : RecyclerView.Adapter<MainRecyclerAdapter.ViewHolder>() {

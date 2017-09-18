@@ -6,7 +6,7 @@
         android:id="@+id/notes_root_layout"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        tools:context="app.note.simple.brulinski.sebastian.com.simplenoteapp.NotesListFragment">
+        tools:context="app.note.simple.brulinski.sebastian.com.simplenoteapp.Fragment.NotesListFragment">
 
         <android.support.v7.widget.RecyclerView
             android:id="@+id/recycler_view"

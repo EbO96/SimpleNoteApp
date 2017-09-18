@@ -1,4 +1,4 @@
-package app.note.simple.brulinski.sebastian.com.simplenoteapp
+package app.note.simple.brulinski.sebastian.com.simplenoteapp.Database
 
 import android.content.ContentValues
 import android.content.Context

@@ -1,4 +1,4 @@
-package app.note.simple.brulinski.sebastian.com.simplenoteapp
+package app.note.simple.brulinski.sebastian.com.simplenoteapp.Activity
 
 import android.content.Context
 import android.content.SharedPreferences
@@ -14,6 +14,12 @@ import android.view.Menu
 import android.view.MenuInflater
 import android.view.MenuItem
 import android.view.View
+import app.note.simple.brulinski.sebastian.com.simplenoteapp.Fragment.CreateNoteFragment
+import app.note.simple.brulinski.sebastian.com.simplenoteapp.Fragment.EditNoteFragment
+import app.note.simple.brulinski.sebastian.com.simplenoteapp.Fragment.NotePreviewFragment
+import app.note.simple.brulinski.sebastian.com.simplenoteapp.Fragment.NotesListFragment
+import app.note.simple.brulinski.sebastian.com.simplenoteapp.HelperClass.CurrentFragmentState
+import app.note.simple.brulinski.sebastian.com.simplenoteapp.R
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.databinding.ActivityMainBinding
 
 class MainActivity : AppCompatActivity() {
@@ -25,16 +31,20 @@ class MainActivity : AppCompatActivity() {
     lateinit var noteFragment: Fragment
 
     companion object {
-        var NOTE_LIST_FRAGMENT_TAG: String = "NOTES"
-        var CREATE_NOTE_FRAGMENT_TAG: String = "CREATE"
-        var EDIT_NOTE_FRAGMENT_TAG: String = "EDIT"
-        var NOTE_PREVIEW_FRAGMENT_TAG: String = "PREVIEW"
-        var menuItemGrid: MenuItem? = null
-        var menuItemLinear: MenuItem? = null
-        var menuItemCreateNote: MenuItem? = null
-        var twoPaneMode: Boolean = false
+        var NOTE_LIST_FRAGMENT_TAG: String = "NOTES" //Fragment TAG
+        var CREATE_NOTE_FRAGMENT_TAG: String = "CREATE" //Fragment TAG
+        var EDIT_NOTE_FRAGMENT_TAG: String = "EDIT" //Fragment TAG
+        var NOTE_PREVIEW_FRAGMENT_TAG: String = "PREVIEW" //Fragment TAG
+        var menuItemGrid: MenuItem? = null //Toolbar menu item (set recycler view layout as staggered layout)
+        var menuItemLinear: MenuItem? = null //Toolbar menu item (set recycler view layout as linear layout)
+        var menuItemCreateNote: MenuItem? = null //Toolbar menu item (display in landscape mode only. Create new note)
+        var twoPaneMode: Boolean = false //Flag - portrait or landscape mode
     }
 
+    /*
+    mUpdateListener - it is a interface between MainActivity and NoteListFragment. Used to
+    update RecyclerView
+     */
     lateinit var mUpdateListener: OnUpdateListListener
 
     interface OnUpdateListListener {

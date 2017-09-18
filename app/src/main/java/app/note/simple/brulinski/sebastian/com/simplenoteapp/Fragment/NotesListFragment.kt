@@ -1,4 +1,4 @@
-package app.note.simple.brulinski.sebastian.com.simplenoteapp
+package app.note.simple.brulinski.sebastian.com.simplenoteapp.Fragment
 
 import android.database.Cursor
 import android.databinding.DataBindingUtil
@@ -9,6 +9,12 @@ import android.support.v7.widget.StaggeredGridLayoutManager
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import app.note.simple.brulinski.sebastian.com.simplenoteapp.*
+import app.note.simple.brulinski.sebastian.com.simplenoteapp.Activity.MainActivity
+import app.note.simple.brulinski.sebastian.com.simplenoteapp.Database.LocalDatabase
+import app.note.simple.brulinski.sebastian.com.simplenoteapp.HelperClass.CurrentFragmentState
+import app.note.simple.brulinski.sebastian.com.simplenoteapp.Holder.ItemsHolder
+import app.note.simple.brulinski.sebastian.com.simplenoteapp.RecyclerView.MainRecyclerAdapter
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.databinding.NotesListFragmentBinding
 import jp.wasabeef.recyclerview.animators.SlideInUpAnimator
 
@@ -148,8 +154,7 @@ class NotesListFragment : Fragment() {
     fun updateNoteList() {
         (activity as MainActivity).setOnUpdateListListener(object : MainActivity.OnUpdateListListener {
             override fun passData(title: String, note: String, position: Int) {
-                itemsObjectsArray.removeAt(position)
-                itemsObjectsArray.add(ItemsHolder(title, note, CreateNoteFragment.getCurrentDateAndTime()))
+                itemsObjectsArray.set(position, ItemsHolder(title, note, CreateNoteFragment.getCurrentDateAndTime()))
                 myRecycler.notifyDataSetChanged()
             }
         })

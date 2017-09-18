@@ -1,4 +1,4 @@
-package app.note.simple.brulinski.sebastian.com.simplenoteapp
+package app.note.simple.brulinski.sebastian.com.simplenoteapp.Fragment
 
 import android.app.Activity
 import android.databinding.DataBindingUtil
@@ -8,6 +8,10 @@ import android.text.TextUtils
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import app.note.simple.brulinski.sebastian.com.simplenoteapp.Activity.MainActivity
+import app.note.simple.brulinski.sebastian.com.simplenoteapp.Database.LocalDatabase
+import app.note.simple.brulinski.sebastian.com.simplenoteapp.HelperClass.CurrentFragmentState
+import app.note.simple.brulinski.sebastian.com.simplenoteapp.R
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.databinding.CreateNoteFragmentBinding
 import java.text.SimpleDateFormat
 import java.util.*
