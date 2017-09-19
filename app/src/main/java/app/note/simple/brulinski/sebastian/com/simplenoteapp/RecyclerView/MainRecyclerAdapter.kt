@@ -61,6 +61,8 @@ class MainRecyclerAdapter(var itemsHolder: ArrayList<ItemsHolder>, var recyclerV
             val note: String = this.itemsHolder.get(pos).note
             val date: String = this.itemsHolder.get(pos).date
 
+
+
             database.use {
                 delete(
                         "notes", "title=? AND note=? AND date=?", arrayOf(title, note, date)

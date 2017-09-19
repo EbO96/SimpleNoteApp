@@ -63,6 +63,7 @@ class NotesListFragment : Fragment() {
         if (!resources.getBoolean(R.bool.twoPaneMode))
             (activity as MainActivity).supportActionBar?.setTitle(getString(R.string.notes))
 
+
         //(activity as MainActivity).changeRecyclerLayout()
 
         //Database
@@ -129,7 +130,7 @@ class NotesListFragment : Fragment() {
     fun editNote() {
         myRecycler.setOnEditItemListener(object : MainRecyclerAdapter.OnEditItemListener {
             override fun itemDetails(title: String, note: String, position: Int) {
-                onEditModeListener_.switch(title, note, position)
+                    onEditModeListener_.switch(title, note, position)
             }
         })
     }

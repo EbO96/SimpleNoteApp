@@ -6,6 +6,7 @@ import android.support.v4.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import app.note.simple.brulinski.sebastian.com.simplenoteapp.Activity.MainActivity
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.R
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.databinding.NotePreviewFragmentBinding
 
@@ -13,8 +14,7 @@ class NotePreviewFragment : Fragment() {
 
     lateinit var mListener: OnEditNoteListener
 
-        var itemPosition = 0
-
+    var itemPosition = 0
 
     interface OnEditNoteListener {
         fun passData(title: String, note: String)
@@ -29,6 +29,9 @@ class NotePreviewFragment : Fragment() {
     override fun onCreateView(inflater: LayoutInflater?, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         binding = DataBindingUtil.inflate(inflater, R.layout.note_preview_fragment, container, false)
 
+        if (!resources.getBoolean(R.bool.twoPaneMode))
+            (activity as MainActivity).supportActionBar?.setTitle(getString(R.string.preview))
+
         return binding.root
     }
 
@@ -41,11 +44,6 @@ class NotePreviewFragment : Fragment() {
 
         binding.previewTitleField.text = title
         binding.previewNoteField.text = note
-
-        //TODO FAB
-//        binding.previewFab.setOnClickListener {
-//            mListener.passData(title, note)
-//        }
     }
 
 }
