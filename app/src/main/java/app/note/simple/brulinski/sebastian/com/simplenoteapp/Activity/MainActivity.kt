@@ -214,8 +214,6 @@ class MainActivity : AppCompatActivity() {
             }
             R.id.main_menu_settings -> {
                 //TODO create settings activity
-                val intent = Intent(this, SettingsActivity::class.java)
-                startActivity(intent)
             }
         }
         return super.onOptionsItemSelected(item)
