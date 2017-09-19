@@ -9,7 +9,6 @@ import android.view.ViewGroup
 import android.widget.TextView
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.Activity.MainActivity
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.Database.LocalSQLAnkoDatabase
-import app.note.simple.brulinski.sebastian.com.simplenoteapp.Fragment.NotesListFragment
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.Model.ItemsHolder
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.R
 
@@ -72,10 +71,11 @@ class MainRecyclerAdapter(var itemsHolder: ArrayList<ItemsHolder>, var recyclerV
                 undo = true
                 this.itemsHolder.add(pos, item)
                 notifyItemInserted(pos)
+                recyclerView.scrollToPosition(pos)
 
             }).setCallback(object : Snackbar.Callback() {
                 override fun onDismissed(transientBottomBar: Snackbar?, event: Int) {
-                    if(!undo){
+                    if (!undo) {
                         database.use {
                             delete(
                                     "notes", "title=? AND note=? AND date=?", arrayOf(title, note, date)

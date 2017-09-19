@@ -282,7 +282,6 @@ class MainActivity : AppCompatActivity() {
     fun clearPreviewList(frag: NotesListFragment) {
         frag.setOnClearPreviewList(object : NotesListFragment.OnClearPreviewList {
             override fun clear() {
-                Log.i("clear", "cleared")
                 val fragment = supportFragmentManager.findFragmentByTag(NOTE_PREVIEW_FRAGMENT_TAG)
                 if (fragment != null && fragment.isVisible)
                     supportFragmentManager.beginTransaction().remove(fragment).commitNow()

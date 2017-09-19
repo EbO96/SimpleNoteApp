@@ -17,12 +17,12 @@
         android:id="@+id/main_menu_grid"
         android:title="Grid"
         app:showAsAction="always"
-        android:icon="@drawable/ic_grid_on_black_24dp"/>
+        android:icon="@drawable/ic_dashboard_black_24dp"/>
 
     <item
         android:id="@+id/main_menu_linear"
         android:title="Linear"
         app:showAsAction="always"
-        android:icon="@drawable/ic_view_headline_black_24dp"/>
+        android:icon="@drawable/ic_view_agenda_black_24dp"/>
 
 </menu>
