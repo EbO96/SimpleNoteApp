@@ -2,6 +2,7 @@ package app.note.simple.brulinski.sebastian.com.simplenoteapp.Fragment
 
 import android.databinding.DataBindingUtil
 import android.os.Bundle
+import android.support.design.widget.Snackbar
 import android.support.v4.app.Fragment
 import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.StaggeredGridLayoutManager
@@ -18,7 +19,7 @@ import app.note.simple.brulinski.sebastian.com.simplenoteapp.Model.ItemsHolder
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.R
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.RecyclerView.MainRecyclerAdapter
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.databinding.NotesListFragmentBinding
-import jp.wasabeef.recyclerview.animators.SlideInUpAnimator
+import jp.wasabeef.recyclerview.animators.SlideInRightAnimator
 import org.jetbrains.anko.db.select
 
 
@@ -80,10 +81,10 @@ class NotesListFragment : Fragment() {
             binding.recyclerView.layoutManager = LinearLayoutManager(context, LinearLayoutManager.VERTICAL, false)
         else binding.recyclerView.layoutManager = StaggeredGridLayoutManager(2, StaggeredGridLayoutManager.VERTICAL)
 
-        binding.recyclerView.itemAnimator = SlideInUpAnimator()
+        binding.recyclerView.itemAnimator = SlideInRightAnimator()
 
         itemsObjectsArray = ArrayList()
-        myRecycler = MainRecyclerAdapter(itemsObjectsArray, binding.recyclerView, database)
+        myRecycler = MainRecyclerAdapter(itemsObjectsArray, binding.recyclerView, database, context)
         binding.recyclerView.adapter = myRecycler
 
         //Get notes
@@ -130,7 +131,7 @@ class NotesListFragment : Fragment() {
     fun editNote() {
         myRecycler.setOnEditItemListener(object : MainRecyclerAdapter.OnEditItemListener {
             override fun itemDetails(title: String, note: String, position: Int) {
-                    onEditModeListener_.switch(title, note, position)
+                onEditModeListener_.switch(title, note, position)
             }
         })
     }

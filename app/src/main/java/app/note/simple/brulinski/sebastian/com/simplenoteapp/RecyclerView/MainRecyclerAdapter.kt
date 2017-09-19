@@ -1,16 +1,20 @@
 package app.note.simple.brulinski.sebastian.com.simplenoteapp.RecyclerView
 
+import android.content.Context
+import android.support.design.widget.Snackbar
 import android.support.v7.widget.RecyclerView
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
+import app.note.simple.brulinski.sebastian.com.simplenoteapp.Activity.MainActivity
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.Database.LocalSQLAnkoDatabase
+import app.note.simple.brulinski.sebastian.com.simplenoteapp.Fragment.NotesListFragment
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.Model.ItemsHolder
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.R
 
 
-class MainRecyclerAdapter(var itemsHolder: ArrayList<ItemsHolder>, var recyclerView: RecyclerView, var database: LocalSQLAnkoDatabase) : RecyclerView.Adapter<MainRecyclerAdapter.ViewHolder>() {
+class MainRecyclerAdapter(var itemsHolder: ArrayList<ItemsHolder>, var recyclerView: RecyclerView, var database: LocalSQLAnkoDatabase, var ctx: Context) : RecyclerView.Adapter<MainRecyclerAdapter.ViewHolder>() {
 
     lateinit var onEditItemListener_: OnEditItemListener
 
@@ -61,13 +65,27 @@ class MainRecyclerAdapter(var itemsHolder: ArrayList<ItemsHolder>, var recyclerV
             val note: String = this.itemsHolder.get(pos).note
             val date: String = this.itemsHolder.get(pos).date
 
+            val item = this.itemsHolder[pos]
+            var undo = false
 
+            Snackbar.make((ctx as MainActivity).binding.root, ctx.getString(R.string.note_deleted), Snackbar.LENGTH_LONG).setAction(ctx.getString(R.string.undo), {
+                undo = true
+                this.itemsHolder.add(pos, item)
+                notifyItemInserted(pos)
 
-            database.use {
-                delete(
-                        "notes", "title=? AND note=? AND date=?", arrayOf(title, note, date)
-                )
-            }
+            }).setCallback(object : Snackbar.Callback() {
+                override fun onDismissed(transientBottomBar: Snackbar?, event: Int) {
+                    if(!undo){
+                        database.use {
+                            delete(
+                                    "notes", "title=? AND note=? AND date=?", arrayOf(title, note, date)
+                            )
+                        }
+                    }
+                }
+            }).show()
+
+            undo = false
 
             onDeleteItemListener_.deletedItemDetails(title, note, date)
             this.itemsHolder.removeAt(pos)
