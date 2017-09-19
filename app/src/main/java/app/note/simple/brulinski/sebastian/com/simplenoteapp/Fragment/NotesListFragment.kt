@@ -1,6 +1,5 @@
 package app.note.simple.brulinski.sebastian.com.simplenoteapp.Fragment
 
-import android.database.Cursor
 import android.databinding.DataBindingUtil
 import android.os.Bundle
 import android.support.v4.app.Fragment
@@ -11,14 +10,16 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.Activity.MainActivity
-import app.note.simple.brulinski.sebastian.com.simplenoteapp.Database.LocalDatabase
+import app.note.simple.brulinski.sebastian.com.simplenoteapp.Database.LocalSQLAnkoDatabase
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.HelperClass.CurrentFragmentState
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.HelperClass.LayoutManagerStyle
-import app.note.simple.brulinski.sebastian.com.simplenoteapp.Holder.ItemsHolder
+import app.note.simple.brulinski.sebastian.com.simplenoteapp.HelperClass.MyRowParser
+import app.note.simple.brulinski.sebastian.com.simplenoteapp.Model.ItemsHolder
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.R
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.RecyclerView.MainRecyclerAdapter
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.databinding.NotesListFragmentBinding
 import jp.wasabeef.recyclerview.animators.SlideInUpAnimator
+import org.jetbrains.anko.db.select
 
 
 /**
@@ -29,7 +30,7 @@ class NotesListFragment : Fragment() {
     lateinit var binding: NotesListFragmentBinding
     lateinit var itemsObjectsArray: ArrayList<ItemsHolder>
     lateinit var myRecycler: MainRecyclerAdapter
-    lateinit var database: LocalDatabase
+    lateinit var database: LocalSQLAnkoDatabase
     lateinit var layoutStyle: LayoutManagerStyle
     var styleFlag: Boolean = true
 
@@ -65,7 +66,7 @@ class NotesListFragment : Fragment() {
         //(activity as MainActivity).changeRecyclerLayout()
 
         //Database
-        database = LocalDatabase(context)
+        database = LocalSQLAnkoDatabase(context)
 
         //Recycler
         binding.recyclerView.setHasFixedSize(true)
@@ -113,21 +114,16 @@ class NotesListFragment : Fragment() {
     }
 
     fun getAndSetNotes() {
-        val data: Cursor = database.getAllNotes()
-        var title: String
-        var note: String
-        var date: String
+        database.use {
+            val notes = select("notes").parseList(MyRowParser())
+            val size = notes.size
 
-        if (data.count > 0) {
-            while (data.moveToNext()) {
-                title = data.getString(1)
-                note = data.getString(2)
-                date = data.getString(3)
-
-                itemsObjectsArray.add(ItemsHolder(title, note, date))
+            for (x in 0 until size) {
+                itemsObjectsArray.add(ItemsHolder(notes.get(x).get(x).title!!, notes.get(x).get(x).note!!, notes.get(x).get(x).date!!))
             }
-            myRecycler.notifyDataSetChanged()
         }
+        myRecycler.notifyDataSetChanged()
+
     }
 
     fun editNote() {

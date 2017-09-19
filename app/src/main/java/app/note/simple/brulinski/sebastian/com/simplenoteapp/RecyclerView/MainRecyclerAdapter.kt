@@ -5,12 +5,12 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
-import app.note.simple.brulinski.sebastian.com.simplenoteapp.Database.LocalDatabase
-import app.note.simple.brulinski.sebastian.com.simplenoteapp.Holder.ItemsHolder
+import app.note.simple.brulinski.sebastian.com.simplenoteapp.Database.LocalSQLAnkoDatabase
+import app.note.simple.brulinski.sebastian.com.simplenoteapp.Model.ItemsHolder
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.R
 
 
-class MainRecyclerAdapter(var itemsHolder: ArrayList<ItemsHolder>, var recyclerView: RecyclerView, var database: LocalDatabase) : RecyclerView.Adapter<MainRecyclerAdapter.ViewHolder>() {
+class MainRecyclerAdapter(var itemsHolder: ArrayList<ItemsHolder>, var recyclerView: RecyclerView, var database: LocalSQLAnkoDatabase) : RecyclerView.Adapter<MainRecyclerAdapter.ViewHolder>() {
 
     lateinit var onEditItemListener_: OnEditItemListener
 
@@ -39,10 +39,10 @@ class MainRecyclerAdapter(var itemsHolder: ArrayList<ItemsHolder>, var recyclerV
         var title = itemsHolder.title
         var note = itemsHolder.note
 
-        if(title.length > 30)
+        if (title.length > 30)
             title = title.substring(0, 30) + "..."
-        if(note.length > 260)
-            note = note.substring(0, 260) +"..."
+        if (note.length > 260)
+            note = note.substring(0, 260) + "..."
 
         holder?.title?.text = title
         holder?.note?.text = note
@@ -61,7 +61,11 @@ class MainRecyclerAdapter(var itemsHolder: ArrayList<ItemsHolder>, var recyclerV
             val note: String = this.itemsHolder.get(pos).note
             val date: String = this.itemsHolder.get(pos).date
 
-            database.deleteRow(title, note, date)
+            database.use {
+                delete(
+                        "notes", "title=? AND note=? AND date=?", arrayOf(title, note, date)
+                )
+            }
 
             onDeleteItemListener_.deletedItemDetails(title, note, date)
             this.itemsHolder.removeAt(pos)

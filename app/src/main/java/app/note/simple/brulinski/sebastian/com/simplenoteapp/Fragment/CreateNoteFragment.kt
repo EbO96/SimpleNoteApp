@@ -8,10 +8,11 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.Activity.MainActivity
-import app.note.simple.brulinski.sebastian.com.simplenoteapp.Database.LocalDatabase
+import app.note.simple.brulinski.sebastian.com.simplenoteapp.Database.LocalSQLAnkoDatabase
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.HelperClass.CurrentFragmentState
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.R
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.databinding.CreateNoteFragmentBinding
+import org.jetbrains.anko.db.insert
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -19,7 +20,7 @@ import java.util.*
 open class CreateNoteFragment : Fragment() {
 
     lateinit var bindingFrag: CreateNoteFragmentBinding
-    lateinit var database: LocalDatabase
+    lateinit var database: LocalSQLAnkoDatabase
 
 
     override fun onCreateView(inflater: LayoutInflater?, container: ViewGroup?, savedInstanceState: Bundle?): View? {
@@ -27,13 +28,24 @@ open class CreateNoteFragment : Fragment() {
 
         CurrentFragmentState.CURRENT = MainActivity.CREATE_NOTE_FRAGMENT_TAG
 
-        database = LocalDatabase(context)
+        database = LocalSQLAnkoDatabase(context)
 
         return bindingFrag.root
     }
 
     fun saveNote(title: String, note: String) {
-        database.addNote(title.trim(), note.trim(), getCurrentDateAndTime())
+        try {
+
+            database.use {
+                val titleCol = Pair<String, String>("title", title.trim())
+                val noteCol = Pair<String, String>("note", note.trim())
+                val dateCol = Pair<String, String>("date", getCurrentDateAndTime())
+
+                insert("notes", titleCol, noteCol, dateCol)
+            }
+        }catch (e: Exception){
+            e.printStackTrace()
+        }
     }
 
     companion object {

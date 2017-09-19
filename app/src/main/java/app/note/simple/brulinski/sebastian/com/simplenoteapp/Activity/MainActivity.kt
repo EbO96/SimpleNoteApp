@@ -12,6 +12,7 @@ import android.util.Log
 import android.view.Menu
 import android.view.MenuInflater
 import android.view.MenuItem
+import app.note.simple.brulinski.sebastian.com.simplenoteapp.Database.LocalSQLAnkoDatabase
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.Fragment.CreateNoteFragment
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.Fragment.EditNoteFragment
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.Fragment.NotePreviewFragment
@@ -20,6 +21,7 @@ import app.note.simple.brulinski.sebastian.com.simplenoteapp.HelperClass.Current
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.HelperClass.LayoutManagerStyle
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.R
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.databinding.ActivityMainBinding
+import org.jetbrains.anko.db.insert
 
 class MainActivity : AppCompatActivity() {
 
@@ -78,6 +80,8 @@ class MainActivity : AppCompatActivity() {
         setSupportActionBar(binding.toolbar)
 
         managerStyle = LayoutManagerStyle(this)
+
+        val databaseAnko: LocalSQLAnkoDatabase = LocalSQLAnkoDatabase(applicationContext)
 
         /*
         After when user rotate phone the onCreate is called again and we save screen orientation state to this value
@@ -248,21 +252,23 @@ class MainActivity : AppCompatActivity() {
 
     override fun onBackPressed() {
         CurrentFragmentState.backPressed = true
-        if (supportFragmentManager.backStackEntryCount > 1)
+        if (supportFragmentManager.backStackEntryCount > 1) {
+            binding.mainFab.setIconDrawable(resources.getDrawable(R.drawable.ic_add_white_24dp))
             supportFragmentManager.popBackStack()
-        else this.finish()
+        } else if (supportFragmentManager.backStackEntryCount <= 1) this.finish()
+        else {
+            val frag = supportFragmentManager.findFragmentById(binding.mainContainer.id)
 
-        val frag = supportFragmentManager.findFragmentById(binding.mainContainer.id)
+            if (frag is CreateNoteFragment && frag.tag.equals(CREATE_NOTE_FRAGMENT_TAG)) {
+                binding.mainFab.setIconDrawable(resources.getDrawable(R.drawable.ic_add_white_24dp))
 
-        if (frag is CreateNoteFragment && frag.tag.equals(CREATE_NOTE_FRAGMENT_TAG)) {
-            binding.mainFab.setIconDrawable(resources.getDrawable(R.drawable.ic_add_white_24dp))
-
-        } else if (frag is EditNoteFragment) { //Update RecyclerView item and return to NoteListFragment
-            binding.mainFab.setIconDrawable(resources.getDrawable(R.drawable.ic_mode_edit_white_24dp))
+            } else if (frag is EditNoteFragment) { //Update RecyclerView item and return to NoteListFragment
+                binding.mainFab.setIconDrawable(resources.getDrawable(R.drawable.ic_mode_edit_white_24dp))
 
 
-        } else if (frag is NotePreviewFragment) {
-            binding.mainFab.setIconDrawable(resources.getDrawable(R.drawable.ic_add_white_24dp))
+            } else if (frag is NotePreviewFragment) {
+                binding.mainFab.setIconDrawable(resources.getDrawable(R.drawable.ic_add_white_24dp))
+            }
         }
     }
 

@@ -1,5 +1,6 @@
 package app.note.simple.brulinski.sebastian.com.simplenoteapp.Fragment
 
+import android.content.ContentValues
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.Activity.MainActivity
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.HelperClass.CurrentFragmentState
 
@@ -31,8 +32,18 @@ class EditNoteFragment : CreateNoteFragment() {
 
         (activity as MainActivity).setOnUpdateListListener(object : MainActivity.OnUpdateListListener {
             override fun passData(title: String, note: String, position: Int) {
-                database.updateRow(title, note, bindingFrag.createNoteTitleField.text.toString(),
-                        bindingFrag.createNoteNoteField.text.toString())
+
+                val values = ContentValues()
+                values.put("title", bindingFrag.createNoteTitleField.text.toString())
+                values.put("note", bindingFrag.createNoteNoteField.text.toString())
+
+                val whereClause = "title=? AND note=?"
+
+                database.use {
+                    update(
+                            "notes", values, whereClause, arrayOf(title, note)
+                    )
+                }
             }
         })
 
