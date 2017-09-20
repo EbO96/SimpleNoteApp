@@ -35,6 +35,8 @@ class NotesListFragment : Fragment() {
     lateinit var database: LocalSQLAnkoDatabase
     lateinit var layoutStyle: LayoutManagerStyle
     var styleFlag: Boolean = true
+    var deletedItem: ItemsHolder? = null
+    var deletedItemPosition: Int? = null
 
     lateinit var mScrollCallback: OnListenRecyclerScroll
 
@@ -50,16 +52,6 @@ class NotesListFragment : Fragment() {
 
     fun setOnEditModeListener(onEditModeListener: OnEditModeListener) {
         this.onEditModeListener_ = onEditModeListener
-    }
-
-    lateinit var mClear: OnClearPreviewList
-
-    interface OnClearPreviewList {
-        fun clear()
-    }
-
-    fun setOnClearPreviewList(mClear: OnClearPreviewList) {
-        this.mClear = mClear
     }
 
     override fun onCreateView(inflater: LayoutInflater?, container: ViewGroup?, savedInstanceState: Bundle?): View? {
@@ -97,7 +89,6 @@ class NotesListFragment : Fragment() {
         getAndSetNotes()
 
         (activity as MainActivity).editItem(this)
-        (activity as MainActivity).clearPreviewList(this)
 
         //Edit note listener
         editNote()
@@ -120,6 +111,9 @@ class NotesListFragment : Fragment() {
 
         //Listen for recycler scrolling
         recyclerScrollingListener()
+
+        //Listen for search
+        updateListBySearch()
 
         return binding.root
     }
@@ -152,8 +146,29 @@ class NotesListFragment : Fragment() {
 
     fun listenDeletedItems() {
         myRecycler.setOnDeleteItemListener(object : MainRecyclerAdapter.OnDeleteItemListener {
-            override fun deletedItemDetails(title: String, note: String, date: String) {
-                mClear.clear()
+            override fun deletedItemDetails(title: String, note: String, date: String, undo: Boolean, delete: Boolean, softDelete: Boolean, position: Int) {
+
+                try {
+                    if (softDelete) { //Always execute
+                        deletedItem = itemsObjectsArray[position] //Save deleted item as temp value
+                        //Remove from recycler
+                        itemsObjectsArray.removeAt(position)
+                        myRecycler.notifyItemRemoved(position) //Notify changes
+
+                    } else if (undo) { //Execute when user click "UNDO"
+                        itemsObjectsArray.add(position, deletedItem!!)
+                        myRecycler.notifyItemInserted(position)
+                    } else if(delete){ //When snackbar dismiss and user not clicked "UNDO"
+
+                        database.use {
+                            delete(
+                                    "notes", "title=? AND note=? AND date=?", arrayOf(title, note, date)
+                            )
+                        }
+                    }
+                } catch (e: Exception) {
+                    e.printStackTrace()
+                }
             }
         })
     }
@@ -161,7 +176,6 @@ class NotesListFragment : Fragment() {
     fun updateNoteList() {
         (activity as MainActivity).setOnUpdateListListener(object : MainActivity.OnUpdateListListener {
             override fun passData(title: String, note: String, position: Int) {
-                Log.i("frag", "update")
                 itemsObjectsArray.set(position, ItemsHolder(title, note, CreateNoteFragment.getCurrentDateAndTime()))
                 myRecycler.notifyDataSetChanged()
             }
@@ -188,5 +202,29 @@ class NotesListFragment : Fragment() {
                 mScrollCallback.recyclerScrolling(null, null, newState)
             }
         })
+    }
+
+    fun updateListBySearch() {
+        try {
+            (activity as MainActivity).setOnSearchResultListener(object : MainActivity.OnSearchResultListener {
+                override fun passNewText(newText: String?) {
+                    var newList: ArrayList<ItemsHolder> = ArrayList()
+
+                    for (itemsHolder: ItemsHolder in itemsObjectsArray) {
+                        val title = itemsHolder.title.toLowerCase()
+                        val note = itemsHolder.note.toLowerCase()
+
+                        if (title.contains(newText!!.toLowerCase()) || note.contains(newText!!.toLowerCase())) {
+                            newList.add(itemsHolder)
+                        }
+                    }
+
+                    myRecycler.setFilter(newList)
+                }
+            })
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
+
     }
 }

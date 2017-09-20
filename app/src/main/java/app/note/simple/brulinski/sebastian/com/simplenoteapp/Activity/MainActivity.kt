@@ -9,6 +9,8 @@ import android.support.v4.app.FragmentManager
 import android.support.v4.app.FragmentTransaction
 import android.support.v7.app.AppCompatActivity
 import android.support.v7.widget.RecyclerView
+import android.support.v7.widget.SearchView
+import android.util.Log
 import android.view.Menu
 import android.view.MenuInflater
 import android.view.MenuItem
@@ -21,7 +23,18 @@ import app.note.simple.brulinski.sebastian.com.simplenoteapp.HelperClass.LayoutM
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.R
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.databinding.ActivityMainBinding
 
-class MainActivity : AppCompatActivity(), NotesListFragment.OnListenRecyclerScroll {
+class MainActivity : AppCompatActivity(), NotesListFragment.OnListenRecyclerScroll, SearchView.OnQueryTextListener, SearchView.OnCloseListener {
+
+
+    lateinit var mSearchCallback: OnSearchResultListener
+
+    interface OnSearchResultListener {
+        fun passNewText(newText: String?)
+    }
+
+    fun setOnSearchResultListener(mSearchCallback: OnSearchResultListener) {
+        this.mSearchCallback = mSearchCallback
+    }
 
     lateinit var mUpdateListener: OnUpdateListListener
 
@@ -76,9 +89,8 @@ class MainActivity : AppCompatActivity(), NotesListFragment.OnListenRecyclerScro
         Set main fragment  (NoteListFragment.kt) manually  only once when saveInstanceState is null
         At the same time we getting layout manager type from SharedPreferences
          */
-        if (savedInstanceState == null) {
+        if (savedInstanceState == null)
             setNotesListFragment()
-        }
 
         floatingActionButtonListener() //Listen for floating action button actions and click
 
@@ -182,12 +194,31 @@ class MainActivity : AppCompatActivity(), NotesListFragment.OnListenRecyclerScro
         menuItemGrid = menu!!.findItem(R.id.main_menu_grid)
         menuItemLinear = menu.findItem(R.id.main_menu_linear)
 
-        return super.onCreateOptionsMenu(menu)
+        val searchView: SearchView = (menu.findItem(R.id.search).getActionView() as SearchView)
+        searchView.setOnQueryTextListener(this)
+
+        return true
     }
 
-    /*
-    Select menu item at Toolbar and execute action
+    override fun onQueryTextSubmit(query: String?): Boolean {
+        Log.i("search", "search submit")
+        return true
+    }
+
+    override fun onQueryTextChange(newText: String?): Boolean {
+        Log.i("search", "search mode")
+        if (supportFragmentManager.findFragmentById(binding.mainContainer.id) is NotesListFragment)
+            mSearchCallback.passNewText(newText)
+        return true
+    }
+
+    override fun onClose(): Boolean {
+        Log.i("search", "search close")
+        return true
+    }                                                                                                              /*
+    Select menu item at Toolbar and execute action 
      */
+
     override fun onOptionsItemSelected(item: MenuItem?): Boolean {
         when (item?.itemId) {
             R.id.main_menu_grid -> {
@@ -254,16 +285,6 @@ class MainActivity : AppCompatActivity(), NotesListFragment.OnListenRecyclerScro
         })
     }
 
-    fun clearPreviewList(frag: NotesListFragment) {
-        frag.setOnClearPreviewList(object : NotesListFragment.OnClearPreviewList {
-            override fun clear() {
-                val fragment = supportFragmentManager.findFragmentByTag(NOTE_PREVIEW_FRAGMENT_TAG)
-                if (fragment != null && fragment.isVisible)
-                    supportFragmentManager.beginTransaction().remove(fragment).commitNow()
-            }
-        })
-    }
-
     /*
     Listen floatingActionButton
      */
@@ -295,6 +316,7 @@ class MainActivity : AppCompatActivity(), NotesListFragment.OnListenRecyclerScro
             }
         }
     }
+
     /*
     Listener recycler scroll via interface between this activity and NoteListFragment.
     When recycler is scrolling then floating action button is hiden

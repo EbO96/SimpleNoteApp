@@ -10,5 +10,9 @@
     <string name="preview">Preview</string>
     <string name="note_deleted">Note deleted</string>
     <string name="undo">UNDO</string>
+    <string name="title">Title</string>
+    <string name="note">Note</string>
+    <string name="search">Search</string>
+    <string name="search_hint">Search for notes</string>
     <!--END-->
 </resources>

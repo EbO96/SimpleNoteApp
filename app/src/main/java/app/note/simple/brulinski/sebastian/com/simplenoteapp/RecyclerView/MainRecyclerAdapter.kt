@@ -3,7 +3,7 @@ package app.note.simple.brulinski.sebastian.com.simplenoteapp.RecyclerView
 import android.content.Context
 import android.support.design.widget.Snackbar
 import android.support.v7.widget.RecyclerView
-import android.support.v7.widget.StaggeredGridLayoutManager
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -29,7 +29,7 @@ class MainRecyclerAdapter(var itemsHolder: ArrayList<ItemsHolder>, var recyclerV
     lateinit var onDeleteItemListener_: OnDeleteItemListener
 
     interface OnDeleteItemListener {
-        fun deletedItemDetails(title: String, note: String, date: String)
+        fun deletedItemDetails(title: String, note: String, date: String, undo: Boolean, delete: Boolean, softDelete: Boolean, position: Int)
     }
 
     fun setOnDeleteItemListener(onDeleteItemListener: OnDeleteItemListener) {
@@ -39,6 +39,8 @@ class MainRecyclerAdapter(var itemsHolder: ArrayList<ItemsHolder>, var recyclerV
 
     override fun onBindViewHolder(holder: ViewHolder?, position: Int) {
         val itemsHolder: ItemsHolder = itemsHolder[position]
+        Log.i("search", "bind")
+        Log.i("search", "array size: " + this.itemsHolder.size)
 
         var title = itemsHolder.title
         var note = itemsHolder.note
@@ -64,36 +66,20 @@ class MainRecyclerAdapter(var itemsHolder: ArrayList<ItemsHolder>, var recyclerV
             val title: String = this.itemsHolder.get(pos).title
             val note: String = this.itemsHolder.get(pos).note
             val date: String = this.itemsHolder.get(pos).date
-
-            val item = this.itemsHolder[pos]
-            var undo = false
-            val itemX = holder.itemView.x
-            val itemY = holder.itemView.y
+            var undoClicked = false
 
             Snackbar.make((ctx as MainActivity).binding.root, ctx.getString(R.string.note_deleted), Snackbar.LENGTH_LONG).setAction(ctx.getString(R.string.undo), {
-                undo = true
-                this.itemsHolder.add(pos, item)
-                notifyItemInserted(pos)
-
-                recyclerView.scrollToPosition(pos)
+                undoClicked = true
+                onDeleteItemListener_.deletedItemDetails(title, note, date, true, false, false, pos)
 
             }).setCallback(object : Snackbar.Callback() {
                 override fun onDismissed(transientBottomBar: Snackbar?, event: Int) {
-                    if (!undo) {
-                        database.use {
-                            delete(
-                                    "notes", "title=? AND note=? AND date=?", arrayOf(title, note, date)
-                            )
-                        }
-                    }
+                    if (!undoClicked)
+                        onDeleteItemListener_.deletedItemDetails(title, note, date, false, true, false, pos)
                 }
             }).show()
 
-            undo = false
-
-            onDeleteItemListener_.deletedItemDetails(title, note, date)
-            this.itemsHolder.removeAt(pos)
-            notifyItemRemoved(pos)
+            onDeleteItemListener_.deletedItemDetails(title, note, date, false, false, true, pos)
             true
         }
     }
@@ -111,6 +97,13 @@ class MainRecyclerAdapter(var itemsHolder: ArrayList<ItemsHolder>, var recyclerV
     class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         val title = itemView.findViewById<TextView>(R.id.titleTextView)
         val note = itemView.findViewById<TextView>(R.id.noteTextView)
+    }
+
+    fun setFilter(newItemList: ArrayList<ItemsHolder>) {
+        Log.i("search", "filter")
+        itemsHolder = ArrayList()
+        itemsHolder.addAll(newItemList)
+        notifyDataSetChanged()
     }
 
 }
