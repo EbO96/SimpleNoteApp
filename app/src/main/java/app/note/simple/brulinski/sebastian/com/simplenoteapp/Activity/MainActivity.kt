@@ -23,7 +23,7 @@ import app.note.simple.brulinski.sebastian.com.simplenoteapp.HelperClass.LayoutM
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.R
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.databinding.ActivityMainBinding
 
-class MainActivity : AppCompatActivity(), NotesListFragment.OnListenRecyclerScroll, SearchView.OnQueryTextListener, SearchView.OnCloseListener {
+class MainActivity : AppCompatActivity(), NotesListFragment.OnListenRecyclerScroll, SearchView.OnQueryTextListener {
 
 
     lateinit var mSearchCallback: OnSearchResultListener
@@ -201,21 +201,15 @@ class MainActivity : AppCompatActivity(), NotesListFragment.OnListenRecyclerScro
     }
 
     override fun onQueryTextSubmit(query: String?): Boolean {
-        Log.i("search", "search submit")
         return true
     }
 
     override fun onQueryTextChange(newText: String?): Boolean {
-        Log.i("search", "search mode")
         if (supportFragmentManager.findFragmentById(binding.mainContainer.id) is NotesListFragment)
             mSearchCallback.passNewText(newText)
         return true
     }
-
-    override fun onClose(): Boolean {
-        Log.i("search", "search close")
-        return true
-    }                                                                                                              /*
+    /*
     Select menu item at Toolbar and execute action 
      */
 

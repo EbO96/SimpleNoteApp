@@ -7,7 +7,6 @@ import android.support.v4.app.Fragment
 import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView
 import android.support.v7.widget.StaggeredGridLayoutManager
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -29,8 +28,11 @@ import org.jetbrains.anko.db.select
  */
 class NotesListFragment : Fragment() {
 
+    companion object {
+        lateinit var itemsObjectsArray: ArrayList<ItemsHolder>
+    }
+
     lateinit var binding: NotesListFragmentBinding
-    lateinit var itemsObjectsArray: ArrayList<ItemsHolder>
     lateinit var myRecycler: MainRecyclerAdapter
     lateinit var database: LocalSQLAnkoDatabase
     lateinit var layoutStyle: LayoutManagerStyle
@@ -57,13 +59,9 @@ class NotesListFragment : Fragment() {
     override fun onCreateView(inflater: LayoutInflater?, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         binding = DataBindingUtil.inflate(inflater, R.layout.notes_list_fragment, container, false)
 
-        Log.i("frag", "create")
         CurrentFragmentState.CURRENT = MainActivity.NOTE_LIST_FRAGMENT_TAG
 
         (activity as MainActivity).supportActionBar?.setTitle(getString(R.string.notes))
-
-
-        //(activity as MainActivity).changeRecyclerLayout()
 
         //Database
         database = LocalSQLAnkoDatabase(context)
@@ -97,7 +95,7 @@ class NotesListFragment : Fragment() {
         updateNoteList()
 
         //Deleted items listener
-        listenDeletedItems()
+        //listenDeletedItems()
 
         //Change layout manager
         (activity as MainActivity).setOnChangeLayoutListener(object : MainActivity.OnChangeLayoutListener {
@@ -128,7 +126,6 @@ class NotesListFragment : Fragment() {
             }
         }
         myRecycler.notifyDataSetChanged()
-
     }
 
     fun editNote() {
@@ -142,35 +139,6 @@ class NotesListFragment : Fragment() {
     override fun onSaveInstanceState(outState: Bundle?) {
         super.onSaveInstanceState(outState)
         outState?.putBoolean("flag", layoutStyle.flag)
-    }
-
-    fun listenDeletedItems() {
-        myRecycler.setOnDeleteItemListener(object : MainRecyclerAdapter.OnDeleteItemListener {
-            override fun deletedItemDetails(title: String, note: String, date: String, undo: Boolean, delete: Boolean, softDelete: Boolean, position: Int) {
-
-                try {
-                    if (softDelete) { //Always execute
-                        deletedItem = itemsObjectsArray[position] //Save deleted item as temp value
-                        //Remove from recycler
-                        itemsObjectsArray.removeAt(position)
-                        myRecycler.notifyItemRemoved(position) //Notify changes
-
-                    } else if (undo) { //Execute when user click "UNDO"
-                        itemsObjectsArray.add(position, deletedItem!!)
-                        myRecycler.notifyItemInserted(position)
-                    } else if(delete){ //When snackbar dismiss and user not clicked "UNDO"
-
-                        database.use {
-                            delete(
-                                    "notes", "title=? AND note=? AND date=?", arrayOf(title, note, date)
-                            )
-                        }
-                    }
-                } catch (e: Exception) {
-                    e.printStackTrace()
-                }
-            }
-        })
     }
 
     fun updateNoteList() {
@@ -205,26 +173,20 @@ class NotesListFragment : Fragment() {
     }
 
     fun updateListBySearch() {
-        try {
-            (activity as MainActivity).setOnSearchResultListener(object : MainActivity.OnSearchResultListener {
-                override fun passNewText(newText: String?) {
-                    var newList: ArrayList<ItemsHolder> = ArrayList()
+        (activity as MainActivity).setOnSearchResultListener(object : MainActivity.OnSearchResultListener {
+            override fun passNewText(newText: String?) {
+                var newList: ArrayList<ItemsHolder> = ArrayList()
 
-                    for (itemsHolder: ItemsHolder in itemsObjectsArray) {
-                        val title = itemsHolder.title.toLowerCase()
-                        val note = itemsHolder.note.toLowerCase()
+                for (itemsHolder: ItemsHolder in itemsObjectsArray) {
+                    val title = itemsHolder.title.toLowerCase()
+                    val note = itemsHolder.note.toLowerCase()
 
-                        if (title.contains(newText!!.toLowerCase()) || note.contains(newText!!.toLowerCase())) {
-                            newList.add(itemsHolder)
-                        }
+                    if (title.contains(newText!!.toLowerCase()) || note.contains(newText.toLowerCase())) {
+                        newList.add(itemsHolder)
                     }
-
-                    myRecycler.setFilter(newList)
                 }
-            })
-        } catch (e: Exception) {
-            e.printStackTrace()
-        }
-
+                myRecycler.setFilter(newList)
+            }
+        })
     }
 }

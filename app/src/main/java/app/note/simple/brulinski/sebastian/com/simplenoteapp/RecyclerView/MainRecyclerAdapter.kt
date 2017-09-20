@@ -3,13 +3,13 @@ package app.note.simple.brulinski.sebastian.com.simplenoteapp.RecyclerView
 import android.content.Context
 import android.support.design.widget.Snackbar
 import android.support.v7.widget.RecyclerView
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.Activity.MainActivity
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.Database.LocalSQLAnkoDatabase
+import app.note.simple.brulinski.sebastian.com.simplenoteapp.Fragment.NotesListFragment
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.Model.ItemsHolder
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.R
 
@@ -17,6 +17,10 @@ import app.note.simple.brulinski.sebastian.com.simplenoteapp.R
 class MainRecyclerAdapter(var itemsHolder: ArrayList<ItemsHolder>, var recyclerView: RecyclerView, var database: LocalSQLAnkoDatabase, var ctx: Context) : RecyclerView.Adapter<MainRecyclerAdapter.ViewHolder>() {
 
     lateinit var onEditItemListener_: OnEditItemListener
+    var deletedItem: ItemsHolder? = null
+    var position = 0
+    var filterListSize = 0
+    var undoClicked = false
 
     interface OnEditItemListener {
         fun itemDetails(title: String, note: String, position: Int)
@@ -26,21 +30,9 @@ class MainRecyclerAdapter(var itemsHolder: ArrayList<ItemsHolder>, var recyclerV
         this.onEditItemListener_ = onEditItemListener
     }
 
-    lateinit var onDeleteItemListener_: OnDeleteItemListener
-
-    interface OnDeleteItemListener {
-        fun deletedItemDetails(title: String, note: String, date: String, undo: Boolean, delete: Boolean, softDelete: Boolean, position: Int)
-    }
-
-    fun setOnDeleteItemListener(onDeleteItemListener: OnDeleteItemListener) {
-        this.onDeleteItemListener_ = onDeleteItemListener
-    }
-
 
     override fun onBindViewHolder(holder: ViewHolder?, position: Int) {
         val itemsHolder: ItemsHolder = itemsHolder[position]
-        Log.i("search", "bind")
-        Log.i("search", "array size: " + this.itemsHolder.size)
 
         var title = itemsHolder.title
         var note = itemsHolder.note
@@ -66,20 +58,42 @@ class MainRecyclerAdapter(var itemsHolder: ArrayList<ItemsHolder>, var recyclerV
             val title: String = this.itemsHolder.get(pos).title
             val note: String = this.itemsHolder.get(pos).note
             val date: String = this.itemsHolder.get(pos).date
-            var undoClicked = false
+
 
             Snackbar.make((ctx as MainActivity).binding.root, ctx.getString(R.string.note_deleted), Snackbar.LENGTH_LONG).setAction(ctx.getString(R.string.undo), {
                 undoClicked = true
-                onDeleteItemListener_.deletedItemDetails(title, note, date, true, false, false, pos)
+                this.itemsHolder.add(pos, deletedItem!!)
+
+                //Execute this if statement only when deleting item is call from search mode
+                if (filterListSize != 0)
+                    NotesListFragment.itemsObjectsArray.add(this.position, deletedItem!!)
+
+                notifyItemInserted(pos)
 
             }).setCallback(object : Snackbar.Callback() {
                 override fun onDismissed(transientBottomBar: Snackbar?, event: Int) {
-                    if (!undoClicked)
-                        onDeleteItemListener_.deletedItemDetails(title, note, date, false, true, false, pos)
+                    notifyDataSetChanged()
+                    if (!undoClicked) {
+                        database.use {
+                            delete(
+                                    "notes", "title=? AND note=? AND date=?", arrayOf(title, note, date)
+                            )
+                        }
+                    }
+                    undoClicked = false
                 }
             }).show()
 
-            onDeleteItemListener_.deletedItemDetails(title, note, date, false, false, true, pos)
+
+            deletedItem = this.itemsHolder[pos]
+            this.position = pos
+            this.itemsHolder.removeAt(pos)
+            this.position = NotesListFragment.itemsObjectsArray.indexOf(deletedItem!!)
+            //Execute this if statement only when deleting item is call from search mode
+            if (filterListSize != 0)
+                NotesListFragment.itemsObjectsArray.removeAt(this.position)
+            notifyItemRemoved(pos)
+
             true
         }
     }
@@ -100,10 +114,18 @@ class MainRecyclerAdapter(var itemsHolder: ArrayList<ItemsHolder>, var recyclerV
     }
 
     fun setFilter(newItemList: ArrayList<ItemsHolder>) {
-        Log.i("search", "filter")
+        filterListSize = newItemList.size
         itemsHolder = ArrayList()
         itemsHolder.addAll(newItemList)
         notifyDataSetChanged()
+    }
+
+    override fun onAttachedToRecyclerView(recyclerView: RecyclerView?) {
+        super.onAttachedToRecyclerView(recyclerView)
+    }
+
+    override fun onDetachedFromRecyclerView(recyclerView: RecyclerView?) {
+        super.onDetachedFromRecyclerView(recyclerView)
     }
 
 }
