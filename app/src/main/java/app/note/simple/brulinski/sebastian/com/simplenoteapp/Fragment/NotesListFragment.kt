@@ -60,8 +60,7 @@ class NotesListFragment : Fragment() {
         Log.i("frag", "create")
         CurrentFragmentState.CURRENT = MainActivity.NOTE_LIST_FRAGMENT_TAG
 
-        if (!resources.getBoolean(R.bool.twoPaneMode))
-            (activity as MainActivity).supportActionBar?.setTitle(getString(R.string.notes))
+        (activity as MainActivity).supportActionBar?.setTitle(getString(R.string.notes))
 
 
         //(activity as MainActivity).changeRecyclerLayout()

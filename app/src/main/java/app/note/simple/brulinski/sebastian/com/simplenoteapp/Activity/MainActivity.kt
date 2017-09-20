@@ -1,7 +1,6 @@
 package app.note.simple.brulinski.sebastian.com.simplenoteapp.Activity
 
 import android.content.Context
-import android.content.Intent
 import android.content.SharedPreferences
 import android.databinding.DataBindingUtil
 import android.os.Bundle
@@ -9,7 +8,6 @@ import android.support.v4.app.Fragment
 import android.support.v4.app.FragmentManager
 import android.support.v4.app.FragmentTransaction
 import android.support.v7.app.AppCompatActivity
-import android.util.Log
 import android.view.Menu
 import android.view.MenuInflater
 import android.view.MenuItem
@@ -47,7 +45,6 @@ class MainActivity : AppCompatActivity() {
         var NOTE_PREVIEW_FRAGMENT_TAG: String = "PREVIEW" //Fragment TAG
         var menuItemGrid: MenuItem? = null //Toolbar menu item (set recycler view layout as staggered layout)
         var menuItemLinear: MenuItem? = null //Toolbar menu item (set recycler view layout as linear layout)
-        var twoPaneMode: Boolean = false //Flag - portrait or landscape mode
     }
 
     /*
@@ -75,11 +72,6 @@ class MainActivity : AppCompatActivity() {
         managerStyle = LayoutManagerStyle(this)
 
         /*
-        After when user rotate phone the onCreate is called again and we save screen orientation state to this value
-         */
-        twoPaneMode = resources.getBoolean(R.bool.twoPaneMode)
-
-        /*
         Set main fragment  (NoteListFragment.kt) manually  only once when saveInstanceState is null
         At the same time we getting layout manager type from SharedPreferences
          */
@@ -98,20 +90,18 @@ class MainActivity : AppCompatActivity() {
         fm = supportFragmentManager
         ft = fm.beginTransaction()
 
-        val notesListFragment: NotesListFragment = NotesListFragment()
+        val notesListFragment = NotesListFragment()
 
         noteFragment = notesListFragment
         ft.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_FADE)
         ft.replace(binding.mainContainer.id, notesListFragment, NOTE_LIST_FRAGMENT_TAG)
 
-        if (!twoPaneMode) //Off fragment transition when user is in landscape mode
-            ft.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN)
+        ft.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN)
 
         ft.addToBackStack(NOTE_LIST_FRAGMENT_TAG)
 
         ft.commit()
         fm.executePendingTransactions()
-
     }
 
     /*
@@ -146,8 +136,6 @@ class MainActivity : AppCompatActivity() {
 
 
         var containerId = binding.mainContainer.id
-        if (twoPaneMode)
-            containerId = binding.mainContainerDetails!!.id
 
         ft.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_FADE)
         ft.replace(containerId, editNoteFragment, EDIT_NOTE_FRAGMENT_TAG)
@@ -176,13 +164,10 @@ class MainActivity : AppCompatActivity() {
         ft = fm.beginTransaction()
 
         var containerID = binding.mainContainer.id
-        if (twoPaneMode)
-            containerID = binding.mainContainerDetails!!.id
 
         ft.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_FADE)
         ft.replace(containerID, previewFragment, NOTE_PREVIEW_FRAGMENT_TAG)
-        if (!twoPaneMode)
-            ft.addToBackStack(NOTE_PREVIEW_FRAGMENT_TAG)
+        ft.addToBackStack(NOTE_PREVIEW_FRAGMENT_TAG)
         ft.commit()
     }
 
@@ -259,15 +244,6 @@ class MainActivity : AppCompatActivity() {
 
     fun editItem(frag: NotesListFragment) {
         /*
-        When user have a one or more item at list and then switch to landscape mode then we
-        set "Preview Mode" fragment in neighboring container
-         */
-
-        if (resources.getBoolean(R.bool.twoPaneMode) && frag.itemsObjectsArray.size != 0) {
-            setNotePreviewFragment(frag.itemsObjectsArray.get(0).title, frag.itemsObjectsArray.get(0).note, 0)
-        }
-
-        /*
         Listen item click and switch to "Preview Mode"
          */
         frag.setOnEditModeListener(object : NotesListFragment.OnEditModeListener {
@@ -293,31 +269,28 @@ class MainActivity : AppCompatActivity() {
     fun floatingActionButtonListener() {
         binding.mainFab.setOnClickListener {
             CurrentFragmentState.backPressed = false //Set flag at false. Necessary in onDestroyView() method in CreateNoteFragment.kt
-            if (twoPaneMode) {
 
-            } else {
-                /*
-                Depending on the current fragment switch to another define below
-                 */
-                val frag = supportFragmentManager.findFragmentById(binding.mainContainer.id)
+            /*
+            Depending on the current fragment switch to another define below
+             */
+            val frag = supportFragmentManager.findFragmentById(binding.mainContainer.id)
 
-                if (frag is NotesListFragment) {
-                    binding.mainFab.setImageDrawable(resources.getDrawable(R.drawable.ic_done_white_24dp))
-                    setCreateNoteFragment()
-                } else if (frag is CreateNoteFragment && frag.tag.equals(CREATE_NOTE_FRAGMENT_TAG)) {
-                    binding.mainFab.setImageDrawable(resources.getDrawable(R.drawable.ic_add_white_24dp))
+            if (frag is NotesListFragment) {
+                binding.mainFab.setImageDrawable(resources.getDrawable(R.drawable.ic_done_white_24dp))
+                setCreateNoteFragment()
+            } else if (frag is CreateNoteFragment && frag.tag.equals(CREATE_NOTE_FRAGMENT_TAG)) {
+                binding.mainFab.setImageDrawable(resources.getDrawable(R.drawable.ic_add_white_24dp))
+                supportFragmentManager.popBackStack()
+            } else if (frag is EditNoteFragment) { //Update RecyclerView item and return to NoteListFragment
+                binding.mainFab.setImageDrawable(resources.getDrawable(R.drawable.ic_add_white_24dp))
+                for (x in 1..2) {
                     supportFragmentManager.popBackStack()
-                } else if (frag is EditNoteFragment) { //Update RecyclerView item and return to NoteListFragment
-                    binding.mainFab.setImageDrawable(resources.getDrawable(R.drawable.ic_add_white_24dp))
-                    for (x in 1..2) {
-                        supportFragmentManager.popBackStack()
-                    }
-                    //mUpdateListener.passData(frag.title, frag.note, frag.position)
-                } else if (frag is NotePreviewFragment) {
-                    binding.mainFab.setImageDrawable(resources.getDrawable(R.drawable.ic_done_white_24dp))
-                    setEditNoteFragment(frag.binding.previewTitleField.text.toString(),
-                            frag.binding.previewNoteField.text.toString(), frag.itemPosition)
                 }
+                //mUpdateListener.passData(frag.title, frag.note, frag.position)
+            } else if (frag is NotePreviewFragment) {
+                binding.mainFab.setImageDrawable(resources.getDrawable(R.drawable.ic_done_white_24dp))
+                setEditNoteFragment(frag.binding.previewTitleField.text.toString(),
+                        frag.binding.previewNoteField.text.toString(), frag.itemPosition)
             }
         }
     }

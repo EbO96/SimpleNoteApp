@@ -28,8 +28,7 @@ open class CreateNoteFragment : Fragment() {
 
         CurrentFragmentState.CURRENT = MainActivity.CREATE_NOTE_FRAGMENT_TAG
 
-        if (!resources.getBoolean(R.bool.twoPaneMode))
-            (activity as MainActivity).supportActionBar?.setTitle(getString(R.string.create))
+        (activity as MainActivity).supportActionBar?.setTitle(getString(R.string.create))
 
         database = LocalSQLAnkoDatabase(context)
 

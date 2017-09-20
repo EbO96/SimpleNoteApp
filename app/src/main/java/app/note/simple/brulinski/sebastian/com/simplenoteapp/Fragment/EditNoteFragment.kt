@@ -14,8 +14,7 @@ class EditNoteFragment : CreateNoteFragment() {
     override fun onStart() {
         CurrentFragmentState.CURRENT = MainActivity.EDIT_NOTE_FRAGMENT_TAG
 
-        if (!resources.getBoolean(R.bool.twoPaneMode))
-            (activity as MainActivity).supportActionBar?.setTitle(getString(R.string.edit))
+        (activity as MainActivity).supportActionBar?.setTitle(getString(R.string.edit))
 
 
         title = arguments.getString("title")

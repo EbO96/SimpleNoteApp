@@ -29,8 +29,7 @@ class NotePreviewFragment : Fragment() {
     override fun onCreateView(inflater: LayoutInflater?, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         binding = DataBindingUtil.inflate(inflater, R.layout.note_preview_fragment, container, false)
 
-        if (!resources.getBoolean(R.bool.twoPaneMode))
-            (activity as MainActivity).supportActionBar?.setTitle(getString(R.string.preview))
+        (activity as MainActivity).supportActionBar?.setTitle(getString(R.string.preview))
 
         return binding.root
     }
