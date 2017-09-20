@@ -23,6 +23,7 @@
                     android:background="@android:color/transparent"
                     android:hint="@string/title"
                     android:maxLines="1"
+                    android:inputType="textShortMessage"
                     android:padding="8dp"
                     android:textSize="24sp"
                     android:textStyle="bold" />
