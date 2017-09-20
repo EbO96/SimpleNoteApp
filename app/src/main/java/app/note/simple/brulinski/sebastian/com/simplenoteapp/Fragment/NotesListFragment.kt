@@ -22,10 +22,6 @@ import app.note.simple.brulinski.sebastian.com.simplenoteapp.databinding.NotesLi
 import jp.wasabeef.recyclerview.animators.SlideInRightAnimator
 import org.jetbrains.anko.db.select
 
-
-/**
- * Created by sebas on 15.09.2017.
- */
 class NotesListFragment : Fragment() {
 
     companion object {
@@ -37,8 +33,6 @@ class NotesListFragment : Fragment() {
     lateinit var database: LocalSQLAnkoDatabase
     lateinit var layoutStyle: LayoutManagerStyle
     var styleFlag: Boolean = true
-    var deletedItem: ItemsHolder? = null
-    var deletedItemPosition: Int? = null
 
     lateinit var mScrollCallback: OnListenRecyclerScroll
 
@@ -66,25 +60,17 @@ class NotesListFragment : Fragment() {
         //Database
         database = LocalSQLAnkoDatabase(context)
 
-        //Recycler
-        binding.recyclerView.setHasFixedSize(true)
-
-        layoutStyle = LayoutManagerStyle(this.activity)
-
-        styleFlag = layoutStyle.flag
-
-        if (styleFlag)
-            binding.recyclerView.layoutManager = LinearLayoutManager(context, LinearLayoutManager.VERTICAL, false)
-        else binding.recyclerView.layoutManager = StaggeredGridLayoutManager(2, StaggeredGridLayoutManager.VERTICAL)
-
-        binding.recyclerView.itemAnimator = SlideInRightAnimator()
-
-        itemsObjectsArray = ArrayList()
-        myRecycler = MainRecyclerAdapter(itemsObjectsArray, binding.recyclerView, database, context)
-        binding.recyclerView.adapter = myRecycler
-
         //Get notes
-        getAndSetNotes()
+        if (savedInstanceState == null) {
+            getAndSetNotes()
+        } else {
+            itemsObjectsArray = savedInstanceState.getParcelableArrayList<ItemsHolder>("notes")
+        }
+
+        /*
+
+         */
+        initRecyclerAdapter()
 
         (activity as MainActivity).editItem(this)
 
@@ -116,7 +102,28 @@ class NotesListFragment : Fragment() {
         return binding.root
     }
 
+    private fun initRecyclerAdapter() { //Init recycler view
+        //Recycler
+        binding.recyclerView.setHasFixedSize(true)
+
+        layoutStyle = LayoutManagerStyle(this.activity)
+
+        styleFlag = layoutStyle.flag
+
+
+        if (styleFlag)
+            binding.recyclerView.layoutManager = LinearLayoutManager(context, LinearLayoutManager.VERTICAL, false)
+        else binding.recyclerView.layoutManager = StaggeredGridLayoutManager(2, StaggeredGridLayoutManager.VERTICAL)
+
+        binding.recyclerView.itemAnimator = SlideInRightAnimator()
+
+        myRecycler = MainRecyclerAdapter(itemsObjectsArray, binding.recyclerView, database, context)
+        binding.recyclerView.adapter = myRecycler
+        myRecycler.notifyDataSetChanged()
+    }
+
     fun getAndSetNotes() {
+        itemsObjectsArray = ArrayList()
         database.use {
             val notes = select("notes").parseList(MyRowParser())
             val size = notes.size
@@ -125,7 +132,6 @@ class NotesListFragment : Fragment() {
                 itemsObjectsArray.add(ItemsHolder(notes.get(x).get(x).title!!, notes.get(x).get(x).note!!, notes.get(x).get(x).date!!))
             }
         }
-        myRecycler.notifyDataSetChanged()
     }
 
     fun editNote() {
@@ -139,6 +145,13 @@ class NotesListFragment : Fragment() {
     override fun onSaveInstanceState(outState: Bundle?) {
         super.onSaveInstanceState(outState)
         outState?.putBoolean("flag", layoutStyle.flag)
+
+        /*
+        Save fragment state do Bundle and restore notes from it instead of
+        getting this data from database
+         */
+
+        outState?.putParcelableArrayList("notes", itemsObjectsArray)
     }
 
     fun updateNoteList() {
@@ -189,4 +202,6 @@ class NotesListFragment : Fragment() {
             }
         })
     }
+
+
 }

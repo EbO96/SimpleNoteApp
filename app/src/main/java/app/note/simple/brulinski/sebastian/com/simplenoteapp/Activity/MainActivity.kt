@@ -197,7 +197,7 @@ class MainActivity : AppCompatActivity(), NotesListFragment.OnListenRecyclerScro
         menuItemLinear = menu.findItem(R.id.main_menu_linear)
 
         val searchView: SearchView = (menu.findItem(R.id.search).getActionView() as SearchView)
-        searchView.queryHint = getString(R.string.search_hint)
+        searchView.queryHint = getString(R.string.search_hint) //Set search hint
 
         searchView.setOnQueryTextListener(this)
 

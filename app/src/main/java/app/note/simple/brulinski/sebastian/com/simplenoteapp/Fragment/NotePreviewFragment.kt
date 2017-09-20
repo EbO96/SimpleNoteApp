@@ -15,6 +15,7 @@ import android.view.ViewTreeObserver
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.Activity.MainActivity
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.R
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.databinding.NotePreviewFragmentBinding
+import app.note.simple.brulinski.sebastian.com.simplenoteapp.databinding.PreviewCardBinding
 import org.jetbrains.anko.support.v4.nestedScrollView
 import java.lang.reflect.Executable
 import java.security.spec.ECField
@@ -33,10 +34,10 @@ class NotePreviewFragment : Fragment() {
         this.mListener = mListener
     }
 
-    lateinit var binding: NotePreviewFragmentBinding
+    lateinit var binding: PreviewCardBinding
 
     override fun onCreateView(inflater: LayoutInflater?, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        binding = DataBindingUtil.inflate(inflater, R.layout.note_preview_fragment, container, false)
+        binding = DataBindingUtil.inflate(inflater, R.layout.preview_card, container, false)
 
         (activity as MainActivity).supportActionBar?.setTitle(getString(R.string.preview))
 
@@ -52,7 +53,6 @@ class NotePreviewFragment : Fragment() {
 
         binding.previewTitleField.text = title
         binding.previewNoteField.text = note
-
 
     }
 
