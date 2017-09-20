@@ -7,6 +7,7 @@ import android.os.Bundle
 import android.support.v4.app.Fragment
 import android.support.v4.app.FragmentManager
 import android.support.v4.app.FragmentTransaction
+import android.support.v4.view.MenuItemCompat
 import android.support.v7.app.AppCompatActivity
 import android.support.v7.widget.RecyclerView
 import android.support.v7.widget.SearchView
@@ -14,6 +15,8 @@ import android.util.Log
 import android.view.Menu
 import android.view.MenuInflater
 import android.view.MenuItem
+import android.view.View
+import android.view.animation.Animation
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.Fragment.CreateNoteFragment
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.Fragment.EditNoteFragment
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.Fragment.NotePreviewFragment
@@ -24,7 +27,6 @@ import app.note.simple.brulinski.sebastian.com.simplenoteapp.R
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.databinding.ActivityMainBinding
 
 class MainActivity : AppCompatActivity(), NotesListFragment.OnListenRecyclerScroll, SearchView.OnQueryTextListener {
-
 
     lateinit var mSearchCallback: OnSearchResultListener
 
@@ -195,10 +197,30 @@ class MainActivity : AppCompatActivity(), NotesListFragment.OnListenRecyclerScro
         menuItemLinear = menu.findItem(R.id.main_menu_linear)
 
         val searchView: SearchView = (menu.findItem(R.id.search).getActionView() as SearchView)
+        searchView.queryHint = getString(R.string.search_hint)
+
         searchView.setOnQueryTextListener(this)
+
+        /*
+        Listen when search mode is active and when collapse
+         */
+        MenuItemCompat.setOnActionExpandListener(menu!!.findItem(R.id.search),object: MenuItemCompat.OnActionExpandListener {
+            override fun onMenuItemActionCollapse(item: MenuItem?): Boolean {
+                menuItemLinear!!.setVisible(true)
+                menuItemGrid!!.setVisible(true)
+                return true }
+
+            override fun onMenuItemActionExpand(item: MenuItem?): Boolean {
+                menuItemLinear!!.setVisible(false)
+                menuItemGrid!!.setVisible(false)
+                return true}
+        })
+
 
         return true
     }
+
+
 
     override fun onQueryTextSubmit(query: String?): Boolean {
         return true
