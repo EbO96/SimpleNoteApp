@@ -1,9 +1,11 @@
 package app.note.simple.brulinski.sebastian.com.simplenoteapp.Fragment
 
+import android.app.Activity
 import android.databinding.DataBindingUtil
 import android.os.Bundle
 import android.support.v4.app.Fragment
 import android.support.v7.widget.LinearLayoutManager
+import android.support.v7.widget.RecyclerView
 import android.support.v7.widget.StaggeredGridLayoutManager
 import android.util.Log
 import android.view.LayoutInflater
@@ -33,6 +35,12 @@ class NotesListFragment : Fragment() {
     lateinit var database: LocalSQLAnkoDatabase
     lateinit var layoutStyle: LayoutManagerStyle
     var styleFlag: Boolean = true
+
+    lateinit var mScrollCallback: OnListenRecyclerScroll
+
+    interface OnListenRecyclerScroll {
+        fun recyclerScrolling(dx: Int?, dy: Int?, newState: Int?)
+    }
 
     lateinit var onEditModeListener_: OnEditModeListener
 
@@ -110,6 +118,9 @@ class NotesListFragment : Fragment() {
             }
         })
 
+        //Listen for recycler scrolling
+        recyclerScrollingListener()
+
         return binding.root
     }
 
@@ -157,7 +168,25 @@ class NotesListFragment : Fragment() {
         })
     }
 
-    override fun onResume() {
-        super.onResume()
+    override fun onAttach(activity: Activity?) {
+        try {
+            mScrollCallback = (activity as OnListenRecyclerScroll)
+
+        } catch (e: ClassCastException) {
+            throw ClassCastException(activity.toString() + " must implement OnListenRecyclerScroll")
+        }
+        super.onAttach(activity)
+    }
+
+    fun recyclerScrollingListener() {
+        binding.recyclerView.addOnScrollListener(object : RecyclerView.OnScrollListener() {
+            override fun onScrolled(recyclerView: RecyclerView?, dx: Int, dy: Int) {
+                mScrollCallback.recyclerScrolling(dx, dy, null)
+            }
+
+            override fun onScrollStateChanged(recyclerView: RecyclerView?, newState: Int) {
+                mScrollCallback.recyclerScrolling(null, null, newState)
+            }
+        })
     }
 }

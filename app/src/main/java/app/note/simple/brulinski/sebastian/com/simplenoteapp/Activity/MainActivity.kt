@@ -8,6 +8,7 @@ import android.support.v4.app.Fragment
 import android.support.v4.app.FragmentManager
 import android.support.v4.app.FragmentTransaction
 import android.support.v7.app.AppCompatActivity
+import android.support.v7.widget.RecyclerView
 import android.view.Menu
 import android.view.MenuInflater
 import android.view.MenuItem
@@ -20,7 +21,7 @@ import app.note.simple.brulinski.sebastian.com.simplenoteapp.HelperClass.LayoutM
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.R
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.databinding.ActivityMainBinding
 
-class MainActivity : AppCompatActivity() {
+class MainActivity : AppCompatActivity(), NotesListFragment.OnListenRecyclerScroll {
 
     lateinit var mUpdateListener: OnUpdateListListener
 
@@ -291,6 +292,20 @@ class MainActivity : AppCompatActivity() {
                 binding.mainFab.setImageDrawable(resources.getDrawable(R.drawable.ic_done_white_24dp))
                 setEditNoteFragment(frag.binding.previewTitleField.text.toString(),
                         frag.binding.previewNoteField.text.toString(), frag.itemPosition)
+            }
+        }
+    }
+    /*
+    Listener recycler scroll via interface between this activity and NoteListFragment.
+    When recycler is scrolling then floating action button is hiden
+     */
+    override fun recyclerScrolling(dx: Int?, dy: Int?, newState: Int?) {
+        if (newState == null) {
+            if (dy!! > 0 || dy < 0 && binding.mainFab.isShown())
+                binding.mainFab.hide();
+        } else {
+            if (newState == RecyclerView.SCROLL_STATE_IDLE) {
+                binding.mainFab.show();
             }
         }
     }
