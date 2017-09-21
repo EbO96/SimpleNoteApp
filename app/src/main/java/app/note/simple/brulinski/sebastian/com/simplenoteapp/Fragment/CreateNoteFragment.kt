@@ -10,13 +10,13 @@ import android.view.LayoutInflater
 import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
-import android.widget.EditText
+import android.widget.LinearLayout
 import android.widget.PopupMenu
-import android.widget.TextView
+import android.widget.PopupWindow
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.Activity.MainActivity
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.Database.LocalSQLAnkoDatabase
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.HelperClass.CurrentFragmentState
-import app.note.simple.brulinski.sebastian.com.simplenoteapp.HelperClass.FontManager
+import app.note.simple.brulinski.sebastian.com.simplenoteapp.HelperClass.EditorManager
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.R
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.databinding.CreateNoteFragmentBinding
 import org.jetbrains.anko.db.insert
@@ -116,7 +116,6 @@ open class CreateNoteFragment : Fragment() {
         }
 
         bindingFrag.noteColor.setOnClickListener {
-
         }
     }
 
@@ -139,34 +138,35 @@ open class CreateNoteFragment : Fragment() {
             override fun onMenuItemClick(p0: MenuItem?): Boolean {
                 when (p0!!.itemId) {
                     R.id.default_font -> {
-                        FontManager.setUpFontStyle(Typeface.DEFAULT, bindingFrag.createNoteNoteField, bindingFrag.createNoteTitleField)
-                        currentFont = FontManager.DEFAULT_FONT
+                        EditorManager.FontManager.setUpFontStyle(Typeface.DEFAULT, bindingFrag.createNoteNoteField, bindingFrag.createNoteTitleField)
+                        currentFont = EditorManager.FontManager.DEFAULT_FONT
                     }
                     R.id.italic_font -> {
-                        FontManager.setUpFontStyle(Typeface.ITALIC, bindingFrag.createNoteNoteField, bindingFrag.createNoteTitleField)
-                        currentFont =  FontManager.ITALIC_FONT
+                        EditorManager.FontManager.setUpFontStyle(Typeface.ITALIC, bindingFrag.createNoteNoteField, bindingFrag.createNoteTitleField)
+                        currentFont = EditorManager.FontManager.ITALIC_FONT
                     }
                     R.id.bold_italic_font -> {
-                        FontManager.setUpFontStyle(Typeface.BOLD_ITALIC, bindingFrag.createNoteNoteField, bindingFrag.createNoteTitleField)
-                        currentFont =  FontManager.BOLD_ITALIC_FONT
+                        EditorManager.FontManager.setUpFontStyle(Typeface.BOLD_ITALIC, bindingFrag.createNoteNoteField, bindingFrag.createNoteTitleField)
+                        currentFont = EditorManager.FontManager.BOLD_ITALIC_FONT
                     }
                     R.id.serif_font -> {
-                        FontManager.setUpFontStyle(Typeface.SERIF, bindingFrag.createNoteNoteField, bindingFrag.createNoteTitleField)
-                        currentFont =  FontManager.SERIF_FONT
+                        EditorManager.FontManager.setUpFontStyle(Typeface.SERIF, bindingFrag.createNoteNoteField, bindingFrag.createNoteTitleField)
+                        currentFont = EditorManager.FontManager.SERIF_FONT
                     }
                     R.id.sans_serif_font -> {
-                        FontManager.setUpFontStyle(Typeface.SANS_SERIF, bindingFrag.createNoteNoteField, bindingFrag.createNoteTitleField)
-                        currentFont =  FontManager.SANS_SERIF_FONT
+                        EditorManager.FontManager.setUpFontStyle(Typeface.SANS_SERIF, bindingFrag.createNoteNoteField, bindingFrag.createNoteTitleField)
+                        currentFont = EditorManager.FontManager.SANS_SERIF_FONT
                     }
                     R.id.monospace_font -> {
-                        FontManager.setUpFontStyle(Typeface.MONOSPACE, bindingFrag.createNoteNoteField, bindingFrag.createNoteTitleField)
-                        currentFont =  FontManager.MONOSPACE_FONT
+                        EditorManager.FontManager.setUpFontStyle(Typeface.MONOSPACE, bindingFrag.createNoteNoteField, bindingFrag.createNoteTitleField)
+                        currentFont = EditorManager.FontManager.MONOSPACE_FONT
                     }
                 }
                 return true
             }
         })
     }
+
 
 }
 

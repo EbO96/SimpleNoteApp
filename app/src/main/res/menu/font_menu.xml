@@ -5,32 +5,32 @@
     <item
         android:id="@+id/default_font"
         android:title="@string/default_font"
-        app:showAsAction="never"/>
+        app:showAsAction="never" />
 
     <item
         android:id="@+id/italic_font"
         android:title="@string/italic"
-        app:showAsAction="never"/>
+        app:showAsAction="never" />
 
     <item
         android:id="@+id/bold_italic_font"
         android:title="@string/bold_italic"
-        app:showAsAction="never"/>
+        app:showAsAction="never" />
 
     <item
         android:id="@+id/serif_font"
         android:title="@string/serif"
-        app:showAsAction="never"/>
+        app:showAsAction="never" />
 
     <item
         android:id="@+id/sans_serif_font"
         android:title="@string/sans_serif"
-        app:showAsAction="never"/>
+        app:showAsAction="never" />
 
     <item
         android:id="@+id/monospace_font"
         android:title="@string/monospace"
-        app:showAsAction="never"/>
+        app:showAsAction="never" />
 
 
 </menu>

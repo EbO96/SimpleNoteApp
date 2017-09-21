@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item
+        android:id="@+id/col_1"
+        android:title="color"
+        android:icon="@drawable/ic_color_lens_black_24dp">
+    </item>
+
+    <item
+        android:id="@+id/col_2"
+        android:title="color"
+        android:icon="@color/material_red">
+    </item>
+
+    <item
+        android:id="@+id/col_3"
+        android:title="color"
+        android:icon="@drawable/ic_color_lens_black_24dp">
+    </item>
+
+    <item
+        android:id="@+id/col_4"
+        android:title="color"
+        android:icon="@drawable/ic_color_lens_black_24dp">
+    </item>
+
+    <item
+        android:id="@+id/col_5"
+        android:title="color"
+        android:icon="@drawable/ic_color_lens_black_24dp">
+    </item>
+</menu>

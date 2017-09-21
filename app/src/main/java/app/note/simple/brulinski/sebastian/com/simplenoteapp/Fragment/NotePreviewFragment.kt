@@ -7,7 +7,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.Activity.MainActivity
-import app.note.simple.brulinski.sebastian.com.simplenoteapp.HelperClass.FontManager
+import app.note.simple.brulinski.sebastian.com.simplenoteapp.HelperClass.EditorManager
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.R
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.databinding.PreviewCardBinding
 
@@ -34,7 +34,7 @@ class NotePreviewFragment : Fragment() {
         font = arguments.getString("font")
         itemPosition = arguments.getInt("position")
 
-        FontManager.recogniseAndSetFont(font, binding.previewTitleField, binding.previewNoteField)
+        EditorManager.FontManager.recogniseAndSetFont(font, binding.previewTitleField, binding.previewNoteField)
         binding.previewTitleField.text = title
         binding.previewNoteField.text = note
 

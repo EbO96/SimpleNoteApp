@@ -2,13 +2,11 @@ package app.note.simple.brulinski.sebastian.com.simplenoteapp.Fragment
 
 import android.app.Activity
 import android.content.ContentValues
-import android.os.Bundle
 import android.text.TextUtils
 import android.util.Log
-import android.view.View
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.Activity.MainActivity
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.HelperClass.CurrentFragmentState
-import app.note.simple.brulinski.sebastian.com.simplenoteapp.HelperClass.FontManager
+import app.note.simple.brulinski.sebastian.com.simplenoteapp.HelperClass.EditorManager
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.R
 
 class EditNoteFragment : CreateNoteFragment() {
@@ -44,7 +42,7 @@ class EditNoteFragment : CreateNoteFragment() {
         listenBarOptions(bindingFrag.createNoteTitleField, bindingFrag.createNoteNoteField)
 
         Log.i("font", "my font " + font)
-        FontManager.recogniseAndSetFont(font, bindingFrag.createNoteTitleField, bindingFrag.createNoteNoteField)
+        EditorManager.FontManager.recogniseAndSetFont(font, bindingFrag.createNoteTitleField, bindingFrag.createNoteNoteField)
 
         bindingFrag.createNoteTitleField.setText(title)
         bindingFrag.createNoteNoteField.setText(note)
