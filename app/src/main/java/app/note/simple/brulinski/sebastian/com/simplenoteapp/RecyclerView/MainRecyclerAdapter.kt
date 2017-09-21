@@ -11,6 +11,7 @@ import android.widget.TextView
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.Activity.MainActivity
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.Database.LocalSQLAnkoDatabase
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.Fragment.NotesListFragment
+import app.note.simple.brulinski.sebastian.com.simplenoteapp.HelperClass.FontManager
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.Model.ItemsHolder
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.R
 
@@ -37,23 +38,26 @@ class MainRecyclerAdapter(var itemsHolder: ArrayList<ItemsHolder>, var recyclerV
 
         var title = itemsHolder.title
         var note = itemsHolder.note
+        var font = itemsHolder.font
+
 
         if (title.length > 30)
             title = title.substring(0, 30) + "..."
         if (note.length > 260)
             note = note.substring(0, 260) + "..."
 
-        holder?.title?.text = title
-        holder?.note?.text = note
+        recogniseFont(font, holder?.title!!, holder.note!!)
+        holder.title?.text = title
+        holder.note.text = note
 
         var pos: Int
 
-        holder?.itemView?.setOnClickListener {
+        holder.itemView?.setOnClickListener {
             pos = recyclerView.getChildAdapterPosition(holder.itemView)
             onEditItemListener_.itemDetails(this.itemsHolder.get(pos).title, this.itemsHolder.get(pos).note, pos)
         }
 
-        holder?.itemView?.setOnLongClickListener {
+        holder.itemView?.setOnLongClickListener {
             pos = recyclerView.getChildAdapterPosition(holder.itemView)
 
             val title: String = this.itemsHolder.get(pos).title
@@ -121,12 +125,19 @@ class MainRecyclerAdapter(var itemsHolder: ArrayList<ItemsHolder>, var recyclerV
         notifyDataSetChanged()
     }
 
-    override fun onAttachedToRecyclerView(recyclerView: RecyclerView?) {
-        super.onAttachedToRecyclerView(recyclerView)
+    fun recogniseFont(font: String, title: TextView, note: TextView) {
+        if (font.equals(FontManager.DEFAULT_FONT)) {
+            FontManager.setUpFontStyle(Typeface.DEFAULT, title, note)
+        } else if (font.equals(FontManager.ITALIC_FONT)) {
+            FontManager.setUpFontStyle(Typeface.ITALIC, title, note)
+        } else if (font.equals(FontManager.BOLD_ITALIC_FONT)) {
+            FontManager.setUpFontStyle(Typeface.BOLD_ITALIC, title, note)
+        } else if (font.equals(FontManager.SERIF_FONT)) {
+            FontManager.setUpFontStyle(Typeface.SERIF, title, note)
+        } else if (font.equals(FontManager.SANS_SERIF_FONT)) {
+            FontManager.setUpFontStyle(Typeface.SANS_SERIF, title, note)
+        } else if (font.equals(FontManager.MONOSPACE_FONT)) {
+            FontManager.setUpFontStyle(Typeface.MONOSPACE, title, note)
+        }
     }
-
-    override fun onDetachedFromRecyclerView(recyclerView: RecyclerView?) {
-        super.onDetachedFromRecyclerView(recyclerView)
-    }
-
 }

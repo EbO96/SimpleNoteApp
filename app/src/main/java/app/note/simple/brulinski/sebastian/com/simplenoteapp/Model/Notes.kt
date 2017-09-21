@@ -16,11 +16,13 @@ class Notes {
 
         var date: String? = null
 
-        constructor(title: String?, note: String?, date: String?) {
+        var font: String? = null
+
+        constructor(title: String?, note: String?, date: String?, font: String?) {
             this.title = title
             this.note = note
             this.date = date
-
+            this.font = font
         }
     }
 }

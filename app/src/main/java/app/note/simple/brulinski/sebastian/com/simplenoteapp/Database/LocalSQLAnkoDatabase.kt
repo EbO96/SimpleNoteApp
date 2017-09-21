@@ -21,7 +21,7 @@ class LocalSQLAnkoDatabase(ctx: Context): ManagedSQLiteOpenHelper(ctx, "user_not
 
     override fun onCreate(p0: SQLiteDatabase) {
         p0.createTable(TABLE, true, "_id" to INTEGER + PRIMARY_KEY, "title" to TEXT, "note" to TEXT,
-                "date" to TEXT)
+                "date" to TEXT, "font" to TEXT)
     }
 
     override fun onUpgrade(p0: SQLiteDatabase, p1: Int, p2: Int) {

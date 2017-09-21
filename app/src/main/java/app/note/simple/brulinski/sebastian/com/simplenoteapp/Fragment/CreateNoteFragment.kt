@@ -10,10 +10,13 @@ import android.view.LayoutInflater
 import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
+import android.widget.EditText
 import android.widget.PopupMenu
+import android.widget.TextView
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.Activity.MainActivity
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.Database.LocalSQLAnkoDatabase
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.HelperClass.CurrentFragmentState
+import app.note.simple.brulinski.sebastian.com.simplenoteapp.HelperClass.FontManager
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.R
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.databinding.CreateNoteFragmentBinding
 import org.jetbrains.anko.db.insert
@@ -25,6 +28,14 @@ open class CreateNoteFragment : Fragment() {
 
     lateinit var bindingFrag: CreateNoteFragmentBinding
     lateinit var database: LocalSQLAnkoDatabase
+
+    var currentFont = "DEFAULT"
+
+    /*
+    Fonts tags
+     */
+
+
 
 
     override fun onCreateView(inflater: LayoutInflater?, container: ViewGroup?, savedInstanceState: Bundle?): View? {
@@ -46,15 +57,16 @@ open class CreateNoteFragment : Fragment() {
         listenBarOptions(bindingFrag.createNoteTitleField, bindingFrag.createNoteNoteField)
     }
 
-    fun saveNote(title: String, note: String) {
+    fun saveNote(title: String, note: String, font: String) {
         try {
 
             database.use {
                 val titleCol = Pair<String, String>("title", title.trim())
                 val noteCol = Pair<String, String>("note", note.trim())
                 val dateCol = Pair<String, String>("date", getCurrentDateAndTime())
+                val fontCol = Pair<String, String>("font", font)
 
-                insert("notes", titleCol, noteCol, dateCol)
+                insert("notes", titleCol, noteCol, dateCol, fontCol)
             }
         } catch (e: Exception) {
             e.printStackTrace()
@@ -73,7 +85,7 @@ open class CreateNoteFragment : Fragment() {
     override fun onDestroyView() {
         if ((!TextUtils.isEmpty(bindingFrag.createNoteTitleField.text.toString().trim()) || !TextUtils.isEmpty(bindingFrag.createNoteNoteField.text.toString().trim())) &&
                 CurrentFragmentState.CURRENT.equals(MainActivity.CREATE_NOTE_FRAGMENT_TAG) && !CurrentFragmentState.backPressed)
-            saveNote(bindingFrag.createNoteTitleField.text.toString(), bindingFrag.createNoteNoteField.text.toString())
+            saveNote(bindingFrag.createNoteTitleField.text.toString(), bindingFrag.createNoteNoteField.text.toString(), currentFont)
         super.onDestroyView()
     }
 
@@ -130,22 +142,28 @@ open class CreateNoteFragment : Fragment() {
             override fun onMenuItemClick(p0: MenuItem?): Boolean {
                 when (p0!!.itemId) {
                     R.id.default_font -> {
-                        setUpFontStyle(Typeface.DEFAULT)
+                        FontManager.setUpFontStyle(Typeface.DEFAULT, bindingFrag.createNoteNoteField, bindingFrag.createNoteTitleField)
+                        currentFont = FontManager.DEFAULT_FONT
                     }
                     R.id.italic_font -> {
-                        setUpFontStyle(Typeface.ITALIC)
+                        FontManager.setUpFontStyle(Typeface.ITALIC, bindingFrag.createNoteNoteField, bindingFrag.createNoteTitleField)
+                        currentFont =  FontManager.ITALIC_FONT
                     }
                     R.id.bold_italic_font -> {
-                        setUpFontStyle(Typeface.BOLD_ITALIC)
+                        FontManager.setUpFontStyle(Typeface.BOLD_ITALIC, bindingFrag.createNoteNoteField, bindingFrag.createNoteTitleField)
+                        currentFont =  FontManager.BOLD_ITALIC_FONT
                     }
                     R.id.serif_font -> {
-                        setUpFontStyle(Typeface.SERIF)
+                        FontManager.setUpFontStyle(Typeface.SERIF, bindingFrag.createNoteNoteField, bindingFrag.createNoteTitleField)
+                        currentFont =  FontManager.SERIF_FONT
                     }
                     R.id.sans_serif_font -> {
-                        setUpFontStyle(Typeface.SANS_SERIF)
+                        FontManager.setUpFontStyle(Typeface.SANS_SERIF, bindingFrag.createNoteNoteField, bindingFrag.createNoteTitleField)
+                        currentFont =  FontManager.SANS_SERIF_FONT
                     }
                     R.id.monospace_font -> {
-                        setUpFontStyle(Typeface.MONOSPACE)
+                        FontManager.setUpFontStyle(Typeface.MONOSPACE, bindingFrag.createNoteNoteField, bindingFrag.createNoteTitleField)
+                        currentFont =  FontManager.MONOSPACE_FONT
                     }
                 }
                 return true
@@ -153,15 +171,27 @@ open class CreateNoteFragment : Fragment() {
         })
     }
 
-    private fun setUpFontStyle(typeInt: Int) {
-        bindingFrag.createNoteTitleField.typeface = Typeface.defaultFromStyle(typeInt)
-        bindingFrag.createNoteNoteField.typeface = Typeface.defaultFromStyle(typeInt)
-    }
-
-    private fun setUpFontStyle(type: Typeface) {
-        bindingFrag.createNoteTitleField.typeface = type
-        bindingFrag.createNoteNoteField.typeface = type
-    }
+//    fun setUpFontStyle(font: Any?, viewTitle: Any?, viewNote: Any?) {
+//        val recognisedFont: Typeface?
+//
+//        var title: TextView?
+//        var note: TextView?
+//
+//        if (font is Int) {
+//            recognisedFont = Typeface.defaultFromStyle(font)
+//        } else recognisedFont = (font as Typeface)
+//
+//        if (viewTitle is TextView) {
+//            title = (viewTitle as TextView)
+//            note = (viewNote as TextView?)
+//        } else {
+//            title = (viewTitle as EditText)
+//            note = (viewNote as EditText)
+//        }
+//
+//        title.typeface = recognisedFont
+//        note!!.typeface = recognisedFont
+//    }
 }
 
 

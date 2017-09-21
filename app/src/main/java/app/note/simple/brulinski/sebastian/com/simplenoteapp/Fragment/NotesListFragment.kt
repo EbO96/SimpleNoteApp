@@ -77,9 +77,6 @@ class NotesListFragment : Fragment() {
         //Edit note listener
         editNote()
 
-        //Listen for update
-        updateNoteList()
-
         //Deleted items listener
         //listenDeletedItems()
 
@@ -129,10 +126,12 @@ class NotesListFragment : Fragment() {
             val size = notes.size
 
             for (x in 0 until size) {
-                itemsObjectsArray.add(ItemsHolder(notes.get(x).get(x).title!!, notes.get(x).get(x).note!!, notes.get(x).get(x).date!!))
+                itemsObjectsArray.add(ItemsHolder(notes.get(x).get(x).title!!, notes.get(x).get(x).note!!,
+                        notes.get(x).get(x).date!!, notes.get(x).get(x).font!!))
             }
         }
     }
+
 
     fun editNote() {
         myRecycler.setOnEditItemListener(object : MainRecyclerAdapter.OnEditItemListener {
@@ -154,14 +153,6 @@ class NotesListFragment : Fragment() {
         outState?.putParcelableArrayList("notes", itemsObjectsArray)
     }
 
-    fun updateNoteList() {
-        (activity as MainActivity).setOnUpdateListListener(object : MainActivity.OnUpdateListListener {
-            override fun passData(title: String, note: String, position: Int) {
-                itemsObjectsArray.set(position, ItemsHolder(title, note, CreateNoteFragment.getCurrentDateAndTime()))
-                myRecycler.notifyDataSetChanged()
-            }
-        })
-    }
 
     override fun onAttach(activity: Activity?) {
         try {

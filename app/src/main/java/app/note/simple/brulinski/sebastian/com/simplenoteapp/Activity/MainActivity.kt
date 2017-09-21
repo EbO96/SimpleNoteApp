@@ -38,16 +38,6 @@ class MainActivity : AppCompatActivity(), NotesListFragment.OnListenRecyclerScro
         this.mSearchCallback = mSearchCallback
     }
 
-    lateinit var mUpdateListener: OnUpdateListListener
-
-    interface OnUpdateListListener {
-        fun passData(title: String, note: String, position: Int)
-    }
-
-    fun setOnUpdateListListener(mUpdateListener: OnUpdateListListener) {
-        this.mUpdateListener = mUpdateListener
-    }
-
     lateinit var binding: ActivityMainBinding
     lateinit var fm: FragmentManager
     lateinit var ft: FragmentTransaction
