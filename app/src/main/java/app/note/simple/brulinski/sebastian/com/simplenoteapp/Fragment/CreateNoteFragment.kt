@@ -1,5 +1,6 @@
 package app.note.simple.brulinski.sebastian.com.simplenoteapp.Fragment
 
+import android.annotation.SuppressLint
 import android.databinding.DataBindingUtil
 import android.os.Bundle
 import android.support.v4.app.Fragment
@@ -25,7 +26,6 @@ open class CreateNoteFragment : Fragment() {
 
     override fun onCreateView(inflater: LayoutInflater?, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         bindingFrag = DataBindingUtil.inflate(inflater, R.layout.create_note_fragment, container, false)
-
         CurrentFragmentState.CURRENT = MainActivity.CREATE_NOTE_FRAGMENT_TAG
 
         (activity as MainActivity).supportActionBar?.setTitle(getString(R.string.create))
@@ -33,6 +33,12 @@ open class CreateNoteFragment : Fragment() {
         database = LocalSQLAnkoDatabase(context)
 
         return bindingFrag.root
+    }
+
+    override fun onViewCreated(view: View?, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+
+        listenBarOptions()
     }
 
     fun saveNote(title: String, note: String) {
@@ -51,11 +57,11 @@ open class CreateNoteFragment : Fragment() {
     }
 
     companion object {
+        @SuppressLint("SimpleDateFormat")
         fun getCurrentDateAndTime(): String { //Get current time from system
             val calendar = Calendar.getInstance()
 
-            val df = SimpleDateFormat("yyyy-MM-dd 'at' HH:mm:ss a")
-            return df.format(calendar.getTime())
+            return SimpleDateFormat("yyyy-MM-dd 'at' HH:mm:ss a").format(calendar.getTime())
         }
     }
 
@@ -65,6 +71,41 @@ open class CreateNoteFragment : Fragment() {
             saveNote(bindingFrag.createNoteTitleField.text.toString(), bindingFrag.createNoteNoteField.text.toString())
         super.onDestroyView()
     }
+
+    private fun listenBarOptions() {
+        bindingFrag.selectAll.setOnClickListener {
+
+        }
+
+        bindingFrag.copyAll.setOnClickListener {
+
+        }
+
+        bindingFrag.paste.setOnClickListener {
+
+        }
+
+        bindingFrag.undo.setOnClickListener {
+
+        }
+
+        bindingFrag.deleteAll.setOnClickListener {
+
+        }
+
+        bindingFrag.fontStyle.setOnClickListener {
+
+        }
+
+        bindingFrag.textColor.setOnClickListener {
+
+        }
+
+        bindingFrag.noteColor.setOnClickListener {
+
+        }
+    }
+
 }
 
 
