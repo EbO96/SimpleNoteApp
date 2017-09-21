@@ -14,6 +14,7 @@ import android.support.v7.widget.SearchView
 import android.view.Menu
 import android.view.MenuInflater
 import android.view.MenuItem
+import android.widget.LinearLayout
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.Fragment.CreateNoteFragment
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.Fragment.EditNoteFragment
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.Fragment.NotePreviewFragment
@@ -22,6 +23,8 @@ import app.note.simple.brulinski.sebastian.com.simplenoteapp.HelperClass.Current
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.HelperClass.LayoutManagerStyle
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.R
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.databinding.ActivityMainBinding
+import org.jetbrains.anko.appcompat.v7.toolbar
+import org.jetbrains.anko.verticalLayout
 
 class MainActivity : AppCompatActivity(), NotesListFragment.OnListenRecyclerScroll, SearchView.OnQueryTextListener, EditNoteFragment.OnInflateNewToolbarListener {
 
@@ -96,11 +99,12 @@ class MainActivity : AppCompatActivity(), NotesListFragment.OnListenRecyclerScro
     } //END OF onCreate(...)
 
     /*
-    Inflate new toolbar
+    Inflate new toolbar or back to previous
      */
     override fun fragmentCreated(visible: Boolean) { //This interface is between this activity and EditNoteFragment
         if (visible) { //Inflate new toolbar
 
+            //setSupportActionBar()
         } else { //Set up previous toolbar
 
         }
