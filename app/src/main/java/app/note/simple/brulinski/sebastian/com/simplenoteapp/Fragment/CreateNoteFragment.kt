@@ -2,6 +2,7 @@ package app.note.simple.brulinski.sebastian.com.simplenoteapp.Fragment
 
 import android.annotation.SuppressLint
 import android.databinding.DataBindingUtil
+import android.graphics.Typeface
 import android.os.Bundle
 import android.support.v4.app.Fragment
 import android.text.TextUtils
@@ -128,16 +129,38 @@ open class CreateNoteFragment : Fragment() {
         popupMenu.setOnMenuItemClickListener(object : PopupMenu.OnMenuItemClickListener {
             override fun onMenuItemClick(p0: MenuItem?): Boolean {
                 when (p0!!.itemId) {
-                    R.id.arial_font -> {
-
+                    R.id.default_font -> {
+                        setUpFontStyle(Typeface.DEFAULT)
                     }
-                    R.id.arial_black -> {
-
+                    R.id.italic_font -> {
+                        setUpFontStyle(Typeface.ITALIC)
+                    }
+                    R.id.bold_italic_font -> {
+                        setUpFontStyle(Typeface.BOLD_ITALIC)
+                    }
+                    R.id.serif_font -> {
+                        setUpFontStyle(Typeface.SERIF)
+                    }
+                    R.id.sans_serif_font -> {
+                        setUpFontStyle(Typeface.SANS_SERIF)
+                    }
+                    R.id.monospace_font -> {
+                        setUpFontStyle(Typeface.MONOSPACE)
                     }
                 }
                 return true
             }
         })
+    }
+
+    private fun setUpFontStyle(typeInt: Int) {
+        bindingFrag.createNoteTitleField.typeface = Typeface.defaultFromStyle(typeInt)
+        bindingFrag.createNoteNoteField.typeface = Typeface.defaultFromStyle(typeInt)
+    }
+
+    private fun setUpFontStyle(type: Typeface) {
+        bindingFrag.createNoteTitleField.typeface = type
+        bindingFrag.createNoteNoteField.typeface = type
     }
 }
 

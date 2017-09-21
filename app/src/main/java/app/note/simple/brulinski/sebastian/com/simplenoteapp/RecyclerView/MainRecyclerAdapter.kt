@@ -1,6 +1,7 @@
 package app.note.simple.brulinski.sebastian.com.simplenoteapp.RecyclerView
 
 import android.content.Context
+import android.graphics.Typeface
 import android.support.design.widget.Snackbar
 import android.support.v7.widget.RecyclerView
 import android.view.LayoutInflater

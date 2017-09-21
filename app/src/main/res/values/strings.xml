@@ -24,7 +24,11 @@
     <string name="change_font_style">Change font style</string>
     <string name="change_text_color">Change text color</string>
     <string name="change_note_color">Change note color</string>
-    <string name="arial_font">Arial</string>
-    <string name="arial_black_font">Arial black</string>
+    <string name="italic">Italic</string>
+    <string name="serif">Serif</string>
+    <string name="default_font">Default</string>
+    <string name="monospace">Monospace</string>
+    <string name="sans_serif">Sans serif</string>
+    <string name="bold_italic">Bold italic</string>
     <!--END-->
 </resources>
