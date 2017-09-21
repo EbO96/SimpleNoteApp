@@ -1,14 +1,23 @@
 package app.note.simple.brulinski.sebastian.com.simplenoteapp.Fragment
 
+import android.app.Activity
 import android.content.ContentValues
+import android.content.Context
 import android.os.Bundle
 import android.text.TextUtils
+import android.util.Log
 import android.view.View
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.Activity.MainActivity
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.HelperClass.CurrentFragmentState
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.R
 
 class EditNoteFragment : CreateNoteFragment() {
+
+    lateinit var mToolbarListener: OnInflateNewToolbarListener
+
+    interface OnInflateNewToolbarListener {
+        fun fragmentCreated(visible: Boolean)
+    }
 
     lateinit var title: String
     lateinit var note: String
@@ -19,6 +28,8 @@ class EditNoteFragment : CreateNoteFragment() {
 
         (activity as MainActivity).supportActionBar?.setTitle(getString(R.string.edit)) //Set toolbar title depending on current fragment
 
+        //Set up toolbar listener
+        mToolbarListener.fragmentCreated(true)
         /*
         Get bundle and set at editText's
          */
@@ -58,6 +69,8 @@ class EditNoteFragment : CreateNoteFragment() {
                 delete("notes", whereClause, arrayOf(title, note))
             }
         }
+        //Set up main toolbar
+        mToolbarListener.fragmentCreated(false)
         super.onDestroyView()
     }
 
@@ -66,5 +79,16 @@ class EditNoteFragment : CreateNoteFragment() {
      */
     fun validTitleAndNote(): Boolean {
         return !TextUtils.isEmpty(bindingFrag.createNoteTitleField.text.trim()) && !TextUtils.isEmpty(bindingFrag.createNoteNoteField.text.trim())
+    }
+
+    override fun onAttach(activity: Activity?) {
+        super.onAttach(activity)
+        try {
+            mToolbarListener = (activity as OnInflateNewToolbarListener)
+        } catch (e: ClassCastException) {
+            e.printStackTrace()
+            throw ClassCastException(activity.toString() + " must implement OnInflateNewToolbarListener interface")
+        }
+
     }
 }

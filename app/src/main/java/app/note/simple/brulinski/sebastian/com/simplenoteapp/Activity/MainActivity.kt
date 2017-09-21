@@ -11,12 +11,9 @@ import android.support.v4.view.MenuItemCompat
 import android.support.v7.app.AppCompatActivity
 import android.support.v7.widget.RecyclerView
 import android.support.v7.widget.SearchView
-import android.util.Log
 import android.view.Menu
 import android.view.MenuInflater
 import android.view.MenuItem
-import android.view.View
-import android.view.animation.Animation
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.Fragment.CreateNoteFragment
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.Fragment.EditNoteFragment
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.Fragment.NotePreviewFragment
@@ -26,7 +23,7 @@ import app.note.simple.brulinski.sebastian.com.simplenoteapp.HelperClass.LayoutM
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.R
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.databinding.ActivityMainBinding
 
-class MainActivity : AppCompatActivity(), NotesListFragment.OnListenRecyclerScroll, SearchView.OnQueryTextListener {
+class MainActivity : AppCompatActivity(), NotesListFragment.OnListenRecyclerScroll, SearchView.OnQueryTextListener, EditNoteFragment.OnInflateNewToolbarListener {
 
     lateinit var mSearchCallback: OnSearchResultListener
 
@@ -97,6 +94,17 @@ class MainActivity : AppCompatActivity(), NotesListFragment.OnListenRecyclerScro
         floatingActionButtonListener() //Listen for floating action button actions and click
 
     } //END OF onCreate(...)
+
+    /*
+    Inflate new toolbar
+     */
+    override fun fragmentCreated(visible: Boolean) { //This interface is between this activity and EditNoteFragment
+        if (visible) { //Inflate new toolbar
+
+        } else { //Set up previous toolbar
+
+        }
+    }
 
     /*
     This function replace another fragment in FrameLayout container by our main Fragment (NoteListFragment.kt - display our notes)
@@ -204,22 +212,23 @@ class MainActivity : AppCompatActivity(), NotesListFragment.OnListenRecyclerScro
         /*
         Listen when search mode is active and when collapse
          */
-        MenuItemCompat.setOnActionExpandListener(menu!!.findItem(R.id.search),object: MenuItemCompat.OnActionExpandListener {
+        MenuItemCompat.setOnActionExpandListener(menu!!.findItem(R.id.search), object : MenuItemCompat.OnActionExpandListener {
             override fun onMenuItemActionCollapse(item: MenuItem?): Boolean {
                 menuItemLinear!!.setVisible(true)
                 menuItemGrid!!.setVisible(true)
-                return true }
+                return true
+            }
 
             override fun onMenuItemActionExpand(item: MenuItem?): Boolean {
                 menuItemLinear!!.setVisible(false)
                 menuItemGrid!!.setVisible(false)
-                return true}
+                return true
+            }
         })
 
 
         return true
     }
-
 
 
     override fun onQueryTextSubmit(query: String?): Boolean {
