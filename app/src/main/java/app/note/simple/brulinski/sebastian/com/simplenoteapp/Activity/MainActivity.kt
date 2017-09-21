@@ -103,7 +103,6 @@ class MainActivity : AppCompatActivity(), NotesListFragment.OnListenRecyclerScro
      */
     override fun fragmentCreated(visible: Boolean) { //This interface is between this activity and EditNoteFragment
         if (visible) { //Inflate new toolbar
-
             //setSupportActionBar()
         } else { //Set up previous toolbar
 

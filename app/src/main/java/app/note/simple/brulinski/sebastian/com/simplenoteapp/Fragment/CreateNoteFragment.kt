@@ -5,9 +5,7 @@ import android.databinding.DataBindingUtil
 import android.os.Bundle
 import android.support.v4.app.Fragment
 import android.text.TextUtils
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
+import android.view.*
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.Activity.MainActivity
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.Database.LocalSQLAnkoDatabase
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.HelperClass.CurrentFragmentState
@@ -38,7 +36,7 @@ open class CreateNoteFragment : Fragment() {
     override fun onViewCreated(view: View?, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        listenBarOptions()
+        listenBarOptions(bindingFrag.createNoteTitleField, bindingFrag.createNoteNoteField)
     }
 
     fun saveNote(title: String, note: String) {
@@ -72,7 +70,7 @@ open class CreateNoteFragment : Fragment() {
         super.onDestroyView()
     }
 
-    private fun listenBarOptions() {
+    fun listenBarOptions(titleView: View, noteView: View) {
         bindingFrag.selectAll.setOnClickListener {
 
         }
@@ -90,7 +88,7 @@ open class CreateNoteFragment : Fragment() {
         }
 
         bindingFrag.deleteAll.setOnClickListener {
-
+            deleteAllOption()
         }
 
         bindingFrag.fontStyle.setOnClickListener {
@@ -106,6 +104,14 @@ open class CreateNoteFragment : Fragment() {
         }
     }
 
+    /*
+    Options bar
+     */
+
+    private fun deleteAllOption() {
+        bindingFrag.createNoteTitleField.text = null
+        bindingFrag.createNoteNoteField.text = null
+    }
 }
 
 

@@ -38,6 +38,8 @@ class EditNoteFragment : CreateNoteFragment() {
         bindingFrag.createNoteTitleField.setText(title)
         bindingFrag.createNoteNoteField.setText(note)
 
+        listenBarOptions(bindingFrag.createNoteTitleField, bindingFrag.createNoteNoteField)
+
         super.onViewCreated(view, savedInstanceState)
     }
 
