@@ -5,7 +5,10 @@ import android.databinding.DataBindingUtil
 import android.os.Bundle
 import android.support.v4.app.Fragment
 import android.text.TextUtils
-import android.view.*
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
+import android.widget.PopupMenu
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.Activity.MainActivity
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.Database.LocalSQLAnkoDatabase
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.HelperClass.CurrentFragmentState
@@ -23,8 +26,10 @@ open class CreateNoteFragment : Fragment() {
 
 
     override fun onCreateView(inflater: LayoutInflater?, container: ViewGroup?, savedInstanceState: Bundle?): View? {
+        setHasOptionsMenu(true)
         bindingFrag = DataBindingUtil.inflate(inflater, R.layout.create_note_fragment, container, false)
         CurrentFragmentState.CURRENT = MainActivity.CREATE_NOTE_FRAGMENT_TAG
+
 
         (activity as MainActivity).supportActionBar?.setTitle(getString(R.string.create))
 
@@ -92,7 +97,7 @@ open class CreateNoteFragment : Fragment() {
         }
 
         bindingFrag.fontStyle.setOnClickListener {
-
+            showFontMenu()
         }
 
         bindingFrag.textColor.setOnClickListener {
@@ -111,6 +116,12 @@ open class CreateNoteFragment : Fragment() {
     private fun deleteAllOption() {
         bindingFrag.createNoteTitleField.text = null
         bindingFrag.createNoteNoteField.text = null
+    }
+
+    private fun showFontMenu() {
+        val popupMenu = PopupMenu(context, bindingFrag.fontStyle)
+        popupMenu.menuInflater.inflate(R.menu.font_menu, popupMenu.menu)
+        popupMenu.show()
     }
 }
 

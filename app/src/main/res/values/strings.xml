@@ -24,5 +24,7 @@
     <string name="change_font_style">Change font style</string>
     <string name="change_text_color">Change text color</string>
     <string name="change_note_color">Change note color</string>
+    <string name="arial_font">Arial</string>
+    <string name="arial_black_font">Arial black</string>
     <!--END-->
 </resources>
