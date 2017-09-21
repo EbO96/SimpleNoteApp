@@ -25,7 +25,7 @@ class MainRecyclerAdapter(var itemsHolder: ArrayList<ItemsHolder>, var recyclerV
     var undoClicked = false
 
     interface OnEditItemListener {
-        fun itemDetails(title: String, note: String, position: Int)
+        fun itemDetails(title: String, note: String, font: String, position: Int)
     }
 
     fun setOnEditItemListener(onEditItemListener: OnEditItemListener) {
@@ -46,7 +46,7 @@ class MainRecyclerAdapter(var itemsHolder: ArrayList<ItemsHolder>, var recyclerV
         if (note.length > 260)
             note = note.substring(0, 260) + "..."
 
-        recogniseFont(font, holder?.title!!, holder.note!!)
+        FontManager.recogniseAndSetFont(font, holder?.title!!, holder.note!!)
         holder.title?.text = title
         holder.note.text = note
 
@@ -54,7 +54,7 @@ class MainRecyclerAdapter(var itemsHolder: ArrayList<ItemsHolder>, var recyclerV
 
         holder.itemView?.setOnClickListener {
             pos = recyclerView.getChildAdapterPosition(holder.itemView)
-            onEditItemListener_.itemDetails(this.itemsHolder.get(pos).title, this.itemsHolder.get(pos).note, pos)
+            onEditItemListener_.itemDetails(this.itemsHolder.get(pos).title, this.itemsHolder.get(pos).note, this.itemsHolder.get(pos).font, pos)
         }
 
         holder.itemView?.setOnLongClickListener {
@@ -125,19 +125,5 @@ class MainRecyclerAdapter(var itemsHolder: ArrayList<ItemsHolder>, var recyclerV
         notifyDataSetChanged()
     }
 
-    fun recogniseFont(font: String, title: TextView, note: TextView) {
-        if (font.equals(FontManager.DEFAULT_FONT)) {
-            FontManager.setUpFontStyle(Typeface.DEFAULT, title, note)
-        } else if (font.equals(FontManager.ITALIC_FONT)) {
-            FontManager.setUpFontStyle(Typeface.ITALIC, title, note)
-        } else if (font.equals(FontManager.BOLD_ITALIC_FONT)) {
-            FontManager.setUpFontStyle(Typeface.BOLD_ITALIC, title, note)
-        } else if (font.equals(FontManager.SERIF_FONT)) {
-            FontManager.setUpFontStyle(Typeface.SERIF, title, note)
-        } else if (font.equals(FontManager.SANS_SERIF_FONT)) {
-            FontManager.setUpFontStyle(Typeface.SANS_SERIF, title, note)
-        } else if (font.equals(FontManager.MONOSPACE_FONT)) {
-            FontManager.setUpFontStyle(Typeface.MONOSPACE, title, note)
-        }
-    }
+
 }

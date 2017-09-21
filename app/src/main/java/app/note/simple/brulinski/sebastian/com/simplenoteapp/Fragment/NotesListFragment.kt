@@ -43,7 +43,7 @@ class NotesListFragment : Fragment() {
     lateinit var onEditModeListener_: OnEditModeListener
 
     interface OnEditModeListener {
-        fun switch(title: String, note: String, position: Int)
+        fun switch(title: String, note: String, font: String, position: Int)
     }
 
     fun setOnEditModeListener(onEditModeListener: OnEditModeListener) {
@@ -135,8 +135,8 @@ class NotesListFragment : Fragment() {
 
     fun editNote() {
         myRecycler.setOnEditItemListener(object : MainRecyclerAdapter.OnEditItemListener {
-            override fun itemDetails(title: String, note: String, position: Int) {
-                onEditModeListener_.switch(title, note, position)
+            override fun itemDetails(title: String, note: String, font: String, position: Int) {
+                onEditModeListener_.switch(title, note, font, position)
             }
         })
     }

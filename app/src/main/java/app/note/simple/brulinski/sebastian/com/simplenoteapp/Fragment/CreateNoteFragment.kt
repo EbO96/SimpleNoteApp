@@ -35,9 +35,6 @@ open class CreateNoteFragment : Fragment() {
     Fonts tags
      */
 
-
-
-
     override fun onCreateView(inflater: LayoutInflater?, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         setHasOptionsMenu(true)
         bindingFrag = DataBindingUtil.inflate(inflater, R.layout.create_note_fragment, container, false)
@@ -171,27 +168,6 @@ open class CreateNoteFragment : Fragment() {
         })
     }
 
-//    fun setUpFontStyle(font: Any?, viewTitle: Any?, viewNote: Any?) {
-//        val recognisedFont: Typeface?
-//
-//        var title: TextView?
-//        var note: TextView?
-//
-//        if (font is Int) {
-//            recognisedFont = Typeface.defaultFromStyle(font)
-//        } else recognisedFont = (font as Typeface)
-//
-//        if (viewTitle is TextView) {
-//            title = (viewTitle as TextView)
-//            note = (viewNote as TextView?)
-//        } else {
-//            title = (viewTitle as EditText)
-//            note = (viewNote as EditText)
-//        }
-//
-//        title.typeface = recognisedFont
-//        note!!.typeface = recognisedFont
-//    }
 }
 
 

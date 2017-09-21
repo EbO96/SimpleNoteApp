@@ -36,5 +36,21 @@ class FontManager {
             title.typeface = recognisedFont
             note!!.typeface = recognisedFont
         }
+
+        fun recogniseAndSetFont(font: String, title: TextView, note: TextView) {
+            if (font.equals(FontManager.DEFAULT_FONT)) {
+                FontManager.setUpFontStyle(Typeface.DEFAULT, title, note)
+            } else if (font.equals(FontManager.ITALIC_FONT)) {
+                FontManager.setUpFontStyle(Typeface.ITALIC, title, note)
+            } else if (font.equals(FontManager.BOLD_ITALIC_FONT)) {
+                FontManager.setUpFontStyle(Typeface.BOLD_ITALIC, title, note)
+            } else if (font.equals(FontManager.SERIF_FONT)) {
+                FontManager.setUpFontStyle(Typeface.SERIF, title, note)
+            } else if (font.equals(FontManager.SANS_SERIF_FONT)) {
+                FontManager.setUpFontStyle(Typeface.SANS_SERIF, title, note)
+            } else if (font.equals(FontManager.MONOSPACE_FONT)) {
+                FontManager.setUpFontStyle(Typeface.MONOSPACE, title, note)
+            }
+        }
     }
 }
