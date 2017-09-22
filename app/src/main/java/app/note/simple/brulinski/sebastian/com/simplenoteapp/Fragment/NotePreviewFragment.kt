@@ -19,6 +19,7 @@ import com.labo.kaji.fragmentanimations.MoveAnimation
 class NotePreviewFragment : Fragment() {
 
     var itemPosition = 0
+    var itemId = ""
     lateinit var database: LocalSQLAnkoDatabase
 
     lateinit var binding: PreviewCardBinding
@@ -36,6 +37,7 @@ class NotePreviewFragment : Fragment() {
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
 
+        itemId = arguments.getString("id")
         val title = arguments.getString("title")
         val note = arguments.getString("note")
         itemPosition = arguments.getInt("position")

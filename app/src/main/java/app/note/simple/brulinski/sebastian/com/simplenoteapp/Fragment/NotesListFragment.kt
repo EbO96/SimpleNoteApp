@@ -16,8 +16,10 @@ import app.note.simple.brulinski.sebastian.com.simplenoteapp.Activity.MainActivi
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.Database.LocalSQLAnkoDatabase
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.HelperClass.CurrentFragmentState
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.HelperClass.LayoutManagerStyle
+import app.note.simple.brulinski.sebastian.com.simplenoteapp.HelperClass.MyRowParserNoteProperties
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.HelperClass.MyRowParserNotes
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.Model.ItemsHolder
+import app.note.simple.brulinski.sebastian.com.simplenoteapp.Model.NotesProperties
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.R
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.RecyclerView.MainRecyclerAdapter
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.databinding.NotesListFragmentBinding
@@ -54,7 +56,7 @@ class NotesListFragment : Fragment() {
     lateinit var onEditModeListener_: OnEditModeListener
 
     interface OnEditModeListener {
-        fun switch(title: String, note: String, position: Int)
+        fun switch(itemId: String, title: String, note: String, position: Int)
     }
 
     fun setOnEditModeListener(onEditModeListener: OnEditModeListener) {
@@ -136,22 +138,48 @@ class NotesListFragment : Fragment() {
 
     fun getAndSetNotes() {
         itemsObjectsArray = ArrayList()
+
+        val notesPropertiesArray: ArrayList<NotesProperties> = ArrayList()
+
         database.use {
-            val notes = select("notes").parseList(MyRowParserNotes())
+            val properties = select(LocalSQLAnkoDatabase.TABLE_NOTES_PROPERTIES).parseList(MyRowParserNoteProperties())
+            val size = properties.size - 1
+
+            for (x in 0..size) {
+                notesPropertiesArray.add(NotesProperties(properties.get(x).get(x).id, properties.get(x).get(x).bgColor,
+                        properties.get(x).get(x).textColor, properties.get(x).get(x).fontColor))
+            }
+        }
+
+        database.use {
+            val notes = select(LocalSQLAnkoDatabase.TABLE_NOTES).parseList(MyRowParserNotes())
             val size = notes.size
 
             for (x in 0 until size) {
-                itemsObjectsArray.add(ItemsHolder(notes.get(x).get(x).title!!, notes.get(x).get(x).note!!,
-                        notes.get(x).get(x).date!!))
+                itemsObjectsArray.add(ItemsHolder(notes.get(x).get(x).id!!, notes.get(x).get(x).title!!, notes.get(x).get(x).note!!,
+                        notes.get(x).get(x).date!!, notesPropertiesArray.get(x).bgColor!!, notesPropertiesArray.get(x).textColor!!,
+                        notesPropertiesArray.get(x).fontColor!!))
             }
         }
+        //debugNotesArray()
     }
 
+//    fun debugNotesArray() {
+//        for (i in 0 until itemsObjectsArray.size) {
+//            Log.i("notesArray", itemsObjectsArray[i].id)
+//            Log.i("notesArray", itemsObjectsArray[i].title)
+//            Log.i("notesArray", itemsObjectsArray[i].note)
+//            Log.i("notesArray", itemsObjectsArray[i].date)
+//            Log.i("notesArray", itemsObjectsArray[i].bgColor)
+//            Log.i("notesArray", itemsObjectsArray[i].textColor)
+//            Log.i("notesArray", itemsObjectsArray[i].fontStyle)
+//        }
+//    }
 
     fun editNote() {
         myRecycler.setOnEditItemListener(object : MainRecyclerAdapter.OnEditItemListener {
-            override fun itemDetails(title: String, note: String, position: Int) {
-                onEditModeListener_.switch(title, note, position)
+            override fun itemDetails(itemId: String, title: String, note: String, position: Int) {
+                onEditModeListener_.switch(itemId, title, note, position)
                 CurrentFragmentState.backPressed = false
                 CurrentFragmentState.PREVIOUS = MainActivity.NOTE_LIST_FRAGMENT_TAG
             }

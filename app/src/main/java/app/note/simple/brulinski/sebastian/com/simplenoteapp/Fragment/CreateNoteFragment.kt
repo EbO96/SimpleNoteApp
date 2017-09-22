@@ -16,7 +16,9 @@ import app.note.simple.brulinski.sebastian.com.simplenoteapp.Database.LocalSQLAn
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.HelperClass.CurrentFragmentState
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.HelperClass.EditorManager
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.HelperClass.MyRowParserNoteProperties
-import app.note.simple.brulinski.sebastian.com.simplenoteapp.Model.NoteID
+import app.note.simple.brulinski.sebastian.com.simplenoteapp.HelperClass.MyRowParserNotes
+import app.note.simple.brulinski.sebastian.com.simplenoteapp.Model.Notes
+import app.note.simple.brulinski.sebastian.com.simplenoteapp.Model.NotesProperties
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.R
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.databinding.CreateNoteFragmentBinding
 import com.cocosw.bottomsheet.BottomSheet
@@ -58,7 +60,7 @@ open class CreateNoteFragment : Fragment() {
             val titleCol = Pair<String, String>("title", title.trim())
             val noteCol = Pair<String, String>("note", note.trim())
             val dateCol = Pair<String, String>("date", getCurrentDateAndTime())
-            var idList: List<List<NoteID>>? = null
+            var idList: List<List<Notes.Note>>? = null
             var size = 0
 
             database.use {
@@ -67,19 +69,18 @@ open class CreateNoteFragment : Fragment() {
 
             database.use {
                 idList = select(LocalSQLAnkoDatabase.TABLE_NOTES).whereArgs("_id", titleCol, noteCol).
-                        parseList(MyRowParserNoteProperties())
-                size = idList!!.size - 1
+                        parseList(MyRowParserNotes())
+                size = idList!!.size
             }
 
-            //TODO
-//            val noteIdCol = Pair<String, String>("note_id", idList!!.get(size).get(size).id)
-//            val bgColorCol = Pair<String, String>("bg_color", "test")
-//            val textColorCol = Pair<String, String>("text_color", "test2")
-//            val fontStyleCol = Pair<String, String>("font_style", "test3")
-//
-//            database.use {
-//                insert(LocalSQLAnkoDatabase.TABLE_NOTES_PROPERTIES, noteIdCol, bgColorCol, textColorCol, fontStyleCol)
-//            }
+            val noteIdCol = Pair<String, String>("note_id", idList!!.get(size-1).get(size-1).id!!)
+            val bgColorCol = Pair<String, String>("bg_color", EditorManager.BackgroundColorManager.currentBgColor)
+            val textColorCol = Pair<String, String>("text_color", EditorManager.FontColorManager.currentFontColor)
+            val fontStyleCol = Pair<String, String>("font_style", EditorManager.FontStyleManager.currentFontStyle)
+
+            database.use {
+                insert(LocalSQLAnkoDatabase.TABLE_NOTES_PROPERTIES, noteIdCol, bgColorCol, textColorCol, fontStyleCol)
+            }
 
         } catch (e: Exception) {
             e.printStackTrace()
@@ -151,28 +152,28 @@ open class CreateNoteFragment : Fragment() {
             override fun onClick(p0: DialogInterface?, p1: Int) {
                 when (p1) {
                     R.id.default_font -> {
-                        EditorManager.FontManager.setUpFontStyle(Typeface.DEFAULT, bindingFrag.createNoteNoteField, bindingFrag.createNoteTitleField)
-                        EditorManager.FontManager.currentFont = EditorManager.FontManager.DEFAULT_FONT
+                        EditorManager.FontStyleManager.setUpFontStyle(Typeface.DEFAULT, bindingFrag.createNoteNoteField, bindingFrag.createNoteTitleField)
+                        EditorManager.FontStyleManager.currentFontStyle = EditorManager.FontStyleManager.DEFAULT_FONT
                     }
                     R.id.italic_font -> {
-                        EditorManager.FontManager.setUpFontStyle(Typeface.ITALIC, bindingFrag.createNoteNoteField, bindingFrag.createNoteTitleField)
-                        EditorManager.FontManager.currentFont = EditorManager.FontManager.ITALIC_FONT
+                        EditorManager.FontStyleManager.setUpFontStyle(Typeface.ITALIC, bindingFrag.createNoteNoteField, bindingFrag.createNoteTitleField)
+                        EditorManager.FontStyleManager.currentFontStyle = EditorManager.FontStyleManager.ITALIC_FONT
                     }
                     R.id.bold_italic_font -> {
-                        EditorManager.FontManager.setUpFontStyle(Typeface.BOLD_ITALIC, bindingFrag.createNoteNoteField, bindingFrag.createNoteTitleField)
-                        EditorManager.FontManager.currentFont = EditorManager.FontManager.BOLD_ITALIC_FONT
+                        EditorManager.FontStyleManager.setUpFontStyle(Typeface.BOLD_ITALIC, bindingFrag.createNoteNoteField, bindingFrag.createNoteTitleField)
+                        EditorManager.FontStyleManager.currentFontStyle = EditorManager.FontStyleManager.BOLD_ITALIC_FONT
                     }
                     R.id.serif_font -> {
-                        EditorManager.FontManager.setUpFontStyle(Typeface.SERIF, bindingFrag.createNoteNoteField, bindingFrag.createNoteTitleField)
-                        EditorManager.FontManager.currentFont = EditorManager.FontManager.SERIF_FONT
+                        EditorManager.FontStyleManager.setUpFontStyle(Typeface.SERIF, bindingFrag.createNoteNoteField, bindingFrag.createNoteTitleField)
+                        EditorManager.FontStyleManager.currentFontStyle = EditorManager.FontStyleManager.SERIF_FONT
                     }
                     R.id.sans_serif_font -> {
-                        EditorManager.FontManager.setUpFontStyle(Typeface.SANS_SERIF, bindingFrag.createNoteNoteField, bindingFrag.createNoteTitleField)
-                        EditorManager.FontManager.currentFont = EditorManager.FontManager.SANS_SERIF_FONT
+                        EditorManager.FontStyleManager.setUpFontStyle(Typeface.SANS_SERIF, bindingFrag.createNoteNoteField, bindingFrag.createNoteTitleField)
+                        EditorManager.FontStyleManager.currentFontStyle = EditorManager.FontStyleManager.SANS_SERIF_FONT
                     }
                     R.id.monospace_font -> {
-                        EditorManager.FontManager.setUpFontStyle(Typeface.MONOSPACE, bindingFrag.createNoteNoteField, bindingFrag.createNoteTitleField)
-                        EditorManager.FontManager.currentFont = EditorManager.FontManager.MONOSPACE_FONT
+                        EditorManager.FontStyleManager.setUpFontStyle(Typeface.MONOSPACE, bindingFrag.createNoteNoteField, bindingFrag.createNoteTitleField)
+                        EditorManager.FontStyleManager.currentFontStyle = EditorManager.FontStyleManager.MONOSPACE_FONT
                     }
                 }
             }
@@ -185,23 +186,23 @@ open class CreateNoteFragment : Fragment() {
                 when (p1) {
                     R.id.col_red -> {
                         EditorManager.BackgroundColorManager.changeColor(viewArray, resources.getColor(R.color.material_red))
-                        EditorManager.BackgroundColorManager.currentColor = EditorManager.BackgroundColorManager.RED
+                        EditorManager.BackgroundColorManager.currentBgColor = EditorManager.BackgroundColorManager.RED
                     }
                     R.id.col_blue -> {
                         EditorManager.BackgroundColorManager.changeColor(viewArray, resources.getColor(R.color.material_blue))
-                        EditorManager.BackgroundColorManager.currentColor = EditorManager.BackgroundColorManager.BLUE
+                        EditorManager.BackgroundColorManager.currentBgColor = EditorManager.BackgroundColorManager.BLUE
                     }
                     R.id.col_green -> {
                         EditorManager.BackgroundColorManager.changeColor(viewArray, resources.getColor(R.color.material_green))
-                        EditorManager.BackgroundColorManager.currentColor = EditorManager.BackgroundColorManager.GREEN
+                        EditorManager.BackgroundColorManager.currentBgColor = EditorManager.BackgroundColorManager.GREEN
                     }
                     R.id.col_yellow -> {
                         EditorManager.BackgroundColorManager.changeColor(viewArray, resources.getColor(R.color.material_yellow))
-                        EditorManager.BackgroundColorManager.currentColor = EditorManager.BackgroundColorManager.YELLOW
+                        EditorManager.BackgroundColorManager.currentBgColor = EditorManager.BackgroundColorManager.YELLOW
                     }
                     R.id.col_white -> {
                         EditorManager.BackgroundColorManager.changeColor(viewArray, resources.getColor(R.color.material_white))
-                        EditorManager.BackgroundColorManager.currentColor = EditorManager.BackgroundColorManager.WHITE
+                        EditorManager.BackgroundColorManager.currentBgColor = EditorManager.BackgroundColorManager.WHITE
                     }
                 }
             }

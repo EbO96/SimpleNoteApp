@@ -8,6 +8,7 @@ import android.util.Log
 import android.view.View
 import android.view.animation.Animation
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.Activity.MainActivity
+import app.note.simple.brulinski.sebastian.com.simplenoteapp.Database.LocalSQLAnkoDatabase
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.HelperClass.CurrentFragmentState
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.HelperClass.EditorManager
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.R
@@ -25,6 +26,7 @@ class EditNoteFragment : CreateNoteFragment() {
     lateinit var title: String
     lateinit var note: String
     var position = 0
+    var itemId = ""
 
     override fun onViewCreated(view: View?, savedInstanceState: Bundle?) {
         Log.i("frag", "Edit Create")
@@ -38,6 +40,7 @@ class EditNoteFragment : CreateNoteFragment() {
         /*
         Get bundle and set at editText's
          */
+        itemId = arguments.getString("id")
         title = arguments.getString("title")
         note = arguments.getString("note")
         position = arguments.getInt("position")
@@ -48,10 +51,10 @@ class EditNoteFragment : CreateNoteFragment() {
         bindingFrag.createNoteNoteField.setText(note)
 
         if (savedInstanceState != null) {
-            EditorManager.FontManager.recogniseAndSetFont(EditorManager.FontManager.currentFont, bindingFrag.createNoteTitleField,
+            EditorManager.FontStyleManager.recogniseAndSetFont(EditorManager.FontStyleManager.currentFontStyle, bindingFrag.createNoteTitleField,
                     bindingFrag.createNoteNoteField)
             val bcg = EditorManager.BackgroundColorManager(context)
-            bcg.recogniseAndSetBackgroundColor(EditorManager.BackgroundColorManager.currentColor, bindingFrag.createNoteParentCard)
+            bcg.recogniseAndSetBackgroundColor(EditorManager.BackgroundColorManager.currentBgColor, bindingFrag.createNoteParentCard)
         }
 
         super.onViewCreated(view, savedInstanceState)
@@ -64,23 +67,36 @@ class EditNoteFragment : CreateNoteFragment() {
         /*
         Update notes in local database
          */
-        val whereClause = "title=? AND note=?"
+        var whereClause = "title=? AND note=?"
 
         if (!CurrentFragmentState.backPressed && validTitleAndNote()) { //When user click FloatingACtionButton and fields are not empty
             //Update note in database
-            val values = ContentValues()
+            var values = ContentValues()
             values.put("title", bindingFrag.createNoteTitleField.text.toString())
             values.put("note", bindingFrag.createNoteNoteField.text.toString())
 
             database.use {
                 update(
-                        "notes", values, whereClause, arrayOf(title, note)
+                        LocalSQLAnkoDatabase.TABLE_NOTES, values, whereClause, arrayOf(title, note)
                 )
+
+                whereClause = "note_id=?"
+                Log.i("abcde", itemId)
+                values = ContentValues()
+                values.put("bg_color", EditorManager.BackgroundColorManager.currentBgColor)
+                values.put("text_color", EditorManager.FontColorManager.currentFontColor)
+                values.put("font_style", EditorManager.FontStyleManager.currentFontStyle)
+
+                database.use {
+                    update(
+                            LocalSQLAnkoDatabase.TABLE_NOTES_PROPERTIES, values, whereClause, arrayOf(itemId)
+                    )
+                }
             }
         } else if ((CurrentFragmentState.backPressed || !CurrentFragmentState.backPressed) && !validTitleAndNote()) { //When user click back button and fields are empty
             //Delete note from database
             database.use {
-                delete("notes", whereClause, arrayOf(title, note))
+                delete(LocalSQLAnkoDatabase.TABLE_NOTES, whereClause, arrayOf(title, note))
             }
         }
         //Set up main toolbar

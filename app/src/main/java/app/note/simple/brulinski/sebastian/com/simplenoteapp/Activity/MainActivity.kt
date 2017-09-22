@@ -12,7 +12,6 @@ import android.support.v4.view.MenuItemCompat
 import android.support.v7.app.AppCompatActivity
 import android.support.v7.widget.RecyclerView
 import android.support.v7.widget.SearchView
-import android.util.Log
 import android.view.Menu
 import android.view.MenuInflater
 import android.view.MenuItem
@@ -137,9 +136,10 @@ class MainActivity : AppCompatActivity(), NotesListFragment.OnListenRecyclerScro
     /*
     This fragment is setting only from preview mode (NotePreviewFragment.kt)
      */
-    private fun setEditNoteFragment(title: String, note: String, position: Int) {
+    private fun setEditNoteFragment(itemId: String, title: String, note: String, position: Int) {
         val args = Bundle()
 
+        args.putString("id", itemId)
         args.putString("title", title)
         args.putString("note", note)
         args.putInt("position", position)
@@ -163,11 +163,12 @@ class MainActivity : AppCompatActivity(), NotesListFragment.OnListenRecyclerScro
     This fragment is setting when user click RecyclerView item
      */
     @SuppressLint("CommitTransaction")
-    private fun setNotePreviewFragment(title: String, note: String, position: Int) {
+    private fun setNotePreviewFragment(itemId: String, title: String, note: String, position: Int) {
 
         binding.mainFab.setImageDrawable(resources.getDrawable(R.drawable.ic_mode_edit_white_24dp))
 
         val args = Bundle()
+        args.putString("id", itemId)
         args.putString("title", title)
         args.putString("note", note)
         args.putInt("position", position)
@@ -297,8 +298,8 @@ class MainActivity : AppCompatActivity(), NotesListFragment.OnListenRecyclerScro
         Listen item click and switch to "Preview Mode"
          */
         frag.setOnEditModeListener(object : NotesListFragment.OnEditModeListener {
-            override fun switch(title: String, note: String, position: Int) {
-                setNotePreviewFragment(title, note, position)
+            override fun switch(itemId: String, title: String, note: String, position: Int) {
+                setNotePreviewFragment(itemId, title, note, position)
             }
         })
     }
@@ -332,7 +333,7 @@ class MainActivity : AppCompatActivity(), NotesListFragment.OnListenRecyclerScro
                 //mUpdateListener.passData(frag.title, frag.note, frag.position)
             } else if (frag is NotePreviewFragment) {
                 binding.mainFab.setImageDrawable(resources.getDrawable(R.drawable.ic_done_white_24dp))
-                setEditNoteFragment(frag.binding.previewTitleField.text.toString(),
+                setEditNoteFragment(frag.itemId, frag.binding.previewTitleField.text.toString(),
                         frag.binding.previewNoteField.text.toString(), frag.itemPosition)
                 CurrentFragmentState.PREVIOUS = MainActivity.NOTE_PREVIEW_FRAGMENT_TAG
             }

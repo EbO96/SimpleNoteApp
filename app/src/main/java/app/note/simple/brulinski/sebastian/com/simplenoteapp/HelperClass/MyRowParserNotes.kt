@@ -12,11 +12,12 @@ class MyRowParserNotes : MapRowParser<List<Notes.Note>> {
 
     override fun parseRow(columns: Map<String, Any?>): List<Notes.Note> {
 
+        val id = columns.getValue("_id")
         val title = columns.getValue("title")
         val note = columns.getValue("note")
         val date = columns.getValue("date")
 
-        listUserNotes.add(Notes.Note(title = title.toString(), note = note.toString(), date = date.toString()))
+        listUserNotes.add(Notes.Note(id = id.toString(), title = title.toString(), note = note.toString(), date = date.toString()))
 
         return listUserNotes
     }

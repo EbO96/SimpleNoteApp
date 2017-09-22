@@ -2,7 +2,6 @@ package app.note.simple.brulinski.sebastian.com.simplenoteapp.RecyclerView
 
 import android.content.Context
 import android.support.design.widget.Snackbar
-import android.support.v7.widget.CardView
 import android.support.v7.widget.RecyclerView
 import android.view.LayoutInflater
 import android.view.View
@@ -11,7 +10,6 @@ import android.widget.TextView
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.Activity.MainActivity
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.Database.LocalSQLAnkoDatabase
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.Fragment.NotesListFragment
-import app.note.simple.brulinski.sebastian.com.simplenoteapp.HelperClass.EditorManager
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.Model.ItemsHolder
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.R
 
@@ -25,7 +23,7 @@ class MainRecyclerAdapter(var itemsHolder: ArrayList<ItemsHolder>, var recyclerV
     var undoClicked = false
 
     interface OnEditItemListener {
-        fun itemDetails(title: String, note: String, position: Int)
+        fun itemDetails(itemId: String, title: String, note: String, position: Int)
     }
 
     fun setOnEditItemListener(onEditItemListener: OnEditItemListener) {
@@ -51,7 +49,7 @@ class MainRecyclerAdapter(var itemsHolder: ArrayList<ItemsHolder>, var recyclerV
 
         holder.itemView?.setOnClickListener {
             pos = recyclerView.getChildAdapterPosition(holder.itemView)
-            onEditItemListener_.itemDetails(this.itemsHolder.get(pos).title, this.itemsHolder.get(pos).note, pos)
+            onEditItemListener_.itemDetails(this.itemsHolder.get(pos).id, this.itemsHolder.get(pos).title, this.itemsHolder.get(pos).note, pos)
         }
 
         holder.itemView?.setOnLongClickListener {

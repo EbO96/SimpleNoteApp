@@ -14,7 +14,7 @@ class EditorManager {
     class BackgroundColorManager(val ctx: Context) {
         companion object {
 
-            var currentColor = "WHITE"
+            var currentBgColor = "WHITE"
 
             var RED = "RED"
             var BLUE = "BLUE"
@@ -63,10 +63,18 @@ class EditorManager {
         }
     }
 
-    class FontManager {
+    class FontColorManager {
+        companion object {
+            val FONT_BLACK = "BLACK"
+
+            var currentFontColor = FONT_BLACK
+        }
+    }
+
+    class FontStyleManager {
 
         companion object {
-            var currentFont = "DEFAULT"
+            var currentFontStyle = "DEFAULT"
             val DEFAULT_FONT = "DEFAULT"
             val ITALIC_FONT = "ITALIC"
             val BOLD_ITALIC_FONT = "BOLD_ITALIC"
@@ -97,18 +105,18 @@ class EditorManager {
             }
 
             fun recogniseAndSetFont(font: String, title: TextView, note: TextView) {
-                if (font.equals(FontManager.DEFAULT_FONT)) {
-                    FontManager.setUpFontStyle(Typeface.DEFAULT, title, note)
-                } else if (font.equals(FontManager.ITALIC_FONT)) {
-                    FontManager.setUpFontStyle(Typeface.ITALIC, title, note)
-                } else if (font.equals(FontManager.BOLD_ITALIC_FONT)) {
-                    FontManager.setUpFontStyle(Typeface.BOLD_ITALIC, title, note)
-                } else if (font.equals(FontManager.SERIF_FONT)) {
-                    FontManager.setUpFontStyle(Typeface.SERIF, title, note)
-                } else if (font.equals(FontManager.SANS_SERIF_FONT)) {
-                    FontManager.setUpFontStyle(Typeface.SANS_SERIF, title, note)
-                } else if (font.equals(FontManager.MONOSPACE_FONT)) {
-                    FontManager.setUpFontStyle(Typeface.MONOSPACE, title, note)
+                if (font.equals(FontStyleManager.DEFAULT_FONT)) {
+                    FontStyleManager.setUpFontStyle(Typeface.DEFAULT, title, note)
+                } else if (font.equals(FontStyleManager.ITALIC_FONT)) {
+                    FontStyleManager.setUpFontStyle(Typeface.ITALIC, title, note)
+                } else if (font.equals(FontStyleManager.BOLD_ITALIC_FONT)) {
+                    FontStyleManager.setUpFontStyle(Typeface.BOLD_ITALIC, title, note)
+                } else if (font.equals(FontStyleManager.SERIF_FONT)) {
+                    FontStyleManager.setUpFontStyle(Typeface.SERIF, title, note)
+                } else if (font.equals(FontStyleManager.SANS_SERIF_FONT)) {
+                    FontStyleManager.setUpFontStyle(Typeface.SANS_SERIF, title, note)
+                } else if (font.equals(FontStyleManager.MONOSPACE_FONT)) {
+                    FontStyleManager.setUpFontStyle(Typeface.MONOSPACE, title, note)
                 }
             }
         }
