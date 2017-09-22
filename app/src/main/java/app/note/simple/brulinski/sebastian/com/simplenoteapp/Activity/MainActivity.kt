@@ -21,6 +21,7 @@ import app.note.simple.brulinski.sebastian.com.simplenoteapp.Fragment.NotePrevie
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.Fragment.NotesListFragment
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.HelperClass.CurrentFragmentState
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.HelperClass.LayoutManagerStyle
+import app.note.simple.brulinski.sebastian.com.simplenoteapp.Model.ItemsHolder
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.R
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.databinding.ActivityMainBinding
 
@@ -136,13 +137,14 @@ class MainActivity : AppCompatActivity(), NotesListFragment.OnListenRecyclerScro
     /*
     This fragment is setting only from preview mode (NotePreviewFragment.kt)
      */
-    private fun setEditNoteFragment(itemId: String, title: String, note: String, position: Int) {
+    private fun setEditNoteFragment(itemId: String, title: String, note: String, position: Int, noteObject: ItemsHolder) {
         val args = Bundle()
 
         args.putString("id", itemId)
         args.putString("title", title)
         args.putString("note", note)
         args.putInt("position", position)
+        args.putParcelableArrayList("note_object", arrayListOf(noteObject))
 
         fm = supportFragmentManager
         ft = fm.beginTransaction()
@@ -163,7 +165,7 @@ class MainActivity : AppCompatActivity(), NotesListFragment.OnListenRecyclerScro
     This fragment is setting when user click RecyclerView item
      */
     @SuppressLint("CommitTransaction")
-    private fun setNotePreviewFragment(itemId: String, title: String, note: String, position: Int) {
+    private fun setNotePreviewFragment(itemId: String, title: String, note: String, position: Int, noteObject: ItemsHolder) {
 
         binding.mainFab.setImageDrawable(resources.getDrawable(R.drawable.ic_mode_edit_white_24dp))
 
@@ -172,6 +174,7 @@ class MainActivity : AppCompatActivity(), NotesListFragment.OnListenRecyclerScro
         args.putString("title", title)
         args.putString("note", note)
         args.putInt("position", position)
+        args.putParcelableArrayList("note_object", arrayListOf(noteObject))
 
         val previewFragment = NotePreviewFragment()
         previewFragment.arguments = args
@@ -298,8 +301,8 @@ class MainActivity : AppCompatActivity(), NotesListFragment.OnListenRecyclerScro
         Listen item click and switch to "Preview Mode"
          */
         frag.setOnEditModeListener(object : NotesListFragment.OnEditModeListener {
-            override fun switch(itemId: String, title: String, note: String, position: Int) {
-                setNotePreviewFragment(itemId, title, note, position)
+            override fun switch(itemId: String, title: String, note: String, position: Int, noteObject: ItemsHolder) {
+                setNotePreviewFragment(itemId, title, note, position, noteObject)
             }
         })
     }
@@ -334,7 +337,7 @@ class MainActivity : AppCompatActivity(), NotesListFragment.OnListenRecyclerScro
             } else if (frag is NotePreviewFragment) {
                 binding.mainFab.setImageDrawable(resources.getDrawable(R.drawable.ic_done_white_24dp))
                 setEditNoteFragment(frag.itemId, frag.binding.previewTitleField.text.toString(),
-                        frag.binding.previewNoteField.text.toString(), frag.itemPosition)
+                        frag.binding.previewNoteField.text.toString(), frag.itemPosition, frag.noteObject.get(0))
                 CurrentFragmentState.PREVIOUS = MainActivity.NOTE_PREVIEW_FRAGMENT_TAG
             }
         }

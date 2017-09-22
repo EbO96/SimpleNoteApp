@@ -2,6 +2,7 @@ package app.note.simple.brulinski.sebastian.com.simplenoteapp.RecyclerView
 
 import android.content.Context
 import android.support.design.widget.Snackbar
+import android.support.v7.widget.CardView
 import android.support.v7.widget.RecyclerView
 import android.view.LayoutInflater
 import android.view.View
@@ -10,6 +11,7 @@ import android.widget.TextView
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.Activity.MainActivity
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.Database.LocalSQLAnkoDatabase
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.Fragment.NotesListFragment
+import app.note.simple.brulinski.sebastian.com.simplenoteapp.HelperClass.EditorManager
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.Model.ItemsHolder
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.R
 
@@ -23,7 +25,7 @@ class MainRecyclerAdapter(var itemsHolder: ArrayList<ItemsHolder>, var recyclerV
     var undoClicked = false
 
     interface OnEditItemListener {
-        fun itemDetails(itemId: String, title: String, note: String, position: Int)
+        fun itemDetails(itemId: String, title: String, note: String, position: Int, noteObject: ItemsHolder)
     }
 
     fun setOnEditItemListener(onEditItemListener: OnEditItemListener) {
@@ -42,14 +44,19 @@ class MainRecyclerAdapter(var itemsHolder: ArrayList<ItemsHolder>, var recyclerV
         if (note.length > 260)
             note = note.substring(0, 260) + "..."
 
-        holder!!.title?.text = title
+        EditorManager.FontStyleManager.recogniseAndSetFont(itemsHolder.fontStyle, holder!!.title, holder.note)
+        val bg = EditorManager.BackgroundColorManager(ctx)
+
+        bg.recogniseAndSetBackgroundColor(itemsHolder.bgColor, holder.card)
+
+        holder.title?.text = title
         holder.note.text = note
 
         var pos: Int
 
         holder.itemView?.setOnClickListener {
             pos = recyclerView.getChildAdapterPosition(holder.itemView)
-            onEditItemListener_.itemDetails(this.itemsHolder.get(pos).id, this.itemsHolder.get(pos).title, this.itemsHolder.get(pos).note, pos)
+            onEditItemListener_.itemDetails(this.itemsHolder.get(pos).id, this.itemsHolder.get(pos).title, this.itemsHolder.get(pos).note, pos, this.itemsHolder.get(pos))
         }
 
         holder.itemView?.setOnLongClickListener {
@@ -112,6 +119,7 @@ class MainRecyclerAdapter(var itemsHolder: ArrayList<ItemsHolder>, var recyclerV
     class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         val title = itemView.findViewById<TextView>(R.id.titleTextView)
         val note = itemView.findViewById<TextView>(R.id.noteTextView)
+        val card = itemView.findViewById<CardView>(R.id.item_card_parent_card)
     }
 
     fun setFilter(newItemList: ArrayList<ItemsHolder>) {

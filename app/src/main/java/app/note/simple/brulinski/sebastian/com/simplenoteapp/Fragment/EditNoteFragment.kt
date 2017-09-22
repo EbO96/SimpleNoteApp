@@ -11,6 +11,7 @@ import app.note.simple.brulinski.sebastian.com.simplenoteapp.Activity.MainActivi
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.Database.LocalSQLAnkoDatabase
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.HelperClass.CurrentFragmentState
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.HelperClass.EditorManager
+import app.note.simple.brulinski.sebastian.com.simplenoteapp.Model.ItemsHolder
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.R
 import com.labo.kaji.fragmentanimations.MoveAnimation
 
@@ -29,7 +30,6 @@ class EditNoteFragment : CreateNoteFragment() {
     var itemId = ""
 
     override fun onViewCreated(view: View?, savedInstanceState: Bundle?) {
-        Log.i("frag", "Edit Create")
 
         CurrentFragmentState.CURRENT = MainActivity.EDIT_NOTE_FRAGMENT_TAG
 
@@ -44,8 +44,16 @@ class EditNoteFragment : CreateNoteFragment() {
         title = arguments.getString("title")
         note = arguments.getString("note")
         position = arguments.getInt("position")
+        val noteObject = arguments.getParcelableArrayList<ItemsHolder>("note_object")
 
         listenBarOptions()
+
+        EditorManager.FontStyleManager.recogniseAndSetFont(noteObject[0].fontStyle, bindingFrag.createNoteTitleField,
+                bindingFrag.createNoteNoteField)
+
+        val bg = EditorManager.BackgroundColorManager(context)
+
+        bg.recogniseAndSetBackgroundColor(noteObject[0].bgColor, bindingFrag.createNoteParentCard)
 
         bindingFrag.createNoteTitleField.setText(title)
         bindingFrag.createNoteNoteField.setText(note)

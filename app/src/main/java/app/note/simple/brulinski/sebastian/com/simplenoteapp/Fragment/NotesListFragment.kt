@@ -56,7 +56,7 @@ class NotesListFragment : Fragment() {
     lateinit var onEditModeListener_: OnEditModeListener
 
     interface OnEditModeListener {
-        fun switch(itemId: String, title: String, note: String, position: Int)
+        fun switch(itemId: String, title: String, note: String, position: Int, noteObject: ItemsHolder)
     }
 
     fun setOnEditModeListener(onEditModeListener: OnEditModeListener) {
@@ -178,8 +178,8 @@ class NotesListFragment : Fragment() {
 
     fun editNote() {
         myRecycler.setOnEditItemListener(object : MainRecyclerAdapter.OnEditItemListener {
-            override fun itemDetails(itemId: String, title: String, note: String, position: Int) {
-                onEditModeListener_.switch(itemId, title, note, position)
+            override fun itemDetails(itemId: String, title: String, note: String, position: Int, noteObject: ItemsHolder) {
+                onEditModeListener_.switch(itemId, title, note, position, noteObject)
                 CurrentFragmentState.backPressed = false
                 CurrentFragmentState.PREVIOUS = MainActivity.NOTE_LIST_FRAGMENT_TAG
             }
