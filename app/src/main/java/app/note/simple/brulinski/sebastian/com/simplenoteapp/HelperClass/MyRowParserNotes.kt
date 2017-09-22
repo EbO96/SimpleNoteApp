@@ -6,7 +6,7 @@ import org.jetbrains.anko.db.MapRowParser
 /**
  * Created by sebas on 9/19/2017.
  */
-class MyRowParser : MapRowParser<List<Notes.Note>> {
+class MyRowParserNotes : MapRowParser<List<Notes.Note>> {
 
     val listUserNotes = ArrayList<Notes.Note>()
 

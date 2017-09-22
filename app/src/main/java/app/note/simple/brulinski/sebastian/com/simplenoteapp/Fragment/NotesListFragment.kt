@@ -16,7 +16,7 @@ import app.note.simple.brulinski.sebastian.com.simplenoteapp.Activity.MainActivi
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.Database.LocalSQLAnkoDatabase
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.HelperClass.CurrentFragmentState
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.HelperClass.LayoutManagerStyle
-import app.note.simple.brulinski.sebastian.com.simplenoteapp.HelperClass.MyRowParser
+import app.note.simple.brulinski.sebastian.com.simplenoteapp.HelperClass.MyRowParserNotes
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.Model.ItemsHolder
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.R
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.RecyclerView.MainRecyclerAdapter
@@ -137,7 +137,7 @@ class NotesListFragment : Fragment() {
     fun getAndSetNotes() {
         itemsObjectsArray = ArrayList()
         database.use {
-            val notes = select("notes").parseList(MyRowParser())
+            val notes = select("notes").parseList(MyRowParserNotes())
             val size = notes.size
 
             for (x in 0 until size) {

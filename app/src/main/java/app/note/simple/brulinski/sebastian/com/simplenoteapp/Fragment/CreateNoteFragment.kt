@@ -7,7 +7,6 @@ import android.graphics.Typeface
 import android.os.Bundle
 import android.support.v4.app.Fragment
 import android.text.TextUtils
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -16,11 +15,14 @@ import app.note.simple.brulinski.sebastian.com.simplenoteapp.Activity.MainActivi
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.Database.LocalSQLAnkoDatabase
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.HelperClass.CurrentFragmentState
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.HelperClass.EditorManager
+import app.note.simple.brulinski.sebastian.com.simplenoteapp.HelperClass.MyRowParserNoteProperties
+import app.note.simple.brulinski.sebastian.com.simplenoteapp.Model.NoteID
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.R
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.databinding.CreateNoteFragmentBinding
 import com.cocosw.bottomsheet.BottomSheet
 import com.labo.kaji.fragmentanimations.MoveAnimation
 import org.jetbrains.anko.db.insert
+import org.jetbrains.anko.db.select
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -53,17 +55,36 @@ open class CreateNoteFragment : Fragment() {
 
     fun saveNote(title: String, note: String) {
         try {
+            val titleCol = Pair<String, String>("title", title.trim())
+            val noteCol = Pair<String, String>("note", note.trim())
+            val dateCol = Pair<String, String>("date", getCurrentDateAndTime())
+            var idList: List<List<NoteID>>? = null
+            var size = 0
 
             database.use {
-                val titleCol = Pair<String, String>("title", title.trim())
-                val noteCol = Pair<String, String>("note", note.trim())
-                val dateCol = Pair<String, String>("date", getCurrentDateAndTime())
-
-                insert("notes", titleCol, noteCol, dateCol)
+                insert(LocalSQLAnkoDatabase.TABLE_NOTES, titleCol, noteCol, dateCol)
             }
+
+            database.use {
+                idList = select(LocalSQLAnkoDatabase.TABLE_NOTES).whereArgs("_id", titleCol, noteCol).
+                        parseList(MyRowParserNoteProperties())
+                size = idList!!.size - 1
+            }
+
+            //TODO
+//            val noteIdCol = Pair<String, String>("note_id", idList!!.get(size).get(size).id)
+//            val bgColorCol = Pair<String, String>("bg_color", "test")
+//            val textColorCol = Pair<String, String>("text_color", "test2")
+//            val fontStyleCol = Pair<String, String>("font_style", "test3")
+//
+//            database.use {
+//                insert(LocalSQLAnkoDatabase.TABLE_NOTES_PROPERTIES, noteIdCol, bgColorCol, textColorCol, fontStyleCol)
+//            }
+
         } catch (e: Exception) {
             e.printStackTrace()
         }
+
     }
 
     companion object {

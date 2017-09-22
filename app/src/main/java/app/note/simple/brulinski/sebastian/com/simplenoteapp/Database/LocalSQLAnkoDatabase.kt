@@ -8,7 +8,8 @@ class LocalSQLAnkoDatabase(ctx: Context) : ManagedSQLiteOpenHelper(ctx, "user_no
 
     companion object {
         private var instance: LocalSQLAnkoDatabase? = null
-        val TABLE: String = "notes"
+        val TABLE_NOTES: String = "notes"
+        val TABLE_NOTES_PROPERTIES: String = "notes_properties"
 
         @Synchronized
         fun getInstance(ctx: Context): LocalSQLAnkoDatabase {
@@ -20,13 +21,15 @@ class LocalSQLAnkoDatabase(ctx: Context) : ManagedSQLiteOpenHelper(ctx, "user_no
     }
 
     override fun onCreate(p0: SQLiteDatabase) {
-        p0.createTable(TABLE, true, "_id" to INTEGER + PRIMARY_KEY, "title" to TEXT, "note" to TEXT,
+        p0.createTable(TABLE_NOTES, true, "_id" to INTEGER + PRIMARY_KEY, "title" to TEXT, "note" to TEXT,
                 "date" to TEXT)
+        p0.createTable(TABLE_NOTES_PROPERTIES, true, "_id" to INTEGER + PRIMARY_KEY, "note_id" to TEXT,
+                "bg_color" to TEXT, "text_color" to TEXT, "font_style" to TEXT)
     }
 
     override fun onUpgrade(p0: SQLiteDatabase, p1: Int, p2: Int) {
-        TODO("not implemented") //To changeMenuItemsVisibility body of created functions use File | Settings | File Templates.
-        p0.dropTable(TABLE, true)
+        p0.dropTable(TABLE_NOTES, true)
+        p0.dropTable(TABLE_NOTES_PROPERTIES, true)
     }
 
 
