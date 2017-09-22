@@ -11,6 +11,7 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.view.animation.Animation
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.Activity.MainActivity
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.Database.LocalSQLAnkoDatabase
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.HelperClass.CurrentFragmentState
@@ -20,6 +21,8 @@ import app.note.simple.brulinski.sebastian.com.simplenoteapp.Model.ItemsHolder
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.R
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.RecyclerView.MainRecyclerAdapter
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.databinding.NotesListFragmentBinding
+import com.labo.kaji.fragmentanimations.MoveAnimation
+
 import jp.wasabeef.recyclerview.animators.SlideInRightAnimator
 import org.jetbrains.anko.db.select
 
@@ -59,8 +62,8 @@ class NotesListFragment : Fragment() {
     }
 
     override fun onCreateView(inflater: LayoutInflater?, container: ViewGroup?, savedInstanceState: Bundle?): View? {
+        Log.i("frag", "List Create")
         binding = DataBindingUtil.inflate(inflater, R.layout.notes_list_fragment, container, false)
-        Log.i("abcd", "create")
 
         CurrentFragmentState.CURRENT = MainActivity.NOTE_LIST_FRAGMENT_TAG
 
@@ -149,6 +152,8 @@ class NotesListFragment : Fragment() {
         myRecycler.setOnEditItemListener(object : MainRecyclerAdapter.OnEditItemListener {
             override fun itemDetails(title: String, note: String, position: Int) {
                 onEditModeListener_.switch(title, note, position)
+                CurrentFragmentState.backPressed = false
+                CurrentFragmentState.PREVIOUS = MainActivity.NOTE_LIST_FRAGMENT_TAG
             }
         })
     }
@@ -210,5 +215,18 @@ class NotesListFragment : Fragment() {
     override fun onStop() {
         mMenuItemsVisible.changeMenuItemsVisibility(false)
         super.onStop()
+    }
+
+    override fun onCreateAnimation(transit: Int, enter: Boolean, nextAnim: Int): Animation {
+
+        if (CurrentFragmentState.backPressed) {
+            return MoveAnimation.create(MoveAnimation.RIGHT, enter, 500)
+        } else {
+            if (enter) {
+                return MoveAnimation.create(MoveAnimation.RIGHT, enter, 500)
+            } else {
+                return MoveAnimation.create(MoveAnimation.LEFT, enter, 500)
+            }
+        }
     }
 }

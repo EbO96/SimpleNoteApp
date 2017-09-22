@@ -6,10 +6,12 @@ import android.os.Bundle
 import android.text.TextUtils
 import android.util.Log
 import android.view.View
+import android.view.animation.Animation
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.Activity.MainActivity
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.HelperClass.CurrentFragmentState
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.HelperClass.EditorManager
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.R
+import com.labo.kaji.fragmentanimations.MoveAnimation
 
 @Suppress("DEPRECATION", "OverridingDeprecatedMember")
 class EditNoteFragment : CreateNoteFragment() {
@@ -25,6 +27,7 @@ class EditNoteFragment : CreateNoteFragment() {
     var position = 0
 
     override fun onViewCreated(view: View?, savedInstanceState: Bundle?) {
+        Log.i("frag", "Edit Create")
 
         CurrentFragmentState.CURRENT = MainActivity.EDIT_NOTE_FRAGMENT_TAG
 
@@ -50,13 +53,8 @@ class EditNoteFragment : CreateNoteFragment() {
             val bcg = EditorManager.BackgroundColorManager(context)
             bcg.recogniseAndSetBackgroundColor(EditorManager.BackgroundColorManager.currentColor, bindingFrag.createNoteParentCard)
         }
+
         super.onViewCreated(view, savedInstanceState)
-    }
-
-    override fun onStart() {
-        super.onStart()
-
-
     }
 
     /*
@@ -104,8 +102,21 @@ class EditNoteFragment : CreateNoteFragment() {
             mToolbarListener = (activity as OnInflateNewToolbarListener)
         } catch (e: ClassCastException) {
             e.printStackTrace()
-            throw ClassCastException(activity.toString() + " must implement OnInflateNewToolbarListener interface")
+            throw ClassCastException(activity.toString() + " must implement OnInflateNewToolbarListener and interface")
         }
 
+    }
+
+    override fun onCreateAnimation(transit: Int, enter: Boolean, nextAnim: Int): Animation {
+
+        if (CurrentFragmentState.backPressed) {
+            return MoveAnimation.create(MoveAnimation.RIGHT, enter, 500)
+        } else {
+            if (enter) {
+                return MoveAnimation.create(MoveAnimation.LEFT, enter, 500)
+            } else {
+                return MoveAnimation.create(MoveAnimation.RIGHT, enter, 500)
+            }
+        }
     }
 }

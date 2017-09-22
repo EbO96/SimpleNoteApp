@@ -1,5 +1,6 @@
 package app.note.simple.brulinski.sebastian.com.simplenoteapp.Activity
 
+import android.annotation.SuppressLint
 import android.content.Context
 import android.content.SharedPreferences
 import android.databinding.DataBindingUtil
@@ -11,6 +12,7 @@ import android.support.v4.view.MenuItemCompat
 import android.support.v7.app.AppCompatActivity
 import android.support.v7.widget.RecyclerView
 import android.support.v7.widget.SearchView
+import android.util.Log
 import android.view.Menu
 import android.view.MenuInflater
 import android.view.MenuItem
@@ -23,8 +25,10 @@ import app.note.simple.brulinski.sebastian.com.simplenoteapp.HelperClass.LayoutM
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.R
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.databinding.ActivityMainBinding
 
+
 @Suppress("DEPRECATION")
-class MainActivity : AppCompatActivity(), NotesListFragment.OnListenRecyclerScroll, SearchView.OnQueryTextListener, EditNoteFragment.OnInflateNewToolbarListener, NotesListFragment.OnChangeItemVisible {
+class MainActivity : AppCompatActivity(), NotesListFragment.OnListenRecyclerScroll, SearchView.OnQueryTextListener, EditNoteFragment.OnInflateNewToolbarListener,
+        NotesListFragment.OnChangeItemVisible {
 
     lateinit var mSearchCallback: OnSearchResultListener
 
@@ -101,17 +105,14 @@ class MainActivity : AppCompatActivity(), NotesListFragment.OnListenRecyclerScro
     /*
     This function replace another fragment in FrameLayout container by our main Fragment (NoteListFragment.kt - display our notes)
      */
-    fun setNotesListFragment() {
+    private fun setNotesListFragment() {
         fm = supportFragmentManager
         ft = fm.beginTransaction()
 
         val notesListFragment = NotesListFragment()
 
         noteFragment = notesListFragment
-        ft.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_FADE)
         ft.replace(binding.mainContainer.id, notesListFragment, NOTE_LIST_FRAGMENT_TAG)
-
-        ft.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN)
 
         ft.addToBackStack(NOTE_LIST_FRAGMENT_TAG)
 
@@ -122,13 +123,12 @@ class MainActivity : AppCompatActivity(), NotesListFragment.OnListenRecyclerScro
     /*
     Fragment used to create new note
      */
-    fun setCreateNoteFragment() {
+    private fun setCreateNoteFragment() {
         fm = supportFragmentManager
         ft = fm.beginTransaction()
 
         val createNoteFragment: CreateNoteFragment = CreateNoteFragment()
 
-        ft.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_FADE)
         ft.replace(binding.mainContainer.id, createNoteFragment, CREATE_NOTE_FRAGMENT_TAG)
         ft.addToBackStack(CREATE_NOTE_FRAGMENT_TAG)
         ft.commit()
@@ -137,7 +137,7 @@ class MainActivity : AppCompatActivity(), NotesListFragment.OnListenRecyclerScro
     /*
     This fragment is setting only from preview mode (NotePreviewFragment.kt)
      */
-    fun setEditNoteFragment(title: String, note: String, position: Int) {
+    private fun setEditNoteFragment(title: String, note: String, position: Int) {
         val args = Bundle()
 
         args.putString("title", title)
@@ -150,10 +150,8 @@ class MainActivity : AppCompatActivity(), NotesListFragment.OnListenRecyclerScro
         val editNoteFragment = EditNoteFragment()
         editNoteFragment.arguments = args
 
+        val containerId = binding.mainContainer.id
 
-        var containerId = binding.mainContainer.id
-
-        ft.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_FADE)
         ft.replace(containerId, editNoteFragment, EDIT_NOTE_FRAGMENT_TAG)
 
         ft.addToBackStack(EDIT_NOTE_FRAGMENT_TAG)
@@ -164,6 +162,7 @@ class MainActivity : AppCompatActivity(), NotesListFragment.OnListenRecyclerScro
     /*
     This fragment is setting when user click RecyclerView item
      */
+    @SuppressLint("CommitTransaction")
     private fun setNotePreviewFragment(title: String, note: String, position: Int) {
 
         binding.mainFab.setImageDrawable(resources.getDrawable(R.drawable.ic_mode_edit_white_24dp))
@@ -179,9 +178,7 @@ class MainActivity : AppCompatActivity(), NotesListFragment.OnListenRecyclerScro
         fm = supportFragmentManager
         ft = fm.beginTransaction()
 
-        var containerID = binding.mainContainer.id
-
-        ft.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_FADE)
+        val containerID = binding.mainContainer.id
         ft.replace(containerID, previewFragment, NOTE_PREVIEW_FRAGMENT_TAG)
         ft.addToBackStack(NOTE_PREVIEW_FRAGMENT_TAG)
         ft.commit()
@@ -191,7 +188,7 @@ class MainActivity : AppCompatActivity(), NotesListFragment.OnListenRecyclerScro
     Create menu at Toolbar
      */
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
-        var menuInflater: MenuInflater = menuInflater
+        val menuInflater: MenuInflater = menuInflater
         menuInflater.inflate(R.menu.main_menu, menu)
 
         menuItemGrid = menu!!.findItem(R.id.main_menu_grid)
@@ -235,7 +232,7 @@ class MainActivity : AppCompatActivity(), NotesListFragment.OnListenRecyclerScro
         return true
     }
     /*
-    Select menu item at Toolbar and execute action 
+    Select menu item at Toolbar and execute action
      */
 
     override fun onOptionsItemSelected(item: MenuItem?): Boolean {
@@ -284,11 +281,13 @@ class MainActivity : AppCompatActivity(), NotesListFragment.OnListenRecyclerScro
 
             if (frag is CreateNoteFragment && frag.tag.equals(CREATE_NOTE_FRAGMENT_TAG)) {
                 binding.mainFab.setImageDrawable(resources.getDrawable(R.drawable.ic_add_white_24dp))
-
+                CurrentFragmentState.PREVIOUS = MainActivity.CREATE_NOTE_FRAGMENT_TAG
             } else if (frag is EditNoteFragment) { //Update RecyclerView item and return to NoteListFragment
                 binding.mainFab.setImageDrawable(resources.getDrawable(R.drawable.ic_mode_edit_white_24dp))
+                CurrentFragmentState.PREVIOUS = MainActivity.EDIT_NOTE_FRAGMENT_TAG
             } else if (frag is NotePreviewFragment) {
                 binding.mainFab.setImageDrawable(resources.getDrawable(R.drawable.ic_add_white_24dp))
+                CurrentFragmentState.PREVIOUS = MainActivity.NOTE_PREVIEW_FRAGMENT_TAG
             }
         } else if (supportFragmentManager.backStackEntryCount <= 1) this.finish()
     }
@@ -319,19 +318,23 @@ class MainActivity : AppCompatActivity(), NotesListFragment.OnListenRecyclerScro
             if (frag is NotesListFragment) {
                 binding.mainFab.setImageDrawable(resources.getDrawable(R.drawable.ic_done_white_24dp))
                 setCreateNoteFragment()
+                CurrentFragmentState.PREVIOUS = MainActivity.NOTE_PREVIEW_FRAGMENT_TAG
             } else if (frag is CreateNoteFragment && frag.tag.equals(CREATE_NOTE_FRAGMENT_TAG)) {
                 binding.mainFab.setImageDrawable(resources.getDrawable(R.drawable.ic_add_white_24dp))
                 supportFragmentManager.popBackStack()
+                CurrentFragmentState.PREVIOUS = MainActivity.CREATE_NOTE_FRAGMENT_TAG
             } else if (frag is EditNoteFragment) { //Update RecyclerView item and return to NoteListFragment
                 binding.mainFab.setImageDrawable(resources.getDrawable(R.drawable.ic_add_white_24dp))
                 for (x in 1..2) {
                     supportFragmentManager.popBackStack()
                 }
+                CurrentFragmentState.PREVIOUS = MainActivity.EDIT_NOTE_FRAGMENT_TAG
                 //mUpdateListener.passData(frag.title, frag.note, frag.position)
             } else if (frag is NotePreviewFragment) {
                 binding.mainFab.setImageDrawable(resources.getDrawable(R.drawable.ic_done_white_24dp))
                 setEditNoteFragment(frag.binding.previewTitleField.text.toString(),
                         frag.binding.previewNoteField.text.toString(), frag.itemPosition)
+                CurrentFragmentState.PREVIOUS = MainActivity.NOTE_PREVIEW_FRAGMENT_TAG
             }
         }
     }
@@ -361,6 +364,5 @@ class MainActivity : AppCompatActivity(), NotesListFragment.OnListenRecyclerScro
             e.printStackTrace()
         }
     }
-
 }
 

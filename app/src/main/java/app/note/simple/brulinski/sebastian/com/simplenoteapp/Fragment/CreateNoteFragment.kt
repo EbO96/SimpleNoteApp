@@ -7,9 +7,11 @@ import android.graphics.Typeface
 import android.os.Bundle
 import android.support.v4.app.Fragment
 import android.text.TextUtils
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.view.animation.Animation
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.Activity.MainActivity
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.Database.LocalSQLAnkoDatabase
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.HelperClass.CurrentFragmentState
@@ -17,6 +19,7 @@ import app.note.simple.brulinski.sebastian.com.simplenoteapp.HelperClass.EditorM
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.R
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.databinding.CreateNoteFragmentBinding
 import com.cocosw.bottomsheet.BottomSheet
+import com.labo.kaji.fragmentanimations.MoveAnimation
 import org.jetbrains.anko.db.insert
 import java.text.SimpleDateFormat
 import java.util.*
@@ -184,6 +187,18 @@ open class CreateNoteFragment : Fragment() {
         }).show()
     }
 
+    override fun onCreateAnimation(transit: Int, enter: Boolean, nextAnim: Int): Animation {
+
+        if (CurrentFragmentState.backPressed) {
+            return MoveAnimation.create(MoveAnimation.RIGHT, enter, 500)
+        } else {
+            if (enter) {
+                return MoveAnimation.create(MoveAnimation.LEFT, enter, 500)
+            } else {
+                return MoveAnimation.create(MoveAnimation.RIGHT, enter, 500)
+            }
+        }
+    }
 
 }
 
