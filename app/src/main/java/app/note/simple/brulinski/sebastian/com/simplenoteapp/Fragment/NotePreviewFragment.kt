@@ -3,17 +3,13 @@ package app.note.simple.brulinski.sebastian.com.simplenoteapp.Fragment
 import android.databinding.DataBindingUtil
 import android.os.Bundle
 import android.support.v4.app.Fragment
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.Activity.MainActivity
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.Database.LocalSQLAnkoDatabase
-import app.note.simple.brulinski.sebastian.com.simplenoteapp.HelperClass.EditorManager
-import app.note.simple.brulinski.sebastian.com.simplenoteapp.HelperClass.ItemIdRowParser
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.R
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.databinding.PreviewCardBinding
-import org.jetbrains.anko.db.select
 
 class NotePreviewFragment : Fragment() {
 

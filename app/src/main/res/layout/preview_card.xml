@@ -1,16 +1,19 @@
 <?xml version="1.0" encoding="utf-8"?>
 <layout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto">
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:background="@color/cardview_light_background">
 
-    <LinearLayout
+    <android.support.v7.widget.CardView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:orientation="vertical">
+        android:layout_margin="4dp"
+        app:cardCornerRadius="10dp"
+        app:cardElevation="2dp">
 
-        <android.support.v7.widget.CardView
+        <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            app:cardElevation="2dp">
+            android:layout_height="match_parent"
+            android:orientation="vertical">
 
             <ScrollView
                 android:layout_width="match_parent"
@@ -22,17 +25,10 @@
                     android:layout_height="wrap_content"
                     android:hint="@string/title"
                     android:maxLines="1"
-                    android:textStyle="bold"
+                    android:padding="8dp"
                     android:textSize="24sp"
-                    android:padding="8dp"/>
+                    android:textStyle="bold" />
             </ScrollView>
-        </android.support.v7.widget.CardView>
-
-        <android.support.v7.widget.CardView
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            app:cardCornerRadius="2dp"
-            app:cardElevation="1dp">
 
             <ScrollView
                 android:id="@+id/preview_scroll_view"
@@ -46,13 +42,14 @@
                     android:layout_height="wrap_content"
                     android:gravity="top|start"
                     android:hint="@string/note"
+                    android:padding="6dp"
                     android:textAlignment="gravity"
-                    android:textSize="18sp"
-                    android:padding="6dp"/>
+                    android:textSize="18sp" />
             </ScrollView>
 
-        </android.support.v7.widget.CardView>
+        </LinearLayout>
 
-    </LinearLayout>
+    </android.support.v7.widget.CardView>
+
 
 </layout>
