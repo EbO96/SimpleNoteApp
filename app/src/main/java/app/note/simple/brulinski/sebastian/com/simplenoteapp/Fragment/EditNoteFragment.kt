@@ -81,7 +81,7 @@ class EditNoteFragment : CreateNoteFragment() {
                 )
 
                 whereClause = "note_id=?"
-                Log.i("abcde", itemId)
+
                 values = ContentValues()
                 values.put("bg_color", EditorManager.BackgroundColorManager.currentBgColor)
                 values.put("text_color", EditorManager.FontColorManager.currentFontColor)

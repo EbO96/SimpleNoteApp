@@ -55,10 +55,7 @@ class MainRecyclerAdapter(var itemsHolder: ArrayList<ItemsHolder>, var recyclerV
         holder.itemView?.setOnLongClickListener {
             pos = recyclerView.getChildAdapterPosition(holder.itemView)
 
-            val titleToDelete: String = this.itemsHolder.get(pos).title
-            val noteToDelete: String = this.itemsHolder.get(pos).note
-            val dateToDelete: String = this.itemsHolder.get(pos).date
-
+            val itemId: String = this.itemsHolder.get(pos).id
 
             @Suppress("DEPRECATION")
             Snackbar.make((ctx as MainActivity).binding.root, ctx.getString(R.string.note_deleted), Snackbar.LENGTH_LONG).setAction(ctx.getString(R.string.undo), {
@@ -77,8 +74,11 @@ class MainRecyclerAdapter(var itemsHolder: ArrayList<ItemsHolder>, var recyclerV
                     if (!undoClicked) {
                         database.use {
                             delete(
-                                    "notes", "title=? AND note=? AND date=?", arrayOf(titleToDelete, noteToDelete, dateToDelete)
+                                    LocalSQLAnkoDatabase.TABLE_NOTES, "_id=?", arrayOf(itemId)
                             )
+                        }
+                        database.use {
+                            delete(LocalSQLAnkoDatabase.TABLE_NOTES_PROPERTIES, "note_id=?", arrayOf(itemId))
                         }
                     }
                     undoClicked = false
