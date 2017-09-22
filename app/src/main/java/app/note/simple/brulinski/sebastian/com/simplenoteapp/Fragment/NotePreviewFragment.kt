@@ -3,18 +3,24 @@ package app.note.simple.brulinski.sebastian.com.simplenoteapp.Fragment
 import android.databinding.DataBindingUtil
 import android.os.Bundle
 import android.support.v4.app.Fragment
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.Activity.MainActivity
+import app.note.simple.brulinski.sebastian.com.simplenoteapp.Database.LocalSQLAnkoDatabase
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.HelperClass.EditorManager
+import app.note.simple.brulinski.sebastian.com.simplenoteapp.HelperClass.ItemIdRowParser
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.R
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.databinding.PreviewCardBinding
+import org.jetbrains.anko.db.select
 
 class NotePreviewFragment : Fragment() {
 
     var itemPosition = 0
     var font = ""
+    var bcgColor = ""
+    lateinit var database: LocalSQLAnkoDatabase
 
     lateinit var binding: PreviewCardBinding
 
@@ -22,6 +28,7 @@ class NotePreviewFragment : Fragment() {
         binding = DataBindingUtil.inflate(inflater, R.layout.preview_card, container, false)
 
         (activity as MainActivity).supportActionBar?.setTitle(getString(R.string.preview))
+        database = LocalSQLAnkoDatabase(context)
 
         return binding.root
     }
@@ -31,10 +38,8 @@ class NotePreviewFragment : Fragment() {
 
         val title = arguments.getString("title")
         val note = arguments.getString("note")
-        font = arguments.getString("font")
         itemPosition = arguments.getInt("position")
 
-        EditorManager.FontManager.recogniseAndSetFont(font, binding.previewTitleField, binding.previewNoteField)
         binding.previewTitleField.text = title
         binding.previewNoteField.text = note
 

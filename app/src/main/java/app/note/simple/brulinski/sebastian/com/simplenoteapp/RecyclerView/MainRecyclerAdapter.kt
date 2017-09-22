@@ -2,6 +2,7 @@ package app.note.simple.brulinski.sebastian.com.simplenoteapp.RecyclerView
 
 import android.content.Context
 import android.support.design.widget.Snackbar
+import android.support.v7.widget.CardView
 import android.support.v7.widget.RecyclerView
 import android.view.LayoutInflater
 import android.view.View
@@ -24,20 +25,18 @@ class MainRecyclerAdapter(var itemsHolder: ArrayList<ItemsHolder>, var recyclerV
     var undoClicked = false
 
     interface OnEditItemListener {
-        fun itemDetails(title: String, note: String, font: String, position: Int)
+        fun itemDetails(title: String, note: String, position: Int)
     }
 
     fun setOnEditItemListener(onEditItemListener: OnEditItemListener) {
         this.onEditItemListener_ = onEditItemListener
     }
 
-
     override fun onBindViewHolder(holder: ViewHolder?, position: Int) {
         val itemsHolder: ItemsHolder = itemsHolder[position]
 
         var title = itemsHolder.title
         var note = itemsHolder.note
-        var font = itemsHolder.font
 
 
         if (title.length > 30)
@@ -45,25 +44,25 @@ class MainRecyclerAdapter(var itemsHolder: ArrayList<ItemsHolder>, var recyclerV
         if (note.length > 260)
             note = note.substring(0, 260) + "..."
 
-        EditorManager.FontManager.recogniseAndSetFont(font, holder?.title!!, holder.note!!)
-        holder.title?.text = title
+        holder!!.title?.text = title
         holder.note.text = note
 
         var pos: Int
 
         holder.itemView?.setOnClickListener {
             pos = recyclerView.getChildAdapterPosition(holder.itemView)
-            onEditItemListener_.itemDetails(this.itemsHolder.get(pos).title, this.itemsHolder.get(pos).note, this.itemsHolder.get(pos).font, pos)
+            onEditItemListener_.itemDetails(this.itemsHolder.get(pos).title, this.itemsHolder.get(pos).note, pos)
         }
 
         holder.itemView?.setOnLongClickListener {
             pos = recyclerView.getChildAdapterPosition(holder.itemView)
 
-            val title: String = this.itemsHolder.get(pos).title
-            val note: String = this.itemsHolder.get(pos).note
-            val date: String = this.itemsHolder.get(pos).date
+            val titleToDelete: String = this.itemsHolder.get(pos).title
+            val noteToDelete: String = this.itemsHolder.get(pos).note
+            val dateToDelete: String = this.itemsHolder.get(pos).date
 
 
+            @Suppress("DEPRECATION")
             Snackbar.make((ctx as MainActivity).binding.root, ctx.getString(R.string.note_deleted), Snackbar.LENGTH_LONG).setAction(ctx.getString(R.string.undo), {
                 undoClicked = true
                 this.itemsHolder.add(pos, deletedItem!!)
@@ -80,7 +79,7 @@ class MainRecyclerAdapter(var itemsHolder: ArrayList<ItemsHolder>, var recyclerV
                     if (!undoClicked) {
                         database.use {
                             delete(
-                                    "notes", "title=? AND note=? AND date=?", arrayOf(title, note, date)
+                                    "notes", "title=? AND note=? AND date=?", arrayOf(titleToDelete, noteToDelete, dateToDelete)
                             )
                         }
                     }

@@ -3,10 +3,9 @@ package app.note.simple.brulinski.sebastian.com.simplenoteapp.Model
 import android.os.Parcel
 import android.os.Parcelable
 
-class ItemsHolder(var title: String, var note: String, var date: String, var font: String) : Parcelable {
 
+class ItemsHolder(var title: String, var note: String, var date: String) : Parcelable {
     constructor(parcel: Parcel) : this(
-            parcel.readString(),
             parcel.readString(),
             parcel.readString(),
             parcel.readString()) {
@@ -16,7 +15,6 @@ class ItemsHolder(var title: String, var note: String, var date: String, var fon
         parcel.writeString(title)
         parcel.writeString(note)
         parcel.writeString(date)
-        parcel.writeString(font)
     }
 
     override fun describeContents(): Int {

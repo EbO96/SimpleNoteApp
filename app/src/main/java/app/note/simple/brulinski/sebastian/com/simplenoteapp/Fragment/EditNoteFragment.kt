@@ -2,13 +2,16 @@ package app.note.simple.brulinski.sebastian.com.simplenoteapp.Fragment
 
 import android.app.Activity
 import android.content.ContentValues
+import android.os.Bundle
 import android.text.TextUtils
 import android.util.Log
+import android.view.View
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.Activity.MainActivity
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.HelperClass.CurrentFragmentState
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.HelperClass.EditorManager
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.R
 
+@Suppress("DEPRECATION", "OverridingDeprecatedMember")
 class EditNoteFragment : CreateNoteFragment() {
 
     lateinit var mToolbarListener: OnInflateNewToolbarListener
@@ -19,11 +22,9 @@ class EditNoteFragment : CreateNoteFragment() {
 
     lateinit var title: String
     lateinit var note: String
-    lateinit var font: String
     var position = 0
 
-    override fun onStart() {
-        super.onStart()
+    override fun onViewCreated(view: View?, savedInstanceState: Bundle?) {
 
         CurrentFragmentState.CURRENT = MainActivity.EDIT_NOTE_FRAGMENT_TAG
 
@@ -36,16 +37,26 @@ class EditNoteFragment : CreateNoteFragment() {
          */
         title = arguments.getString("title")
         note = arguments.getString("note")
-        font = arguments.getString("font")
         position = arguments.getInt("position")
 
-        listenBarOptions(bindingFrag.createNoteTitleField, bindingFrag.createNoteNoteField)
-
-        Log.i("font", "my font " + font)
-        EditorManager.FontManager.recogniseAndSetFont(font, bindingFrag.createNoteTitleField, bindingFrag.createNoteNoteField)
+        listenBarOptions()
 
         bindingFrag.createNoteTitleField.setText(title)
         bindingFrag.createNoteNoteField.setText(note)
+
+        if (savedInstanceState != null) {
+            EditorManager.FontManager.recogniseAndSetFont(EditorManager.FontManager.currentFont, bindingFrag.createNoteTitleField,
+                    bindingFrag.createNoteNoteField)
+            val bcg = EditorManager.BackgroundColorManager(context)
+            bcg.recogniseAndSetBackgroundColor(EditorManager.BackgroundColorManager.currentColor, bindingFrag.createNoteParentCard)
+        }
+        super.onViewCreated(view, savedInstanceState)
+    }
+
+    override fun onStart() {
+        super.onStart()
+
+
     }
 
     /*
@@ -55,25 +66,23 @@ class EditNoteFragment : CreateNoteFragment() {
         /*
         Update notes in local database
          */
-        val whereClause = "title=? AND note=? AND font=?"
+        val whereClause = "title=? AND note=?"
 
         if (!CurrentFragmentState.backPressed && validTitleAndNote()) { //When user click FloatingACtionButton and fields are not empty
             //Update note in database
             val values = ContentValues()
             values.put("title", bindingFrag.createNoteTitleField.text.toString())
             values.put("note", bindingFrag.createNoteNoteField.text.toString())
-            values.put("font", currentFont)
 
             database.use {
-                Log.i("font", currentFont)
                 update(
-                        "notes", values, whereClause, arrayOf(title, note, font)
+                        "notes", values, whereClause, arrayOf(title, note)
                 )
             }
         } else if ((CurrentFragmentState.backPressed || !CurrentFragmentState.backPressed) && !validTitleAndNote()) { //When user click back button and fields are empty
             //Delete note from database
             database.use {
-                delete("notes", whereClause, arrayOf(title, note, font))
+                delete("notes", whereClause, arrayOf(title, note))
             }
         }
         //Set up main toolbar

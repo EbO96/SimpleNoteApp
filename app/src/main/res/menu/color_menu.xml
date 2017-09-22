@@ -1,32 +1,32 @@
 <?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
     <item
-        android:id="@+id/col_1"
-        android:title="color"
-        android:icon="@drawable/ic_color_lens_black_24dp">
+        android:id="@+id/col_red"
+        android:title="color red"
+        android:icon="@mipmap/red_circle">
     </item>
 
     <item
-        android:id="@+id/col_2"
-        android:title="color"
-        android:icon="@color/material_red">
+        android:id="@+id/col_blue"
+        android:title="color blue"
+        android:icon="@mipmap/blue_circle">
     </item>
 
     <item
-        android:id="@+id/col_3"
-        android:title="color"
-        android:icon="@drawable/ic_color_lens_black_24dp">
+        android:id="@+id/col_green"
+        android:title="color green"
+        android:icon="@mipmap/green_circle">
     </item>
 
     <item
-        android:id="@+id/col_4"
-        android:title="color"
-        android:icon="@drawable/ic_color_lens_black_24dp">
+        android:id="@+id/col_yellow"
+        android:title="color yellow"
+        android:icon="@mipmap/yellow_circle">
     </item>
 
     <item
-        android:id="@+id/col_5"
-        android:title="color"
-        android:icon="@drawable/ic_color_lens_black_24dp">
+        android:id="@+id/col_white"
+        android:title="color white"
+        android:icon="@mipmap/white_circle">
     </item>
 </menu>

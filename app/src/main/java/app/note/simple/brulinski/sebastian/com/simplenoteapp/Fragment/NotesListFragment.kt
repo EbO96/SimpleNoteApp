@@ -22,6 +22,7 @@ import app.note.simple.brulinski.sebastian.com.simplenoteapp.databinding.NotesLi
 import jp.wasabeef.recyclerview.animators.SlideInRightAnimator
 import org.jetbrains.anko.db.select
 
+@Suppress("DEPRECATION", "OverridingDeprecatedMember")
 class NotesListFragment : Fragment() {
 
     companion object {
@@ -43,7 +44,7 @@ class NotesListFragment : Fragment() {
     lateinit var onEditModeListener_: OnEditModeListener
 
     interface OnEditModeListener {
-        fun switch(title: String, note: String, font: String, position: Int)
+        fun switch(title: String, note: String, position: Int)
     }
 
     fun setOnEditModeListener(onEditModeListener: OnEditModeListener) {
@@ -127,7 +128,7 @@ class NotesListFragment : Fragment() {
 
             for (x in 0 until size) {
                 itemsObjectsArray.add(ItemsHolder(notes.get(x).get(x).title!!, notes.get(x).get(x).note!!,
-                        notes.get(x).get(x).date!!, notes.get(x).get(x).font!!))
+                        notes.get(x).get(x).date!!))
             }
         }
     }
@@ -135,8 +136,8 @@ class NotesListFragment : Fragment() {
 
     fun editNote() {
         myRecycler.setOnEditItemListener(object : MainRecyclerAdapter.OnEditItemListener {
-            override fun itemDetails(title: String, note: String, font: String, position: Int) {
-                onEditModeListener_.switch(title, note, font, position)
+            override fun itemDetails(title: String, note: String, position: Int) {
+                onEditModeListener_.switch(title, note, position)
             }
         })
     }
@@ -155,13 +156,13 @@ class NotesListFragment : Fragment() {
 
 
     override fun onAttach(activity: Activity?) {
+        super.onAttach(activity)
         try {
             mScrollCallback = (activity as OnListenRecyclerScroll)
 
         } catch (e: ClassCastException) {
             throw ClassCastException(activity.toString() + " must implement OnListenRecyclerScroll")
         }
-        super.onAttach(activity)
     }
 
     fun recyclerScrollingListener() {

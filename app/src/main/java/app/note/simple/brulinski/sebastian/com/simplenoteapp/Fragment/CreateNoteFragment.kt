@@ -1,24 +1,22 @@
 package app.note.simple.brulinski.sebastian.com.simplenoteapp.Fragment
 
 import android.annotation.SuppressLint
+import android.content.DialogInterface
 import android.databinding.DataBindingUtil
 import android.graphics.Typeface
 import android.os.Bundle
 import android.support.v4.app.Fragment
 import android.text.TextUtils
 import android.view.LayoutInflater
-import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
-import android.widget.LinearLayout
-import android.widget.PopupMenu
-import android.widget.PopupWindow
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.Activity.MainActivity
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.Database.LocalSQLAnkoDatabase
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.HelperClass.CurrentFragmentState
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.HelperClass.EditorManager
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.R
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.databinding.CreateNoteFragmentBinding
+import com.cocosw.bottomsheet.BottomSheet
 import org.jetbrains.anko.db.insert
 import java.text.SimpleDateFormat
 import java.util.*
@@ -28,8 +26,6 @@ open class CreateNoteFragment : Fragment() {
 
     lateinit var bindingFrag: CreateNoteFragmentBinding
     lateinit var database: LocalSQLAnkoDatabase
-
-    var currentFont = "DEFAULT"
 
     /*
     Fonts tags
@@ -51,19 +47,18 @@ open class CreateNoteFragment : Fragment() {
     override fun onViewCreated(view: View?, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        listenBarOptions(bindingFrag.createNoteTitleField, bindingFrag.createNoteNoteField)
+        listenBarOptions()
     }
 
-    fun saveNote(title: String, note: String, font: String) {
+    fun saveNote(title: String, note: String) {
         try {
 
             database.use {
                 val titleCol = Pair<String, String>("title", title.trim())
                 val noteCol = Pair<String, String>("note", note.trim())
                 val dateCol = Pair<String, String>("date", getCurrentDateAndTime())
-                val fontCol = Pair<String, String>("font", font)
 
-                insert("notes", titleCol, noteCol, dateCol, fontCol)
+                insert("notes", titleCol, noteCol, dateCol)
             }
         } catch (e: Exception) {
             e.printStackTrace()
@@ -82,11 +77,15 @@ open class CreateNoteFragment : Fragment() {
     override fun onDestroyView() {
         if ((!TextUtils.isEmpty(bindingFrag.createNoteTitleField.text.toString().trim()) || !TextUtils.isEmpty(bindingFrag.createNoteNoteField.text.toString().trim())) &&
                 CurrentFragmentState.CURRENT.equals(MainActivity.CREATE_NOTE_FRAGMENT_TAG) && !CurrentFragmentState.backPressed)
-            saveNote(bindingFrag.createNoteTitleField.text.toString(), bindingFrag.createNoteNoteField.text.toString(), currentFont)
+            saveNote(bindingFrag.createNoteTitleField.text.toString(), bindingFrag.createNoteNoteField.text.toString())
         super.onDestroyView()
     }
 
-    fun listenBarOptions(titleView: View, noteView: View) {
+    override fun onSaveInstanceState(outState: Bundle?) {
+        super.onSaveInstanceState(outState)
+    }
+
+    fun listenBarOptions() {
         bindingFrag.selectAll.setOnClickListener {
 
         }
@@ -116,6 +115,7 @@ open class CreateNoteFragment : Fragment() {
         }
 
         bindingFrag.noteColor.setOnClickListener {
+            changeBcgColor(arrayListOf(bindingFrag.createNoteParentCard))
         }
     }
 
@@ -129,42 +129,65 @@ open class CreateNoteFragment : Fragment() {
     }
 
     private fun showFontMenu() {
-        val popupMenu = PopupMenu(context, bindingFrag.fontStyle)
-        popupMenu.menuInflater.inflate(R.menu.font_menu, popupMenu.menu)
-        popupMenu.show()
-
-        //Listen for actions
-        popupMenu.setOnMenuItemClickListener(object : PopupMenu.OnMenuItemClickListener {
-            override fun onMenuItemClick(p0: MenuItem?): Boolean {
-                when (p0!!.itemId) {
+        BottomSheet.Builder(activity).title(getString(R.string.fonts)).sheet(R.menu.font_menu).listener(object : DialogInterface.OnClickListener {
+            override fun onClick(p0: DialogInterface?, p1: Int) {
+                when (p1) {
                     R.id.default_font -> {
                         EditorManager.FontManager.setUpFontStyle(Typeface.DEFAULT, bindingFrag.createNoteNoteField, bindingFrag.createNoteTitleField)
-                        currentFont = EditorManager.FontManager.DEFAULT_FONT
+                        EditorManager.FontManager.currentFont = EditorManager.FontManager.DEFAULT_FONT
                     }
                     R.id.italic_font -> {
                         EditorManager.FontManager.setUpFontStyle(Typeface.ITALIC, bindingFrag.createNoteNoteField, bindingFrag.createNoteTitleField)
-                        currentFont = EditorManager.FontManager.ITALIC_FONT
+                        EditorManager.FontManager.currentFont = EditorManager.FontManager.ITALIC_FONT
                     }
                     R.id.bold_italic_font -> {
                         EditorManager.FontManager.setUpFontStyle(Typeface.BOLD_ITALIC, bindingFrag.createNoteNoteField, bindingFrag.createNoteTitleField)
-                        currentFont = EditorManager.FontManager.BOLD_ITALIC_FONT
+                        EditorManager.FontManager.currentFont = EditorManager.FontManager.BOLD_ITALIC_FONT
                     }
                     R.id.serif_font -> {
                         EditorManager.FontManager.setUpFontStyle(Typeface.SERIF, bindingFrag.createNoteNoteField, bindingFrag.createNoteTitleField)
-                        currentFont = EditorManager.FontManager.SERIF_FONT
+                        EditorManager.FontManager.currentFont = EditorManager.FontManager.SERIF_FONT
                     }
                     R.id.sans_serif_font -> {
                         EditorManager.FontManager.setUpFontStyle(Typeface.SANS_SERIF, bindingFrag.createNoteNoteField, bindingFrag.createNoteTitleField)
-                        currentFont = EditorManager.FontManager.SANS_SERIF_FONT
+                        EditorManager.FontManager.currentFont = EditorManager.FontManager.SANS_SERIF_FONT
                     }
                     R.id.monospace_font -> {
                         EditorManager.FontManager.setUpFontStyle(Typeface.MONOSPACE, bindingFrag.createNoteNoteField, bindingFrag.createNoteTitleField)
-                        currentFont = EditorManager.FontManager.MONOSPACE_FONT
+                        EditorManager.FontManager.currentFont = EditorManager.FontManager.MONOSPACE_FONT
                     }
                 }
-                return true
             }
-        })
+        }).show()
+    }
+
+    fun changeBcgColor(viewArray: ArrayList<Any>) { //Change color of background
+        BottomSheet.Builder(activity).title(getString(R.string.colors)).sheet(R.menu.color_menu).listener(object : DialogInterface.OnClickListener {
+            override fun onClick(p0: DialogInterface?, p1: Int) {
+                when (p1) {
+                    R.id.col_red -> {
+                        EditorManager.BackgroundColorManager.changeColor(viewArray, resources.getColor(R.color.material_red))
+                        EditorManager.BackgroundColorManager.currentColor = EditorManager.BackgroundColorManager.RED
+                    }
+                    R.id.col_blue -> {
+                        EditorManager.BackgroundColorManager.changeColor(viewArray, resources.getColor(R.color.material_blue))
+                        EditorManager.BackgroundColorManager.currentColor = EditorManager.BackgroundColorManager.BLUE
+                    }
+                    R.id.col_green -> {
+                        EditorManager.BackgroundColorManager.changeColor(viewArray, resources.getColor(R.color.material_green))
+                        EditorManager.BackgroundColorManager.currentColor = EditorManager.BackgroundColorManager.GREEN
+                    }
+                    R.id.col_yellow -> {
+                        EditorManager.BackgroundColorManager.changeColor(viewArray, resources.getColor(R.color.material_yellow))
+                        EditorManager.BackgroundColorManager.currentColor = EditorManager.BackgroundColorManager.YELLOW
+                    }
+                    R.id.col_white -> {
+                        EditorManager.BackgroundColorManager.changeColor(viewArray, resources.getColor(R.color.material_white))
+                        EditorManager.BackgroundColorManager.currentColor = EditorManager.BackgroundColorManager.WHITE
+                    }
+                }
+            }
+        }).show()
     }
 
 

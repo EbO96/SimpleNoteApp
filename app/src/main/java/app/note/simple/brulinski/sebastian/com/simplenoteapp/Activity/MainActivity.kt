@@ -23,6 +23,7 @@ import app.note.simple.brulinski.sebastian.com.simplenoteapp.HelperClass.LayoutM
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.R
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.databinding.ActivityMainBinding
 
+@Suppress("DEPRECATION")
 class MainActivity : AppCompatActivity(), NotesListFragment.OnListenRecyclerScroll, SearchView.OnQueryTextListener, EditNoteFragment.OnInflateNewToolbarListener {
 
     lateinit var mSearchCallback: OnSearchResultListener
@@ -135,12 +136,11 @@ class MainActivity : AppCompatActivity(), NotesListFragment.OnListenRecyclerScro
     /*
     This fragment is setting only from preview mode (NotePreviewFragment.kt)
      */
-    fun setEditNoteFragment(title: String, note: String, font: String, position: Int) {
+    fun setEditNoteFragment(title: String, note: String, position: Int) {
         val args = Bundle()
 
         args.putString("title", title)
         args.putString("note", note)
-        args.putString("font", font)
         args.putInt("position", position)
 
         fm = supportFragmentManager
@@ -163,14 +163,13 @@ class MainActivity : AppCompatActivity(), NotesListFragment.OnListenRecyclerScro
     /*
     This fragment is setting when user click RecyclerView item
      */
-    private fun setNotePreviewFragment(title: String, note: String, font: String, position: Int) {
+    private fun setNotePreviewFragment(title: String, note: String, position: Int) {
 
         binding.mainFab.setImageDrawable(resources.getDrawable(R.drawable.ic_mode_edit_white_24dp))
 
         val args = Bundle()
         args.putString("title", title)
         args.putString("note", note)
-        args.putString("font", font)
         args.putInt("position", position)
 
         val previewFragment = NotePreviewFragment()
@@ -297,8 +296,8 @@ class MainActivity : AppCompatActivity(), NotesListFragment.OnListenRecyclerScro
         Listen item click and switch to "Preview Mode"
          */
         frag.setOnEditModeListener(object : NotesListFragment.OnEditModeListener {
-            override fun switch(title: String, note: String, font: String, position: Int) {
-                setNotePreviewFragment(title, note, font, position)
+            override fun switch(title: String, note: String, position: Int) {
+                setNotePreviewFragment(title, note, position)
             }
         })
     }
@@ -330,7 +329,7 @@ class MainActivity : AppCompatActivity(), NotesListFragment.OnListenRecyclerScro
             } else if (frag is NotePreviewFragment) {
                 binding.mainFab.setImageDrawable(resources.getDrawable(R.drawable.ic_done_white_24dp))
                 setEditNoteFragment(frag.binding.previewTitleField.text.toString(),
-                        frag.binding.previewNoteField.text.toString(), frag.font, frag.itemPosition)
+                        frag.binding.previewNoteField.text.toString(), frag.itemPosition)
             }
         }
     }

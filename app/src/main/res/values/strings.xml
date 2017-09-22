@@ -30,5 +30,7 @@
     <string name="monospace">Monospace</string>
     <string name="sans_serif">Sans serif</string>
     <string name="bold_italic">Bold italic</string>
+    <string name="colors">Colors</string>
+    <string name="fonts">Fonts</string>
     <!--END-->
 </resources>

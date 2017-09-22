@@ -20,7 +20,7 @@
     <item
         android:id="@+id/serif_font"
         android:title="@string/serif"
-        app:showAsAction="never" />
+        app:showAsAction="never"/>
 
     <item
         android:id="@+id/sans_serif_font"

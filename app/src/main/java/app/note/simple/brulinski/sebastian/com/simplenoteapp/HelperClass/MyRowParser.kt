@@ -15,9 +15,8 @@ class MyRowParser : MapRowParser<List<Notes.Note>> {
         val title = columns.getValue("title")
         val note = columns.getValue("note")
         val date = columns.getValue("date")
-        val font = columns.getValue("font")
 
-        listUserNotes.add(Notes.Note(title = title.toString(), note = note.toString(), date = date.toString(), font = font.toString()))
+        listUserNotes.add(Notes.Note(title = title.toString(), note = note.toString(), date = date.toString()))
 
         return listUserNotes
     }
