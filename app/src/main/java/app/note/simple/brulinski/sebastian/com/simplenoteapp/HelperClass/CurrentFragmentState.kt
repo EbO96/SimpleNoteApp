@@ -11,5 +11,6 @@ class CurrentFragmentState {
         var CURRENT = "NONE"
         var backPressed = false
         var PREVIOUS = MainActivity.NOTE_LIST_FRAGMENT_TAG
+        val FRAGMENT_ANIM_DURATION = 200L
     }
 }

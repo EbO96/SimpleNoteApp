@@ -57,19 +57,19 @@ class NotePreviewFragment : Fragment() {
 
         if (CurrentFragmentState.backPressed) {
             if (CurrentFragmentState.PREVIOUS.equals(MainActivity.EDIT_NOTE_FRAGMENT_TAG)) {
-                return MoveAnimation.create(MoveAnimation.RIGHT, enter, 500)
+                return MoveAnimation.create(MoveAnimation.RIGHT, enter, CurrentFragmentState.FRAGMENT_ANIM_DURATION)
             } else {
                 if (enter) {
-                    return MoveAnimation.create(MoveAnimation.LEFT, enter, 500)
+                    return MoveAnimation.create(MoveAnimation.LEFT, enter, CurrentFragmentState.FRAGMENT_ANIM_DURATION)
                 } else {
-                    return MoveAnimation.create(MoveAnimation.RIGHT, enter, 500)
+                    return MoveAnimation.create(MoveAnimation.RIGHT, enter, CurrentFragmentState.FRAGMENT_ANIM_DURATION)
                 }
             }
         } else {
             if (enter) {
-                return MoveAnimation.create(MoveAnimation.LEFT, enter, 500)
+                return MoveAnimation.create(MoveAnimation.LEFT, enter, CurrentFragmentState.FRAGMENT_ANIM_DURATION)
             } else {
-                return MoveAnimation.create(MoveAnimation.LEFT, enter, 500)
+                return MoveAnimation.create(MoveAnimation.LEFT, enter, CurrentFragmentState.FRAGMENT_ANIM_DURATION)
             }
         }
     }

@@ -211,12 +211,12 @@ open class CreateNoteFragment : Fragment() {
     override fun onCreateAnimation(transit: Int, enter: Boolean, nextAnim: Int): Animation {
 
         if (CurrentFragmentState.backPressed) {
-            return MoveAnimation.create(MoveAnimation.RIGHT, enter, 500)
+            return MoveAnimation.create(MoveAnimation.RIGHT, enter, CurrentFragmentState.FRAGMENT_ANIM_DURATION)
         } else {
             if (enter) {
-                return MoveAnimation.create(MoveAnimation.LEFT, enter, 500)
+                return MoveAnimation.create(MoveAnimation.LEFT, enter, CurrentFragmentState.FRAGMENT_ANIM_DURATION)
             } else {
-                return MoveAnimation.create(MoveAnimation.RIGHT, enter, 500)
+                return MoveAnimation.create(MoveAnimation.RIGHT, enter, CurrentFragmentState.FRAGMENT_ANIM_DURATION)
             }
         }
     }
