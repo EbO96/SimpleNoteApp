@@ -32,10 +32,8 @@ open class CreateNoteFragment : Fragment() {
      */
 
     override fun onCreateView(inflater: LayoutInflater?, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        setHasOptionsMenu(true)
         bindingFrag = DataBindingUtil.inflate(inflater, R.layout.create_note_fragment, container, false)
         CurrentFragmentState.CURRENT = MainActivity.CREATE_NOTE_FRAGMENT_TAG
-
 
         (activity as MainActivity).supportActionBar?.setTitle(getString(R.string.create))
 
@@ -79,10 +77,6 @@ open class CreateNoteFragment : Fragment() {
                 CurrentFragmentState.CURRENT.equals(MainActivity.CREATE_NOTE_FRAGMENT_TAG) && !CurrentFragmentState.backPressed)
             saveNote(bindingFrag.createNoteTitleField.text.toString(), bindingFrag.createNoteNoteField.text.toString())
         super.onDestroyView()
-    }
-
-    override fun onSaveInstanceState(outState: Bundle?) {
-        super.onSaveInstanceState(outState)
     }
 
     fun listenBarOptions() {

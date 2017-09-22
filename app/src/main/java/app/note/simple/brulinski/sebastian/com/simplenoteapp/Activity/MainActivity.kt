@@ -24,7 +24,7 @@ import app.note.simple.brulinski.sebastian.com.simplenoteapp.R
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.databinding.ActivityMainBinding
 
 @Suppress("DEPRECATION")
-class MainActivity : AppCompatActivity(), NotesListFragment.OnListenRecyclerScroll, SearchView.OnQueryTextListener, EditNoteFragment.OnInflateNewToolbarListener {
+class MainActivity : AppCompatActivity(), NotesListFragment.OnListenRecyclerScroll, SearchView.OnQueryTextListener, EditNoteFragment.OnInflateNewToolbarListener, NotesListFragment.OnChangeItemVisible {
 
     lateinit var mSearchCallback: OnSearchResultListener
 
@@ -49,11 +49,12 @@ class MainActivity : AppCompatActivity(), NotesListFragment.OnListenRecyclerScro
         var NOTE_PREVIEW_FRAGMENT_TAG: String = "PREVIEW" //Fragment TAG
         var menuItemGrid: MenuItem? = null //Toolbar menu item (set recycler view layout as staggered layout)
         var menuItemLinear: MenuItem? = null //Toolbar menu item (set recycler view layout as linear layout)
+        var menuItemSearch: MenuItem? = null //Toolbar menu item (set recycler view layout as linear layout)
     }
 
     /*
     mLayoutListener - it is a interface between MainActivity and NoteListFragment. Used to
-    change layout manager
+    changeMenuItemsVisibility layout manager
      */
     lateinit var mLayoutListener: OnChangeLayoutListener
 
@@ -195,6 +196,7 @@ class MainActivity : AppCompatActivity(), NotesListFragment.OnListenRecyclerScro
 
         menuItemGrid = menu!!.findItem(R.id.main_menu_grid)
         menuItemLinear = menu.findItem(R.id.main_menu_linear)
+        menuItemSearch = menu.findItem(R.id.search)
 
         val searchView: SearchView = (menu.findItem(R.id.search).getActionView() as SearchView)
         searchView.queryHint = getString(R.string.search_hint) //Set search hint
@@ -206,22 +208,22 @@ class MainActivity : AppCompatActivity(), NotesListFragment.OnListenRecyclerScro
          */
         MenuItemCompat.setOnActionExpandListener(menu!!.findItem(R.id.search), object : MenuItemCompat.OnActionExpandListener {
             override fun onMenuItemActionCollapse(item: MenuItem?): Boolean {
-                menuItemLinear!!.setVisible(true)
-                menuItemGrid!!.setVisible(true)
+                setMenuItemsVisibility(true)
                 return true
             }
 
             override fun onMenuItemActionExpand(item: MenuItem?): Boolean {
-                menuItemLinear!!.setVisible(false)
-                menuItemGrid!!.setVisible(false)
+                setMenuItemsVisibility(false)
                 return true
             }
         })
 
-
         return true
     }
 
+    override fun changeMenuItemsVisibility(visible: Boolean) {
+        setMenuItemsVisibility(visible)
+    }
 
     override fun onQueryTextSubmit(query: String?): Boolean {
         return true
@@ -272,7 +274,7 @@ class MainActivity : AppCompatActivity(), NotesListFragment.OnListenRecyclerScro
             supportFragmentManager.popBackStack()
             /*
             User interface implement only one floating action button in this activity.
-            When user press back button then we change icon at floatingActionButton
+            When user press back button then we changeMenuItemsVisibility icon at floatingActionButton
 
             Example: Current screen is "Edit Mode" (EditNoteFragment.kt) and user press back button.
             In result we switch to "Preview Mode" (NotePreviewFragment.kt) and changing icon at floatingActionButton
@@ -348,5 +350,17 @@ class MainActivity : AppCompatActivity(), NotesListFragment.OnListenRecyclerScro
             }
         }
     }
+
+    fun setMenuItemsVisibility(visible: Boolean) {
+        try {
+            if (menuItemGrid!!.isVisible != visible)
+                menuItemLinear!!.setVisible(visible)
+            menuItemGrid!!.setVisible(visible)
+            menuItemSearch!!.setVisible(visible)
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
+    }
+
 }
 

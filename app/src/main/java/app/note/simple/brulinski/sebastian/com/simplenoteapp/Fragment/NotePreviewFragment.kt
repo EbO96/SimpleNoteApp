@@ -14,8 +14,6 @@ import app.note.simple.brulinski.sebastian.com.simplenoteapp.databinding.Preview
 class NotePreviewFragment : Fragment() {
 
     var itemPosition = 0
-    var font = ""
-    var bcgColor = ""
     lateinit var database: LocalSQLAnkoDatabase
 
     lateinit var binding: PreviewCardBinding

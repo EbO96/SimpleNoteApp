@@ -25,7 +25,7 @@ class LocalSQLAnkoDatabase(ctx: Context) : ManagedSQLiteOpenHelper(ctx, "user_no
     }
 
     override fun onUpgrade(p0: SQLiteDatabase, p1: Int, p2: Int) {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+        TODO("not implemented") //To changeMenuItemsVisibility body of created functions use File | Settings | File Templates.
         p0.dropTable(TABLE, true)
     }
 

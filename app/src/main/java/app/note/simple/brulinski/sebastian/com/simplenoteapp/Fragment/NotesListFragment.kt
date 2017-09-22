@@ -7,6 +7,7 @@ import android.support.v4.app.Fragment
 import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView
 import android.support.v7.widget.StaggeredGridLayoutManager
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -35,6 +36,12 @@ class NotesListFragment : Fragment() {
     lateinit var layoutStyle: LayoutManagerStyle
     var styleFlag: Boolean = true
 
+    lateinit var mMenuItemsVisible: OnChangeItemVisible
+
+    interface OnChangeItemVisible {
+        fun changeMenuItemsVisibility(visible: Boolean)
+    }
+
     lateinit var mScrollCallback: OnListenRecyclerScroll
 
     interface OnListenRecyclerScroll {
@@ -53,10 +60,14 @@ class NotesListFragment : Fragment() {
 
     override fun onCreateView(inflater: LayoutInflater?, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         binding = DataBindingUtil.inflate(inflater, R.layout.notes_list_fragment, container, false)
+        Log.i("abcd", "create")
 
         CurrentFragmentState.CURRENT = MainActivity.NOTE_LIST_FRAGMENT_TAG
 
         (activity as MainActivity).supportActionBar?.setTitle(getString(R.string.notes))
+
+        if (savedInstanceState == null)
+            mMenuItemsVisible.changeMenuItemsVisibility(true)
 
         //Database
         database = LocalSQLAnkoDatabase(context)
@@ -159,9 +170,10 @@ class NotesListFragment : Fragment() {
         super.onAttach(activity)
         try {
             mScrollCallback = (activity as OnListenRecyclerScroll)
+            mMenuItemsVisible = (activity as OnChangeItemVisible)
 
         } catch (e: ClassCastException) {
-            throw ClassCastException(activity.toString() + " must implement OnListenRecyclerScroll")
+            throw ClassCastException(activity.toString() + " must implement OnListenRecyclerScroll and OnChangeItemVisible")
         }
     }
 
@@ -180,7 +192,7 @@ class NotesListFragment : Fragment() {
     fun updateListBySearch() {
         (activity as MainActivity).setOnSearchResultListener(object : MainActivity.OnSearchResultListener {
             override fun passNewText(newText: String?) {
-                var newList: ArrayList<ItemsHolder> = ArrayList()
+                val newList: ArrayList<ItemsHolder> = ArrayList()
 
                 for (itemsHolder: ItemsHolder in itemsObjectsArray) {
                     val title = itemsHolder.title.toLowerCase()
@@ -195,5 +207,8 @@ class NotesListFragment : Fragment() {
         })
     }
 
-
+    override fun onStop() {
+        mMenuItemsVisible.changeMenuItemsVisibility(false)
+        super.onStop()
+    }
 }
