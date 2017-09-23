@@ -13,12 +13,14 @@ import app.note.simple.brulinski.sebastian.com.simplenoteapp.Activity.MainActivi
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.Database.LocalSQLAnkoDatabase
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.HelperClass.CurrentFragmentState
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.HelperClass.EditorManager
+import app.note.simple.brulinski.sebastian.com.simplenoteapp.Interfaces.ChangeFabIcon
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.Model.ItemsHolder
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.R
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.databinding.PreviewCardBinding
 import com.labo.kaji.fragmentanimations.MoveAnimation
 
 class NotePreviewFragment : Fragment() {
+
 
     var itemPosition = 0
     var itemId = ""
@@ -31,7 +33,6 @@ class NotePreviewFragment : Fragment() {
         Log.i("frag", "Prev Create")
         binding = DataBindingUtil.inflate(inflater, R.layout.preview_card, container, false)
 
-        (activity as MainActivity).supportActionBar?.setTitle(getString(R.string.preview))
         database = LocalSQLAnkoDatabase(context)
 
         return binding.root
@@ -39,6 +40,9 @@ class NotePreviewFragment : Fragment() {
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
+
+        (activity as MainActivity).supportActionBar?.setTitle(getString(R.string.preview))
+        (activity as MainActivity).changeFabDrawableIcon(ChangeFabIcon.PREVIEW)
 
         itemId = arguments.getString("id")
         val title = arguments.getString("title")

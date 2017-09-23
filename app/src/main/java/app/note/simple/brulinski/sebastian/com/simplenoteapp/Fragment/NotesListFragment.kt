@@ -15,6 +15,7 @@ import android.view.animation.Animation
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.Activity.MainActivity
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.Database.LocalSQLAnkoDatabase
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.HelperClass.*
+import app.note.simple.brulinski.sebastian.com.simplenoteapp.Interfaces.ChangeFabIcon
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.Model.ItemsHolder
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.Model.NotesProperties
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.R
@@ -68,8 +69,6 @@ class NotesListFragment : Fragment() {
 
         CurrentFragmentState.CURRENT = MainActivity.NOTE_LIST_FRAGMENT_TAG
 
-        (activity as MainActivity).supportActionBar?.setTitle(getString(R.string.notes))
-
         if (savedInstanceState == null)
             mMenuItemsVisible.changeMenuItemsVisibility(true)
 
@@ -114,6 +113,12 @@ class NotesListFragment : Fragment() {
         EditorManager.resetAllToDefault() //Reset all note properties values to default
 
         return binding.root
+    }
+
+    override fun onActivityCreated(savedInstanceState: Bundle?) {
+        super.onActivityCreated(savedInstanceState)
+        (activity as MainActivity).supportActionBar?.setTitle(getString(R.string.notes))
+        (activity as MainActivity).changeFabDrawableIcon(ChangeFabIcon.LIST)
     }
 
     private fun initRecyclerAdapter() { //Init recycler view

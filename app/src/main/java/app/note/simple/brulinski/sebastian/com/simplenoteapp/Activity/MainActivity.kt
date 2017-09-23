@@ -4,6 +4,7 @@ import android.annotation.SuppressLint
 import android.content.Context
 import android.content.SharedPreferences
 import android.databinding.DataBindingUtil
+import android.graphics.drawable.Drawable
 import android.os.Bundle
 import android.support.v4.app.Fragment
 import android.support.v4.app.FragmentManager
@@ -21,6 +22,7 @@ import app.note.simple.brulinski.sebastian.com.simplenoteapp.Fragment.NotePrevie
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.Fragment.NotesListFragment
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.HelperClass.CurrentFragmentState
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.HelperClass.LayoutManagerStyle
+import app.note.simple.brulinski.sebastian.com.simplenoteapp.Interfaces.ChangeFabIcon
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.Model.ItemsHolder
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.R
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.databinding.ActivityMainBinding
@@ -28,7 +30,7 @@ import app.note.simple.brulinski.sebastian.com.simplenoteapp.databinding.Activit
 
 @Suppress("DEPRECATION")
 class MainActivity : AppCompatActivity(), NotesListFragment.OnListenRecyclerScroll, SearchView.OnQueryTextListener, EditNoteFragment.OnInflateNewToolbarListener,
-        NotesListFragment.OnChangeItemVisible {
+        NotesListFragment.OnChangeItemVisible, ChangeFabIcon {
 
     lateinit var mSearchCallback: OnSearchResultListener
 
@@ -167,8 +169,6 @@ class MainActivity : AppCompatActivity(), NotesListFragment.OnListenRecyclerScro
     @SuppressLint("CommitTransaction")
     private fun setNotePreviewFragment(itemId: String, title: String, note: String, position: Int, noteObject: ItemsHolder) {
 
-        binding.mainFab.setImageDrawable(resources.getDrawable(R.drawable.ic_mode_edit_white_24dp))
-
         val args = Bundle()
         args.putString("id", itemId)
         args.putString("title", title)
@@ -284,13 +284,10 @@ class MainActivity : AppCompatActivity(), NotesListFragment.OnListenRecyclerScro
             val frag = supportFragmentManager.findFragmentById(binding.mainContainer.id)
 
             if (frag is CreateNoteFragment && frag.tag.equals(CREATE_NOTE_FRAGMENT_TAG)) {
-                binding.mainFab.setImageDrawable(resources.getDrawable(R.drawable.ic_add_white_24dp))
                 CurrentFragmentState.PREVIOUS = MainActivity.CREATE_NOTE_FRAGMENT_TAG
             } else if (frag is EditNoteFragment) { //Update RecyclerView item and return to NoteListFragment
-                binding.mainFab.setImageDrawable(resources.getDrawable(R.drawable.ic_mode_edit_white_24dp))
                 CurrentFragmentState.PREVIOUS = MainActivity.EDIT_NOTE_FRAGMENT_TAG
             } else if (frag is NotePreviewFragment) {
-                binding.mainFab.setImageDrawable(resources.getDrawable(R.drawable.ic_add_white_24dp))
                 CurrentFragmentState.PREVIOUS = MainActivity.NOTE_PREVIEW_FRAGMENT_TAG
             }
         } else if (supportFragmentManager.backStackEntryCount <= 1) this.finish()
@@ -320,27 +317,37 @@ class MainActivity : AppCompatActivity(), NotesListFragment.OnListenRecyclerScro
             val frag = supportFragmentManager.findFragmentById(binding.mainContainer.id)
 
             if (frag is NotesListFragment) {
-                binding.mainFab.setImageDrawable(resources.getDrawable(R.drawable.ic_done_white_24dp))
                 setCreateNoteFragment()
                 CurrentFragmentState.PREVIOUS = MainActivity.NOTE_PREVIEW_FRAGMENT_TAG
             } else if (frag is CreateNoteFragment && frag.tag.equals(CREATE_NOTE_FRAGMENT_TAG)) {
-                binding.mainFab.setImageDrawable(resources.getDrawable(R.drawable.ic_add_white_24dp))
                 supportFragmentManager.popBackStack()
                 CurrentFragmentState.PREVIOUS = MainActivity.CREATE_NOTE_FRAGMENT_TAG
             } else if (frag is EditNoteFragment) { //Update RecyclerView item and return to NoteListFragment
-                binding.mainFab.setImageDrawable(resources.getDrawable(R.drawable.ic_add_white_24dp))
                 for (x in 1..2) {
                     supportFragmentManager.popBackStack()
                 }
                 CurrentFragmentState.PREVIOUS = MainActivity.EDIT_NOTE_FRAGMENT_TAG
                 //mUpdateListener.passData(frag.title, frag.note, frag.position)
             } else if (frag is NotePreviewFragment) {
-                binding.mainFab.setImageDrawable(resources.getDrawable(R.drawable.ic_done_white_24dp))
                 setEditNoteFragment(frag.itemId, frag.binding.previewTitleField.text.toString(),
                         frag.binding.previewNoteField.text.toString(), frag.itemPosition, frag.noteObject.get(0))
                 CurrentFragmentState.PREVIOUS = MainActivity.NOTE_PREVIEW_FRAGMENT_TAG
             }
         }
+    }
+
+    /*
+    Change FAB icon
+    */
+    override fun changeFabDrawableIcon(from: String) {
+        var drawIcon: Drawable? = null
+        when (from) {
+            ChangeFabIcon.EDIT -> drawIcon = resources.getDrawable(R.drawable.ic_done_white_24dp)
+            ChangeFabIcon.CREATE -> drawIcon = resources.getDrawable(R.drawable.ic_done_white_24dp)
+            ChangeFabIcon.PREVIEW -> drawIcon = resources.getDrawable(R.drawable.ic_mode_edit_white_24dp)
+            ChangeFabIcon.LIST -> drawIcon = resources.getDrawable(R.drawable.ic_add_white_24dp)
+        }
+        binding.mainFab.setImageDrawable(drawIcon!!)
     }
 
     /*

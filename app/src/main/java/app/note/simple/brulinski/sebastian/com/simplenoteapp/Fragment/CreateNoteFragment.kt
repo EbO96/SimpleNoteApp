@@ -20,6 +20,7 @@ import app.note.simple.brulinski.sebastian.com.simplenoteapp.Database.LocalSQLAn
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.HelperClass.CurrentFragmentState
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.HelperClass.EditorManager
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.HelperClass.MyRowParserNotes
+import app.note.simple.brulinski.sebastian.com.simplenoteapp.Interfaces.ChangeFabIcon
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.Model.Notes
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.R
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.databinding.CreateNoteFragmentBinding
@@ -43,8 +44,6 @@ open class CreateNoteFragment : Fragment() {
     override fun onCreateView(inflater: LayoutInflater?, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         bindingFrag = DataBindingUtil.inflate(inflater, R.layout.create_note_fragment, container, false)
         CurrentFragmentState.CURRENT = MainActivity.CREATE_NOTE_FRAGMENT_TAG
-
-        (activity as MainActivity).supportActionBar?.setTitle(getString(R.string.create))
 
         database = LocalSQLAnkoDatabase(context)
         var bgColor = ""
@@ -73,6 +72,9 @@ open class CreateNoteFragment : Fragment() {
 
     override fun onViewCreated(view: View?, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
+        (activity as MainActivity).supportActionBar?.setTitle(getString(R.string.create))
+        (activity as MainActivity).changeFabDrawableIcon(ChangeFabIcon.CREATE)
 
         listenBarOptions()
     }
@@ -153,7 +155,7 @@ open class CreateNoteFragment : Fragment() {
         }
 
         bindingFrag.deleteAll.setOnClickListener {
-            deleteAllOption()
+            deleteAll()
         }
 
         bindingFrag.fontStyle.setOnClickListener {
@@ -174,7 +176,7 @@ open class CreateNoteFragment : Fragment() {
     Options bar
      */
 
-    private fun deleteAllOption() {
+    private fun deleteAll() {
         bindingFrag.createNoteTitleField.text = null
         bindingFrag.createNoteNoteField.text = null
     }

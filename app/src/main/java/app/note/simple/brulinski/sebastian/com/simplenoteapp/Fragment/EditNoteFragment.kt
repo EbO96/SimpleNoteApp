@@ -10,6 +10,7 @@ import app.note.simple.brulinski.sebastian.com.simplenoteapp.Activity.MainActivi
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.Database.LocalSQLAnkoDatabase
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.HelperClass.CurrentFragmentState
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.HelperClass.EditorManager
+import app.note.simple.brulinski.sebastian.com.simplenoteapp.Interfaces.ChangeFabIcon
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.Model.ItemsHolder
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.R
 import com.labo.kaji.fragmentanimations.MoveAnimation
@@ -34,6 +35,7 @@ class EditNoteFragment : CreateNoteFragment() {
         CurrentFragmentState.CURRENT = MainActivity.EDIT_NOTE_FRAGMENT_TAG
 
         (activity as MainActivity).supportActionBar?.setTitle(getString(R.string.edit)) //Set toolbar title depending on current fragment
+        (activity as MainActivity).changeFabDrawableIcon(ChangeFabIcon.EDIT)
 
         //Set up toolbar listener
         mToolbarListener.fragmentCreated(true)
