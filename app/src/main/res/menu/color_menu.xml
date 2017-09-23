@@ -7,15 +7,40 @@
     </item>
 
     <item
+        android:id="@+id/col_pink"
+        android:title="@string/pink"
+        android:icon="@mipmap/pink_circle">
+    </item>
+
+    <item
+        android:id="@+id/col_purple"
+        android:title="@string/purple"
+        android:icon="@mipmap/purple_circle">
+    </item>
+
+    <item
         android:id="@+id/col_blue"
         android:title="@string/blue"
         android:icon="@mipmap/blue_circle">
     </item>
 
     <item
+        android:id="@+id/col_indigo"
+        android:title="@string/indigo"
+        android:icon="@mipmap/indigo_circle">
+    </item>
+
+    <item
         android:id="@+id/col_green"
         android:title="@string/green"
         android:icon="@mipmap/green_circle">
+    </item>
+
+
+    <item
+        android:id="@+id/col_teal"
+        android:title="@string/teal"
+        android:icon="@mipmap/teal_circle">
     </item>
 
     <item
@@ -28,5 +53,23 @@
         android:id="@+id/col_white"
         android:title="@string/white"
         android:icon="@mipmap/white_circle">
+    </item>
+
+    <item
+        android:id="@+id/col_blue_grey"
+        android:title="@string/blue_grey"
+        android:icon="@mipmap/blue_grey_circle">
+    </item>
+
+    <item
+        android:id="@+id/col_black"
+        android:title="@string/black"
+        android:icon="@mipmap/black_circle">
+    </item>
+
+    <item
+        android:id="@+id/col_brown"
+        android:title="@string/brown"
+        android:icon="@mipmap/brown_circle">
     </item>
 </menu>

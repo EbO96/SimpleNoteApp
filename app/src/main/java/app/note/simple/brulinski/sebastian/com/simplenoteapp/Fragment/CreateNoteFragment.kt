@@ -50,14 +50,14 @@ open class CreateNoteFragment : Fragment() {
             bgColor = savedInstanceState.getString("bg_color")
             fontStyle = savedInstanceState.getString("font_style")
         } else {
-            bgColor = EditorManager.BackgroundColorManager.currentBgColor
+            bgColor = EditorManager.ColorManager.currentBgColor
             fontStyle = EditorManager.FontStyleManager.currentFontStyle
         }
 
         EditorManager.FontStyleManager.recogniseAndSetFont(fontStyle, bindingFrag.createNoteTitleField, bindingFrag.createNoteNoteField)
-        val bg = EditorManager.BackgroundColorManager(context)
+        val bg = EditorManager.ColorManager(context)
 
-        bg.recogniseAndSetBackgroundColor(bgColor, bindingFrag.createNoteParentCard)
+        bg.recogniseAndSetColor(bgColor, bindingFrag.createNoteParentCard)
 
         return bindingFrag.root
     }
@@ -70,7 +70,7 @@ open class CreateNoteFragment : Fragment() {
 
     override fun onSaveInstanceState(outState: Bundle?) {
         super.onSaveInstanceState(outState)
-        outState!!.putString("bg_color", EditorManager.BackgroundColorManager.currentBgColor)
+        outState!!.putString("bg_color", EditorManager.ColorManager.currentBgColor)
         outState.putString("font_style", EditorManager.FontStyleManager.currentFontStyle)
     }
 
@@ -93,8 +93,8 @@ open class CreateNoteFragment : Fragment() {
             }
 
             val noteIdCol = Pair<String, String>("note_id", idList!!.get(size - 1).get(size - 1).id!!)
-            val bgColorCol = Pair<String, String>("bg_color", EditorManager.BackgroundColorManager.currentBgColor)
-            val textColorCol = Pair<String, String>("text_color", EditorManager.FontColorManager.currentFontColor)
+            val bgColorCol = Pair<String, String>("bg_color", EditorManager.ColorManager.currentBgColor)
+            val textColorCol = Pair<String, String>("text_color", EditorManager.ColorManager.currentFontColor)
             val fontStyleCol = Pair<String, String>("font_style", EditorManager.FontStyleManager.currentFontStyle)
 
             database.use {
@@ -150,11 +150,12 @@ open class CreateNoteFragment : Fragment() {
         }
 
         bindingFrag.textColor.setOnClickListener {
+            changeColorOf(arrayListOf(bindingFrag.createNoteTitleField, bindingFrag.createNoteNoteField), getString(R.string.font_color), "FONT")
 
         }
 
         bindingFrag.noteColor.setOnClickListener {
-            changeBcgColor(arrayListOf(bindingFrag.createNoteParentCard))
+            changeColorOf(arrayListOf(bindingFrag.createNoteParentCard), getString(R.string.note_color), "BG")
         }
     }
 
@@ -165,6 +166,10 @@ open class CreateNoteFragment : Fragment() {
     private fun deleteAllOption() {
         bindingFrag.createNoteTitleField.text = null
         bindingFrag.createNoteNoteField.text = null
+    }
+
+    private fun showFontColorMenu() {
+
     }
 
     private fun showFontMenu() {
@@ -200,30 +205,70 @@ open class CreateNoteFragment : Fragment() {
         }).show()
     }
 
-    fun changeBcgColor(viewArray: ArrayList<Any>) { //Change color of background
-        BottomSheet.Builder(activity).title(getString(R.string.colors)).sheet(R.menu.color_menu).listener(object : DialogInterface.OnClickListener {
+    fun changeColorOf(viewsArray: ArrayList<Any>, sheetTitle: String, colorOf: String) { //Change color of background
+        var resColor = resources.getColor(R.color.material_white)
+        var currentColor = EditorManager.ColorManager.currentBgColor
+
+        BottomSheet.Builder(activity).title(sheetTitle).sheet(R.menu.color_menu).listener(object : DialogInterface.OnClickListener {
             override fun onClick(p0: DialogInterface?, p1: Int) {
                 when (p1) {
                     R.id.col_red -> {
-                        EditorManager.BackgroundColorManager.changeColor(viewArray, resources.getColor(R.color.material_red))
-                        EditorManager.BackgroundColorManager.currentBgColor = EditorManager.BackgroundColorManager.RED
+                        resColor = resources.getColor(R.color.material_red)
+                        currentColor = EditorManager.ColorManager.RED
+                    }
+                    R.id.col_pink -> {
+                        resColor = resources.getColor(R.color.material_pink)
+                        currentColor = EditorManager.ColorManager.PINK
+                    }
+                    R.id.col_purple -> {
+                        resColor = resources.getColor(R.color.material_purple)
+                        currentColor = EditorManager.ColorManager.PURPLE
                     }
                     R.id.col_blue -> {
-                        EditorManager.BackgroundColorManager.changeColor(viewArray, resources.getColor(R.color.material_blue))
-                        EditorManager.BackgroundColorManager.currentBgColor = EditorManager.BackgroundColorManager.BLUE
+                        resColor = resources.getColor(R.color.material_blue)
+                        currentColor = EditorManager.ColorManager.BLUE
+                    }
+                    R.id.col_indigo -> {
+                        resColor = resources.getColor(R.color.material_indigo)
+                        currentColor = EditorManager.ColorManager.INDIGO
                     }
                     R.id.col_green -> {
-                        EditorManager.BackgroundColorManager.changeColor(viewArray, resources.getColor(R.color.material_green))
-                        EditorManager.BackgroundColorManager.currentBgColor = EditorManager.BackgroundColorManager.GREEN
+                        resColor = resources.getColor(R.color.material_green)
+                        currentColor = EditorManager.ColorManager.GREEN
+                    }
+                    R.id.col_teal -> {
+                        resColor = resources.getColor(R.color.material_teal)
+                        currentColor = EditorManager.ColorManager.TEAL
                     }
                     R.id.col_yellow -> {
-                        EditorManager.BackgroundColorManager.changeColor(viewArray, resources.getColor(R.color.material_yellow))
-                        EditorManager.BackgroundColorManager.currentBgColor = EditorManager.BackgroundColorManager.YELLOW
+                        resColor = resources.getColor(R.color.material_yellow)
+                        currentColor = EditorManager.ColorManager.YELLOW
                     }
                     R.id.col_white -> {
-                        EditorManager.BackgroundColorManager.changeColor(viewArray, resources.getColor(R.color.material_white))
-                        EditorManager.BackgroundColorManager.currentBgColor = EditorManager.BackgroundColorManager.WHITE
+                        resColor = resources.getColor(R.color.material_white)
+                        currentColor = EditorManager.ColorManager.WHITE
                     }
+                    R.id.col_blue_grey -> {
+                        resColor = resources.getColor(R.color.material_blue_grey)
+                        currentColor = EditorManager.ColorManager.BLUE_GRAY
+                    }
+                    R.id.col_black -> {
+                        resColor = resources.getColor(R.color.material_black)
+                        currentColor = EditorManager.ColorManager.BLACK
+                    }
+                    R.id.col_brown -> {
+                        resColor = resources.getColor(R.color.material_brown)
+                        currentColor = EditorManager.ColorManager.BROWN
+                    }
+                }
+                /*
+                Change color
+                 */
+                if (colorOf.equals("BG")) {
+                    EditorManager.ColorManager.changeBgColor(viewsArray, resColor)
+                    EditorManager.ColorManager.currentBgColor = currentColor
+                } else if (colorOf.equals("FONT")) {
+                    EditorManager.ColorManager.changeFontColor(viewsArray, resColor)
                 }
             }
         }).show()

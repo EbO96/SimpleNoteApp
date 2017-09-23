@@ -48,9 +48,9 @@ class NotePreviewFragment : Fragment() {
         noteObject = arguments.getParcelableArrayList<ItemsHolder>("note_object")
 
         EditorManager.FontStyleManager.recogniseAndSetFont(noteObject[0].fontStyle, binding.previewTitleField, binding.previewNoteField)
-        val bg = EditorManager.BackgroundColorManager(context)
+        val bg = EditorManager.ColorManager(context)
 
-        bg.recogniseAndSetBackgroundColor(noteObject[0].bgColor, binding.previewCardParentCard)
+        bg.recogniseAndSetColor(noteObject[0].bgColor, binding.previewCardParentCard)
         binding.previewTitleField.text = title
         binding.previewNoteField.text = note
 

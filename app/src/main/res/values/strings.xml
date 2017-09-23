@@ -37,5 +37,14 @@
     <string name="green">green</string>
     <string name="yellow">yellow</string>
     <string name="white">white</string>
+    <string name="black">black</string>
+    <string name="blue_grey">blue grey</string>
+    <string name="brown">brown</string>
+    <string name="indigo">indigo</string>
+    <string name="pink">pink</string>
+    <string name="purple">purple</string>
+    <string name="teal">teal</string>
+    <string name="note_color">Note color</string>
+    <string name="font_color">Font color</string>
     <!--END-->
 </resources>

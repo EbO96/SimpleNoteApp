@@ -50,21 +50,21 @@ class EditNoteFragment : CreateNoteFragment() {
 
         if (savedInstanceState != null) {
             noteObject = savedInstanceState.getParcelableArrayList("note_object")
-            noteObject[0].bgColor = EditorManager.BackgroundColorManager.currentBgColor
+            noteObject[0].bgColor = EditorManager.ColorManager.currentBgColor
             noteObject[0].fontStyle = EditorManager.FontStyleManager.currentFontStyle
             Log.i("abcd", noteObject[0].bgColor + "\n" + noteObject[0].fontStyle)
         } else {
             noteObject = arguments.getParcelableArrayList<ItemsHolder>("note_object")
             EditorManager.FontStyleManager.currentFontStyle = noteObject[0].fontStyle
-            EditorManager.BackgroundColorManager.currentBgColor = noteObject[0].bgColor
+            EditorManager.ColorManager.currentBgColor = noteObject[0].bgColor
         }
 
         EditorManager.FontStyleManager.recogniseAndSetFont(noteObject[0].fontStyle, bindingFrag.createNoteTitleField,
                 bindingFrag.createNoteNoteField)
 
-        val bg = EditorManager.BackgroundColorManager(context)
+        val bg = EditorManager.ColorManager(context)
 
-        bg.recogniseAndSetBackgroundColor(noteObject[0].bgColor, bindingFrag.createNoteParentCard)
+        bg.recogniseAndSetColor(noteObject[0].bgColor, bindingFrag.createNoteParentCard)
 
         bindingFrag.createNoteTitleField.setText(title)
         bindingFrag.createNoteNoteField.setText(note)
@@ -100,8 +100,8 @@ class EditNoteFragment : CreateNoteFragment() {
                 whereClause = "note_id=?"
 
                 values = ContentValues()
-                values.put("bg_color", EditorManager.BackgroundColorManager.currentBgColor)
-                values.put("text_color", EditorManager.FontColorManager.currentFontColor)
+                values.put("bg_color", EditorManager.ColorManager.currentBgColor)
+                values.put("text_color", EditorManager.ColorManager.currentFontColor)
                 values.put("font_style", EditorManager.FontStyleManager.currentFontStyle)
 
                 database.use {

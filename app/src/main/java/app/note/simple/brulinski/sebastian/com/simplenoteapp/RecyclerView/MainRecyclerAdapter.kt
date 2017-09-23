@@ -45,9 +45,9 @@ class MainRecyclerAdapter(var itemsHolder: ArrayList<ItemsHolder>, var recyclerV
             note = note.substring(0, 260) + "..."
 
         EditorManager.FontStyleManager.recogniseAndSetFont(itemsHolder.fontStyle, holder!!.title, holder.note)
-        val bg = EditorManager.BackgroundColorManager(ctx)
+        val bg = EditorManager.ColorManager(ctx)
 
-        bg.recogniseAndSetBackgroundColor(itemsHolder.bgColor, holder.card)
+        bg.recogniseAndSetColor(itemsHolder.bgColor, holder.card)
 
         holder.title?.text = title
         holder.note.text = note

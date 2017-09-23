@@ -7,29 +7,53 @@ import android.support.v7.widget.CardView
 import android.widget.EditText
 import android.widget.TextView
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.R
+import org.jetbrains.anko.hintTextColor
+import org.jetbrains.anko.textColor
 
 class EditorManager {
 
     companion object {
         fun resetAllToDefault() {
-            BackgroundColorManager.currentBgColor = BackgroundColorManager.WHITE
+            ColorManager.currentBgColor = ColorManager.WHITE
             FontStyleManager.currentFontStyle = FontStyleManager.DEFAULT_FONT
         }
     }
 
     @Suppress("DEPRECATION")
-    class BackgroundColorManager(val ctx: Context) {
+    class ColorManager(val ctx: Context) {
         companion object {
 
             var currentBgColor = "WHITE"
+            var currentFontColor = "BLACK"
 
-            var RED = "RED"
-            var BLUE = "BLUE"
-            var GREEN = "GREEN"
-            var YELLOW = "YELLOW"
-            var WHITE = "WHITE"
+            val RED = "RED"
+            val PINK = "PINK"
+            val PURPLE = "PURPLE"
+            val BLUE = "BLUE"
+            val INDIGO = "INDIGO"
+            val GREEN = "GREEN"
+            val TEAL = "TEAL"
+            val YELLOW = "YELLOW"
+            val WHITE = "WHITE"
+            val BLUE_GRAY = "BLUE_GRAY"
+            val BLACK = "BLACK"
+            val BROWN = "BROWN"
 
-            fun changeColor(view: ArrayList<Any>, color: Int) {
+            fun changeFontColor(views: ArrayList<Any>, color: Int) {
+                var myView: TextView?
+
+                for (x in 0 until views.size) {
+                    if (views[x] is EditText)
+                        myView = (views[x] as EditText)
+                    else {
+                        myView = (views[x] as TextView)
+                    }
+                    myView.textColor = color
+                    myView.hintTextColor = color
+                }
+            }
+
+            fun changeBgColor(view: ArrayList<Any>, color: Int) {
                 try {
                     var myView: CardView? = null
 
@@ -45,26 +69,48 @@ class EditorManager {
             }
         }
 
-        fun recogniseAndSetBackgroundColor(color: String, cardView: CardView) {
+        fun recogniseAndSetColor(color: String, cardView: CardView) {
+
             when (color) {
                 RED -> {
-                    changeColor(arrayListOf(cardView), ctx.resources.getColor(R.color.material_red))
+                    changeBgColor(arrayListOf(cardView), ctx.resources.getColor(R.color.material_red))
+                }
+                PINK -> {
+                    changeBgColor(arrayListOf(cardView), ctx.resources.getColor(R.color.material_pink))
+                }
+                PURPLE -> {
+                    changeBgColor(arrayListOf(cardView), ctx.resources.getColor(R.color.material_purple))
                 }
                 BLUE -> {
-                    changeColor(arrayListOf(cardView), ctx.resources.getColor(R.color.material_blue))
+                    changeBgColor(arrayListOf(cardView), ctx.resources.getColor(R.color.material_blue))
 
+                }
+                INDIGO -> {
+                    changeBgColor(arrayListOf(cardView), ctx.resources.getColor(R.color.material_indigo))
                 }
                 GREEN -> {
-                    changeColor(arrayListOf(cardView), ctx.resources.getColor(R.color.material_green))
+                    changeBgColor(arrayListOf(cardView), ctx.resources.getColor(R.color.material_green))
 
                 }
+                TEAL -> {
+                    changeBgColor(arrayListOf(cardView), ctx.resources.getColor(R.color.material_teal))
+                }
                 YELLOW -> {
-                    changeColor(arrayListOf(cardView), ctx.resources.getColor(R.color.material_yellow))
+                    changeBgColor(arrayListOf(cardView), ctx.resources.getColor(R.color.material_yellow))
 
                 }
                 WHITE -> {
-                    changeColor(arrayListOf(cardView), ctx.resources.getColor(R.color.material_white))
+                    changeBgColor(arrayListOf(cardView), ctx.resources.getColor(R.color.material_white))
 
+                }
+                BLUE_GRAY -> {
+                    changeBgColor(arrayListOf(cardView), ctx.resources.getColor(R.color.material_blue_grey))
+                }
+                BLACK -> {
+                    changeBgColor(arrayListOf(cardView), ctx.resources.getColor(R.color.material_black))
+                }
+                BROWN -> {
+                    changeBgColor(arrayListOf(cardView), ctx.resources.getColor(R.color.material_brown))
                 }
             }
         }
@@ -72,9 +118,8 @@ class EditorManager {
 
     class FontColorManager {
         companion object {
-            val FONT_BLACK = "BLACK"
 
-            var currentFontColor = FONT_BLACK
+
         }
     }
 
