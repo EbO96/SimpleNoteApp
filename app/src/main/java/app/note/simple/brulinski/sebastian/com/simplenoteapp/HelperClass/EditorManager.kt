@@ -10,6 +10,13 @@ import app.note.simple.brulinski.sebastian.com.simplenoteapp.R
 
 class EditorManager {
 
+    companion object {
+        fun resetAllToDefault() {
+            BackgroundColorManager.currentBgColor = BackgroundColorManager.WHITE
+            FontStyleManager.currentFontStyle = FontStyleManager.DEFAULT_FONT
+        }
+    }
+
     @Suppress("DEPRECATION")
     class BackgroundColorManager(val ctx: Context) {
         companion object {

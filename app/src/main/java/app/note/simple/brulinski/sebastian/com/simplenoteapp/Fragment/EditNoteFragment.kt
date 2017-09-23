@@ -122,6 +122,7 @@ class EditNoteFragment : CreateNoteFragment() {
         }
         //Set up main toolbar
         mToolbarListener.fragmentCreated(false)
+        EditorManager.resetAllToDefault() //Reset all note properties values to default
         super.onDestroyView()
     }
 

@@ -15,10 +15,8 @@ import app.note.simple.brulinski.sebastian.com.simplenoteapp.Activity.MainActivi
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.Database.LocalSQLAnkoDatabase
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.HelperClass.CurrentFragmentState
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.HelperClass.EditorManager
-import app.note.simple.brulinski.sebastian.com.simplenoteapp.HelperClass.MyRowParserNoteProperties
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.HelperClass.MyRowParserNotes
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.Model.Notes
-import app.note.simple.brulinski.sebastian.com.simplenoteapp.Model.NotesProperties
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.R
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.databinding.CreateNoteFragmentBinding
 import com.cocosw.bottomsheet.BottomSheet
@@ -45,6 +43,21 @@ open class CreateNoteFragment : Fragment() {
         (activity as MainActivity).supportActionBar?.setTitle(getString(R.string.create))
 
         database = LocalSQLAnkoDatabase(context)
+        var bgColor = ""
+        var fontStyle = ""
+
+        if (savedInstanceState != null) {
+            bgColor = savedInstanceState.getString("bg_color")
+            fontStyle = savedInstanceState.getString("font_style")
+        } else {
+            bgColor = EditorManager.BackgroundColorManager.currentBgColor
+            fontStyle = EditorManager.FontStyleManager.currentFontStyle
+        }
+
+        EditorManager.FontStyleManager.recogniseAndSetFont(fontStyle, bindingFrag.createNoteTitleField, bindingFrag.createNoteNoteField)
+        val bg = EditorManager.BackgroundColorManager(context)
+
+        bg.recogniseAndSetBackgroundColor(bgColor, bindingFrag.createNoteParentCard)
 
         return bindingFrag.root
     }
@@ -53,6 +66,12 @@ open class CreateNoteFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
 
         listenBarOptions()
+    }
+
+    override fun onSaveInstanceState(outState: Bundle?) {
+        super.onSaveInstanceState(outState)
+        outState!!.putString("bg_color", EditorManager.BackgroundColorManager.currentBgColor)
+        outState.putString("font_style", EditorManager.FontStyleManager.currentFontStyle)
     }
 
     fun saveNote(title: String, note: String) {
@@ -73,7 +92,7 @@ open class CreateNoteFragment : Fragment() {
                 size = idList!!.size
             }
 
-            val noteIdCol = Pair<String, String>("note_id", idList!!.get(size-1).get(size-1).id!!)
+            val noteIdCol = Pair<String, String>("note_id", idList!!.get(size - 1).get(size - 1).id!!)
             val bgColorCol = Pair<String, String>("bg_color", EditorManager.BackgroundColorManager.currentBgColor)
             val textColorCol = Pair<String, String>("text_color", EditorManager.FontColorManager.currentFontColor)
             val fontStyleCol = Pair<String, String>("font_style", EditorManager.FontStyleManager.currentFontStyle)
@@ -101,6 +120,8 @@ open class CreateNoteFragment : Fragment() {
         if ((!TextUtils.isEmpty(bindingFrag.createNoteTitleField.text.toString().trim()) || !TextUtils.isEmpty(bindingFrag.createNoteNoteField.text.toString().trim())) &&
                 CurrentFragmentState.CURRENT.equals(MainActivity.CREATE_NOTE_FRAGMENT_TAG) && !CurrentFragmentState.backPressed)
             saveNote(bindingFrag.createNoteTitleField.text.toString(), bindingFrag.createNoteNoteField.text.toString())
+
+        EditorManager.resetAllToDefault() //Reset all note properties values to default
         super.onDestroyView()
     }
 
