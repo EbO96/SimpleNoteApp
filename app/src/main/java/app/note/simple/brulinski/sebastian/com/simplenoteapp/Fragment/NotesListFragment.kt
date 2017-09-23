@@ -14,10 +14,7 @@ import android.view.ViewGroup
 import android.view.animation.Animation
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.Activity.MainActivity
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.Database.LocalSQLAnkoDatabase
-import app.note.simple.brulinski.sebastian.com.simplenoteapp.HelperClass.CurrentFragmentState
-import app.note.simple.brulinski.sebastian.com.simplenoteapp.HelperClass.LayoutManagerStyle
-import app.note.simple.brulinski.sebastian.com.simplenoteapp.HelperClass.MyRowParserNoteProperties
-import app.note.simple.brulinski.sebastian.com.simplenoteapp.HelperClass.MyRowParserNotes
+import app.note.simple.brulinski.sebastian.com.simplenoteapp.HelperClass.*
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.Model.ItemsHolder
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.Model.NotesProperties
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.R
@@ -113,6 +110,8 @@ class NotesListFragment : Fragment() {
 
         //Listen for search
         updateListBySearch()
+
+        EditorManager.resetAllToDefault() //Reset all note properties values to default
 
         return binding.root
     }

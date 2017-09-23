@@ -121,7 +121,6 @@ open class CreateNoteFragment : Fragment() {
                 CurrentFragmentState.CURRENT.equals(MainActivity.CREATE_NOTE_FRAGMENT_TAG) && !CurrentFragmentState.backPressed)
             saveNote(bindingFrag.createNoteTitleField.text.toString(), bindingFrag.createNoteNoteField.text.toString())
 
-        EditorManager.resetAllToDefault() //Reset all note properties values to default
         super.onDestroyView()
     }
 
@@ -231,7 +230,6 @@ open class CreateNoteFragment : Fragment() {
     }
 
     override fun onCreateAnimation(transit: Int, enter: Boolean, nextAnim: Int): Animation {
-
         if (CurrentFragmentState.backPressed) {
             return MoveAnimation.create(MoveAnimation.RIGHT, enter, CurrentFragmentState.FRAGMENT_ANIM_DURATION)
         } else {
