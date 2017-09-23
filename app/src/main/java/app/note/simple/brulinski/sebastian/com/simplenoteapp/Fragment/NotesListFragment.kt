@@ -27,6 +27,7 @@ import com.labo.kaji.fragmentanimations.MoveAnimation
 
 import jp.wasabeef.recyclerview.animators.SlideInRightAnimator
 import org.jetbrains.anko.db.select
+import java.util.*
 
 @Suppress("DEPRECATION", "OverridingDeprecatedMember")
 class NotesListFragment : Fragment() {
@@ -84,10 +85,9 @@ class NotesListFragment : Fragment() {
             itemsObjectsArray = savedInstanceState.getParcelableArrayList<ItemsHolder>("notes")
         }
 
-        /*
-
-         */
         initRecyclerAdapter()
+
+        sortNotes()
 
         (activity as MainActivity).editItem(this)
 
@@ -164,17 +164,38 @@ class NotesListFragment : Fragment() {
         //debugNotesArray()
     }
 
-//    fun debugNotesArray() {
-//        for (i in 0 until itemsObjectsArray.size) {
-//            Log.i("notesArray", itemsObjectsArray[i].id)
-//            Log.i("notesArray", itemsObjectsArray[i].title)
-//            Log.i("notesArray", itemsObjectsArray[i].note)
-//            Log.i("notesArray", itemsObjectsArray[i].date)
-//            Log.i("notesArray", itemsObjectsArray[i].bgColor)
-//            Log.i("notesArray", itemsObjectsArray[i].textColor)
-//            Log.i("notesArray", itemsObjectsArray[i].fontStyle)
-//        }
-//    }
+    private fun sortNotes() {
+        debugNotesArray()
+        Log.i("notesArray", "sorting notes...")
+        try{
+            Collections.sort(itemsObjectsArray, object : Comparator<ItemsHolder> {
+                override fun compare(o1: ItemsHolder, o2: ItemsHolder): Int {
+                    if (o1.date == null || o2.date == null) {
+                        return 0
+                    }
+                    return o2.date!!.compareTo(o1.date!!)
+                }
+            })
+        }catch (e: Exception){
+            e.printStackTrace()
+        }
+        myRecycler.notifyDataSetChanged()
+        Log.i("notesArray", "sorting complete")
+        debugNotesArray()
+    }
+
+    fun debugNotesArray() {
+        for (i in 0 until itemsObjectsArray.size) {
+            Log.i("notesArray", itemsObjectsArray[i].id)
+            Log.i("notesArray", itemsObjectsArray[i].title)
+            Log.i("notesArray", itemsObjectsArray[i].note)
+            Log.i("notesArray", itemsObjectsArray[i].date)
+            Log.i("notesArray", itemsObjectsArray[i].bgColor)
+            Log.i("notesArray", itemsObjectsArray[i].textColor)
+            Log.i("notesArray", itemsObjectsArray[i].fontStyle)
+            Log.i("notesArray", "------------------------------------")
+        }
+    }
 
     fun editNote() {
         myRecycler.setOnEditItemListener(object : MainRecyclerAdapter.OnEditItemListener {

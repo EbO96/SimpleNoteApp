@@ -131,7 +131,7 @@ class EditNoteFragment : CreateNoteFragment() {
      */
 
     fun validTitleAndNote(): Boolean {
-        return !TextUtils.isEmpty(bindingFrag.createNoteTitleField.text.trim()) && !TextUtils.isEmpty(bindingFrag.createNoteNoteField.text.trim())
+        return !TextUtils.isEmpty(bindingFrag.createNoteTitleField.text.trim()) || !TextUtils.isEmpty(bindingFrag.createNoteNoteField.text.trim())
     }
 
     override fun onAttach(activity: Activity?) {
