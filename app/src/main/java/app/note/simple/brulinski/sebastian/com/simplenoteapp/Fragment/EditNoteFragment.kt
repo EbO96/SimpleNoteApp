@@ -4,7 +4,6 @@ import android.app.Activity
 import android.content.ContentValues
 import android.os.Bundle
 import android.text.TextUtils
-import android.util.Log
 import android.view.View
 import android.view.animation.Animation
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.Activity.MainActivity
@@ -105,6 +104,10 @@ class EditNoteFragment : CreateNoteFragment() {
             //Delete note from database
             database.use {
                 delete(LocalSQLAnkoDatabase.TABLE_NOTES, whereClause, arrayOf(title, note))
+            }
+                whereClause = "note_id=?"
+            database.use {
+                delete(LocalSQLAnkoDatabase.TABLE_NOTES_PROPERTIES, whereClause, arrayOf(itemId))
             }
         }
         //Set up main toolbar
