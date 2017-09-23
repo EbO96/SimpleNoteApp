@@ -2,31 +2,31 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
     <item
         android:id="@+id/col_red"
-        android:title="color red"
+        android:title="@string/red"
         android:icon="@mipmap/red_circle">
     </item>
 
     <item
         android:id="@+id/col_blue"
-        android:title="color blue"
+        android:title="@string/blue"
         android:icon="@mipmap/blue_circle">
     </item>
 
     <item
         android:id="@+id/col_green"
-        android:title="color green"
+        android:title="@string/green"
         android:icon="@mipmap/green_circle">
     </item>
 
     <item
         android:id="@+id/col_yellow"
-        android:title="color yellow"
+        android:title="@string/yellow"
         android:icon="@mipmap/yellow_circle">
     </item>
 
     <item
         android:id="@+id/col_white"
-        android:title="color white"
+        android:title="@string/white"
         android:icon="@mipmap/white_circle">
     </item>
 </menu>

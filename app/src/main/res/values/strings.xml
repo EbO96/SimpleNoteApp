@@ -32,5 +32,10 @@
     <string name="bold_italic">Bold italic</string>
     <string name="colors">Colors</string>
     <string name="fonts">Fonts</string>
+    <string name="red">red</string>
+    <string name="blue">blue</string>
+    <string name="green">green</string>
+    <string name="yellow">yellow</string>
+    <string name="white">white</string>
     <!--END-->
 </resources>
