@@ -24,7 +24,6 @@
                     android:id="@+id/preview_title_field"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:hint="@string/title"
                     android:padding="8dp"
                     android:textSize="24sp"
                     android:textStyle="bold" />
@@ -41,7 +40,6 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:gravity="top|start"
-                    android:hint="@string/note"
                     android:padding="6dp"
                     android:textAlignment="gravity"
                     android:textSize="18sp" />
