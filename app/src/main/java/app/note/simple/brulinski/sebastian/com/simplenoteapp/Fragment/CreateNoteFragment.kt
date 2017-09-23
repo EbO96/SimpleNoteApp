@@ -45,19 +45,24 @@ open class CreateNoteFragment : Fragment() {
         database = LocalSQLAnkoDatabase(context)
         var bgColor = ""
         var fontStyle = ""
+        var fontColor = ""
 
         if (savedInstanceState != null) {
             bgColor = savedInstanceState.getString("bg_color")
             fontStyle = savedInstanceState.getString("font_style")
+            fontColor = savedInstanceState.getString("text_color")
         } else {
             bgColor = EditorManager.ColorManager.currentBgColor
             fontStyle = EditorManager.FontStyleManager.currentFontStyle
+            fontColor = EditorManager.ColorManager.currentFontColor
         }
 
         EditorManager.FontStyleManager.recogniseAndSetFont(fontStyle, bindingFrag.createNoteTitleField, bindingFrag.createNoteNoteField)
         val bg = EditorManager.ColorManager(context)
 
-        bg.recogniseAndSetColor(bgColor, bindingFrag.createNoteParentCard)
+        bg.recogniseAndSetColor(bgColor, arrayListOf(bindingFrag.createNoteParentCard), "BG") //Change note color
+
+        bg.recogniseAndSetColor(fontColor, arrayListOf(bindingFrag.createNoteTitleField, bindingFrag.createNoteNoteField), "FONT")
 
         return bindingFrag.root
     }
@@ -72,6 +77,7 @@ open class CreateNoteFragment : Fragment() {
         super.onSaveInstanceState(outState)
         outState!!.putString("bg_color", EditorManager.ColorManager.currentBgColor)
         outState.putString("font_style", EditorManager.FontStyleManager.currentFontStyle)
+        outState.putString("text_color", EditorManager.ColorManager.currentFontColor)
     }
 
     fun saveNote(title: String, note: String) {
@@ -269,6 +275,7 @@ open class CreateNoteFragment : Fragment() {
                     EditorManager.ColorManager.currentBgColor = currentColor
                 } else if (colorOf.equals("FONT")) {
                     EditorManager.ColorManager.changeFontColor(viewsArray, resColor)
+                    EditorManager.ColorManager.currentFontColor = currentColor
                 }
             }
         }).show()

@@ -69,49 +69,54 @@ class EditorManager {
             }
         }
 
-        fun recogniseAndSetColor(color: String, cardView: CardView) {
+        fun recogniseAndSetColor(color: String, viewsArray: ArrayList<Any>, colorOf: String) {
+            var resColor = 0
 
             when (color) {
                 RED -> {
-                    changeBgColor(arrayListOf(cardView), ctx.resources.getColor(R.color.material_red))
+                    resColor = ctx.resources.getColor(R.color.material_red)
                 }
                 PINK -> {
-                    changeBgColor(arrayListOf(cardView), ctx.resources.getColor(R.color.material_pink))
+                    resColor = ctx.resources.getColor(R.color.material_pink)
                 }
                 PURPLE -> {
-                    changeBgColor(arrayListOf(cardView), ctx.resources.getColor(R.color.material_purple))
+                    resColor = ctx.resources.getColor(R.color.material_purple)
                 }
                 BLUE -> {
-                    changeBgColor(arrayListOf(cardView), ctx.resources.getColor(R.color.material_blue))
+                    resColor = ctx.resources.getColor(R.color.material_blue)
 
                 }
                 INDIGO -> {
-                    changeBgColor(arrayListOf(cardView), ctx.resources.getColor(R.color.material_indigo))
+                    resColor = ctx.resources.getColor(R.color.material_indigo)
                 }
                 GREEN -> {
-                    changeBgColor(arrayListOf(cardView), ctx.resources.getColor(R.color.material_green))
+                    resColor = ctx.resources.getColor(R.color.material_green)
 
                 }
                 TEAL -> {
-                    changeBgColor(arrayListOf(cardView), ctx.resources.getColor(R.color.material_teal))
+                    resColor = ctx.resources.getColor(R.color.material_teal)
                 }
                 YELLOW -> {
-                    changeBgColor(arrayListOf(cardView), ctx.resources.getColor(R.color.material_yellow))
-
+                    resColor = ctx.resources.getColor(R.color.material_yellow)
                 }
                 WHITE -> {
-                    changeBgColor(arrayListOf(cardView), ctx.resources.getColor(R.color.material_white))
-
+                    resColor = ctx.resources.getColor(R.color.material_white)
                 }
                 BLUE_GRAY -> {
-                    changeBgColor(arrayListOf(cardView), ctx.resources.getColor(R.color.material_blue_grey))
+                    resColor = ctx.resources.getColor(R.color.material_blue_grey)
                 }
                 BLACK -> {
-                    changeBgColor(arrayListOf(cardView), ctx.resources.getColor(R.color.material_black))
+                    resColor = ctx.resources.getColor(R.color.material_black)
                 }
                 BROWN -> {
-                    changeBgColor(arrayListOf(cardView), ctx.resources.getColor(R.color.material_brown))
+                    resColor = ctx.resources.getColor(R.color.material_brown)
                 }
+            }
+
+            if(colorOf.equals("BG")){//Color of background
+                changeBgColor(viewsArray, resColor)
+            }else if(colorOf.equals("FONT")) { //Color of font
+                changeFontColor(viewsArray, resColor)
             }
         }
     }

@@ -47,7 +47,8 @@ class MainRecyclerAdapter(var itemsHolder: ArrayList<ItemsHolder>, var recyclerV
         EditorManager.FontStyleManager.recogniseAndSetFont(itemsHolder.fontStyle, holder!!.title, holder.note)
         val bg = EditorManager.ColorManager(ctx)
 
-        bg.recogniseAndSetColor(itemsHolder.bgColor, holder.card)
+        bg.recogniseAndSetColor(itemsHolder.bgColor, arrayListOf(holder.card), "BG") //Change note color
+        bg.recogniseAndSetColor(itemsHolder.textColor, arrayListOf(holder.title, holder.note), "FONT")
 
         holder.title?.text = title
         holder.note.text = note

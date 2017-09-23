@@ -64,7 +64,7 @@ class EditNoteFragment : CreateNoteFragment() {
 
         val bg = EditorManager.ColorManager(context)
 
-        bg.recogniseAndSetColor(noteObject[0].bgColor, bindingFrag.createNoteParentCard)
+        bg.recogniseAndSetColor(noteObject[0].bgColor, arrayListOf(bindingFrag.createNoteParentCard), "BG") //Change note color
 
         bindingFrag.createNoteTitleField.setText(title)
         bindingFrag.createNoteNoteField.setText(note)
