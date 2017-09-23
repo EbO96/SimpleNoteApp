@@ -4,6 +4,7 @@ import android.app.Activity
 import android.content.ContentValues
 import android.os.Bundle
 import android.text.TextUtils
+import android.util.Log
 import android.view.View
 import android.view.animation.Animation
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.Activity.MainActivity
@@ -27,6 +28,7 @@ class EditNoteFragment : CreateNoteFragment() {
     lateinit var note: String
     var position = 0
     var itemId = ""
+    var noteObject = ArrayList<ItemsHolder>()
 
     override fun onViewCreated(view: View?, savedInstanceState: Bundle?) {
 
@@ -43,9 +45,19 @@ class EditNoteFragment : CreateNoteFragment() {
         title = arguments.getString("title")
         note = arguments.getString("note")
         position = arguments.getInt("position")
-        val noteObject = arguments.getParcelableArrayList<ItemsHolder>("note_object")
 
         listenBarOptions()
+
+        if (savedInstanceState != null) {
+            noteObject = savedInstanceState.getParcelableArrayList("note_object")
+            noteObject[0].bgColor = EditorManager.BackgroundColorManager.currentBgColor
+            noteObject[0].fontStyle = EditorManager.FontStyleManager.currentFontStyle
+            Log.i("abcd", noteObject[0].bgColor + "\n" + noteObject[0].fontStyle)
+        } else {
+            noteObject = arguments.getParcelableArrayList<ItemsHolder>("note_object")
+            EditorManager.FontStyleManager.currentFontStyle = noteObject[0].fontStyle
+            EditorManager.BackgroundColorManager.currentBgColor = noteObject[0].bgColor
+        }
 
         EditorManager.FontStyleManager.recogniseAndSetFont(noteObject[0].fontStyle, bindingFrag.createNoteTitleField,
                 bindingFrag.createNoteNoteField)
@@ -57,14 +69,12 @@ class EditNoteFragment : CreateNoteFragment() {
         bindingFrag.createNoteTitleField.setText(title)
         bindingFrag.createNoteNoteField.setText(note)
 
-        if (savedInstanceState != null) {
-            EditorManager.FontStyleManager.recogniseAndSetFont(EditorManager.FontStyleManager.currentFontStyle, bindingFrag.createNoteTitleField,
-                    bindingFrag.createNoteNoteField)
-            val bcg = EditorManager.BackgroundColorManager(context)
-            bcg.recogniseAndSetBackgroundColor(EditorManager.BackgroundColorManager.currentBgColor, bindingFrag.createNoteParentCard)
-        }
-
         super.onViewCreated(view, savedInstanceState)
+    }
+
+    override fun onSaveInstanceState(outState: Bundle?) {
+        super.onSaveInstanceState(outState)
+        outState!!.putParcelableArrayList("note_object", noteObject)
     }
 
     /*
@@ -105,7 +115,7 @@ class EditNoteFragment : CreateNoteFragment() {
             database.use {
                 delete(LocalSQLAnkoDatabase.TABLE_NOTES, whereClause, arrayOf(title, note))
             }
-                whereClause = "note_id=?"
+            whereClause = "note_id=?"
             database.use {
                 delete(LocalSQLAnkoDatabase.TABLE_NOTES_PROPERTIES, whereClause, arrayOf(itemId))
             }
