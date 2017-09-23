@@ -1,13 +1,15 @@
 package app.note.simple.brulinski.sebastian.com.simplenoteapp.Fragment
 
 import android.annotation.SuppressLint
+import android.content.ClipData
+import android.content.ClipboardManager
+import android.content.Context
 import android.content.DialogInterface
 import android.databinding.DataBindingUtil
 import android.graphics.Typeface
 import android.os.Bundle
 import android.support.v4.app.Fragment
 import android.text.TextUtils
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -139,12 +141,11 @@ open class CreateNoteFragment : Fragment() {
 
         bindingFrag.copyAll.setOnClickListener {
             val text = copySelectedText()
-            if (text != null)
-                Toast.makeText(context, text, Toast.LENGTH_SHORT).show()
+
         }
 
         bindingFrag.paste.setOnClickListener {
-
+            pasteText()
         }
 
         bindingFrag.undo.setOnClickListener {
@@ -296,7 +297,7 @@ open class CreateNoteFragment : Fragment() {
         }
     }
 
-    private fun copySelectedText(): String? {
+    private fun copySelectedText() {
         val title = bindingFrag.createNoteTitleField
         val note = bindingFrag.createNoteNoteField
 
@@ -315,13 +316,33 @@ open class CreateNoteFragment : Fragment() {
             endIndex = note.selectionEnd
 
             text = note.text.substring(startIndex, endIndex)
-        } else {
-            return null
         }
 
-        return text
+        if (!text.equals("")) {
+            val clipboardManager = (context.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager)
+            val clip = ClipData.newPlainText("text", text)
+            clipboardManager.primaryClip = clip
+            Toast.makeText(context, getString(R.string.copied), Toast.LENGTH_SHORT).show()
+        }
     }
 
+    private fun pasteText() {
+        val clipboardManager = (context.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager)
+        val pasteData = clipboardManager.primaryClip.getItemAt(0).text
+
+        val title = bindingFrag.createNoteTitleField
+        val note = bindingFrag.createNoteNoteField
+
+        val startIndex: Int
+
+        if (title.isFocused && clipboardManager.hasPrimaryClip()) {
+            startIndex = title.selectionStart
+            title.text.insert(startIndex, pasteData)
+        } else if (note.isFocused && clipboardManager.hasPrimaryClip()) {
+            startIndex = note.selectionStart
+            note.text.insert(startIndex, pasteData)
+        }
+    }
 
     override fun onCreateAnimation(transit: Int, enter: Boolean, nextAnim: Int): Animation {
         if (CurrentFragmentState.backPressed) {

@@ -46,5 +46,6 @@
     <string name="teal">teal</string>
     <string name="note_color">Note color</string>
     <string name="font_color">Font color</string>
+    <string name="copied">copied</string>
     <!--END-->
 </resources>
