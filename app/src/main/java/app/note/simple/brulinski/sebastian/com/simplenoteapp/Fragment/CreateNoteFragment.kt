@@ -7,10 +7,12 @@ import android.graphics.Typeface
 import android.os.Bundle
 import android.support.v4.app.Fragment
 import android.text.TextUtils
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.view.animation.Animation
+import android.widget.Toast
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.Activity.MainActivity
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.Database.LocalSQLAnkoDatabase
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.HelperClass.CurrentFragmentState
@@ -132,11 +134,13 @@ open class CreateNoteFragment : Fragment() {
 
     fun listenBarOptions() {
         bindingFrag.selectAll.setOnClickListener {
-
+            selectAllText()
         }
 
         bindingFrag.copyAll.setOnClickListener {
-
+            val text = copySelectedText()
+            if (text != null)
+                Toast.makeText(context, text, Toast.LENGTH_SHORT).show()
         }
 
         bindingFrag.paste.setOnClickListener {
@@ -174,10 +178,6 @@ open class CreateNoteFragment : Fragment() {
         bindingFrag.createNoteNoteField.text = null
     }
 
-    private fun showFontColorMenu() {
-
-    }
-
     private fun showFontMenu() {
         BottomSheet.Builder(activity).title(getString(R.string.fonts)).sheet(R.menu.font_menu).listener(object : DialogInterface.OnClickListener {
             override fun onClick(p0: DialogInterface?, p1: Int) {
@@ -211,7 +211,7 @@ open class CreateNoteFragment : Fragment() {
         }).show()
     }
 
-    fun changeColorOf(viewsArray: ArrayList<Any>, sheetTitle: String, colorOf: String) { //Change color of background
+    private fun changeColorOf(viewsArray: ArrayList<Any>, sheetTitle: String, colorOf: String) { //Change color of background
         var resColor = resources.getColor(R.color.material_white)
         var currentColor = EditorManager.ColorManager.currentBgColor
 
@@ -280,6 +280,48 @@ open class CreateNoteFragment : Fragment() {
             }
         }).show()
     }
+
+    private fun selectAllText() {
+        val title = bindingFrag.createNoteTitleField
+        val note = bindingFrag.createNoteNoteField
+
+        if (title.isFocused && !TextUtils.isEmpty(title.text)) {
+            title.clearFocus()
+            title.requestFocus()
+            title.setSelection(0, title.length())
+        } else if (note.isFocused && !TextUtils.isEmpty(note.text)) {
+            note.clearFocus()
+            note.requestFocus()
+            note.setSelection(0, note.length())
+        }
+    }
+
+    private fun copySelectedText(): String? {
+        val title = bindingFrag.createNoteTitleField
+        val note = bindingFrag.createNoteNoteField
+
+        val startIndex: Int
+        val endIndex: Int
+
+        var text = ""
+
+        if (title.isFocused && !TextUtils.isEmpty(title.text) && (title.selectionStart - title.selectionEnd) < 0) {
+            startIndex = title.selectionStart
+            endIndex = title.selectionEnd
+
+            text = title.text.substring(startIndex, endIndex)
+        } else if (note.isFocused && !TextUtils.isEmpty(note.text) && (note.selectionStart - note.selectionEnd) < 0) {
+            startIndex = note.selectionStart
+            endIndex = note.selectionEnd
+
+            text = note.text.substring(startIndex, endIndex)
+        } else {
+            return null
+        }
+
+        return text
+    }
+
 
     override fun onCreateAnimation(transit: Int, enter: Boolean, nextAnim: Int): Animation {
         if (CurrentFragmentState.backPressed) {
