@@ -266,6 +266,11 @@ class NotesListFragment : Fragment() {
         super.onStop()
     }
 
+    override fun onStart() {
+        mMenuItemsVisible.changeMenuItemsVisibility(true)
+        super.onStart()
+    }
+
     override fun onCreateAnimation(transit: Int, enter: Boolean, nextAnim: Int): Animation {
 
         if (CurrentFragmentState.backPressed) {

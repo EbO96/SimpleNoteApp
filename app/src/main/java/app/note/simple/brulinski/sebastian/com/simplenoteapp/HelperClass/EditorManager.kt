@@ -16,6 +16,7 @@ class EditorManager {
         fun resetAllToDefault() {
             ColorManager.currentBgColor = ColorManager.WHITE
             FontStyleManager.currentFontStyle = FontStyleManager.DEFAULT_FONT
+            ColorManager.currentFontColor = ColorManager.BLACK
         }
     }
 

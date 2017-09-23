@@ -51,6 +51,7 @@ class NotePreviewFragment : Fragment() {
         val bg = EditorManager.ColorManager(context)
 
         bg.recogniseAndSetColor(noteObject[0].bgColor, arrayListOf(binding.previewCardParentCard), "BG") //Change note color
+        bg.recogniseAndSetColor(noteObject[0].textColor, arrayListOf(binding.previewTitleField, binding.previewNoteField), "FONT") //Change text color
         binding.previewTitleField.text = title
         binding.previewNoteField.text = note
 

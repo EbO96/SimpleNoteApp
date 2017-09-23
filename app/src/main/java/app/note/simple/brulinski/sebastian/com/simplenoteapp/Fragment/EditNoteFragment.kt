@@ -4,7 +4,6 @@ import android.app.Activity
 import android.content.ContentValues
 import android.os.Bundle
 import android.text.TextUtils
-import android.util.Log
 import android.view.View
 import android.view.animation.Animation
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.Activity.MainActivity
@@ -52,11 +51,12 @@ class EditNoteFragment : CreateNoteFragment() {
             noteObject = savedInstanceState.getParcelableArrayList("note_object")
             noteObject[0].bgColor = EditorManager.ColorManager.currentBgColor
             noteObject[0].fontStyle = EditorManager.FontStyleManager.currentFontStyle
-            Log.i("abcd", noteObject[0].bgColor + "\n" + noteObject[0].fontStyle)
+            noteObject[0].textColor = EditorManager.ColorManager.currentFontColor
         } else {
             noteObject = arguments.getParcelableArrayList<ItemsHolder>("note_object")
             EditorManager.FontStyleManager.currentFontStyle = noteObject[0].fontStyle
             EditorManager.ColorManager.currentBgColor = noteObject[0].bgColor
+            EditorManager.ColorManager.currentFontColor = noteObject[0].textColor
         }
 
         EditorManager.FontStyleManager.recogniseAndSetFont(noteObject[0].fontStyle, bindingFrag.createNoteTitleField,
@@ -65,6 +65,8 @@ class EditNoteFragment : CreateNoteFragment() {
         val bg = EditorManager.ColorManager(context)
 
         bg.recogniseAndSetColor(noteObject[0].bgColor, arrayListOf(bindingFrag.createNoteParentCard), "BG") //Change note color
+
+        bg.recogniseAndSetColor(noteObject[0].textColor, arrayListOf(bindingFrag.createNoteNoteField, bindingFrag.createNoteTitleField), "FONT") //Change text color
 
         bindingFrag.createNoteTitleField.setText(title)
         bindingFrag.createNoteNoteField.setText(note)

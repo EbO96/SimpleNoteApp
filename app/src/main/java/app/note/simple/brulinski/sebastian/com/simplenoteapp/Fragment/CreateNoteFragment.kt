@@ -62,7 +62,7 @@ open class CreateNoteFragment : Fragment() {
 
         bg.recogniseAndSetColor(bgColor, arrayListOf(bindingFrag.createNoteParentCard), "BG") //Change note color
 
-        bg.recogniseAndSetColor(fontColor, arrayListOf(bindingFrag.createNoteTitleField, bindingFrag.createNoteNoteField), "FONT")
+        bg.recogniseAndSetColor(fontColor, arrayListOf(bindingFrag.createNoteTitleField, bindingFrag.createNoteNoteField), "FONT") //Change text color
 
         return bindingFrag.root
     }
