@@ -352,4 +352,3 @@ class MainActivity : AppCompatActivity(), NotesListFragment.OnListenRecyclerScro
         }
     }
 }
-

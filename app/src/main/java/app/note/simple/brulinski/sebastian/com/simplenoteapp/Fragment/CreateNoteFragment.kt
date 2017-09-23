@@ -9,7 +9,10 @@ import android.databinding.DataBindingUtil
 import android.graphics.Typeface
 import android.os.Bundle
 import android.support.v4.app.Fragment
+import android.text.Editable
 import android.text.TextUtils
+import android.text.TextWatcher
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -17,10 +20,11 @@ import android.view.animation.Animation
 import android.widget.Toast
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.Activity.MainActivity
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.Database.LocalSQLAnkoDatabase
+import app.note.simple.brulinski.sebastian.com.simplenoteapp.Editor.EditorManager
+import app.note.simple.brulinski.sebastian.com.simplenoteapp.Editor.UndoRedo
+import app.note.simple.brulinski.sebastian.com.simplenoteapp.Editor.addTextChangedListener
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.HelperClass.CurrentFragmentState
-import app.note.simple.brulinski.sebastian.com.simplenoteapp.HelperClass.EditorManager
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.HelperClass.MyRowParserNotes
-import app.note.simple.brulinski.sebastian.com.simplenoteapp.Interfaces.ChangeParentActivity
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.Model.Notes
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.R
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.databinding.CreateNoteFragmentBinding
@@ -36,6 +40,7 @@ open class CreateNoteFragment : Fragment() {
 
     lateinit var bindingFrag: CreateNoteFragmentBinding
     lateinit var database: LocalSQLAnkoDatabase
+    lateinit var undoRedo: UndoRedo
 
     /*
     Fonts tags
@@ -66,7 +71,7 @@ open class CreateNoteFragment : Fragment() {
         bg.recogniseAndSetColor(bgColor, arrayListOf(bindingFrag.createNoteParentCard), "BG") //Change note color
 
         bg.recogniseAndSetColor(fontColor, arrayListOf(bindingFrag.createNoteTitleField, bindingFrag.createNoteNoteField), "FONT") //Change text color
-
+        editListener()
         return bindingFrag.root
     }
 
@@ -74,8 +79,10 @@ open class CreateNoteFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
 
         (activity as MainActivity).refreshActivity(MainActivity.CREATE_NOTE_FRAGMENT_TAG)
+        undoRedo = UndoRedo(bindingFrag) //Setup UndoRedo class to handle operations at undo and redo actions
 
         listenBarOptions()
+
     }
 
     override fun onSaveInstanceState(outState: Bundle?) {
@@ -136,6 +143,7 @@ open class CreateNoteFragment : Fragment() {
     }
 
     fun listenBarOptions() {
+
         bindingFrag.selectAll.setOnClickListener {
             selectAllText()
         }
@@ -150,7 +158,7 @@ open class CreateNoteFragment : Fragment() {
         }
 
         bindingFrag.undo.setOnClickListener {
-
+            undoRedo.getUndo()
         }
 
         bindingFrag.deleteAll.setOnClickListener {
@@ -169,6 +177,7 @@ open class CreateNoteFragment : Fragment() {
         bindingFrag.noteColor.setOnClickListener {
             changeColorOf(arrayListOf(bindingFrag.createNoteParentCard), getString(R.string.note_color), "BG")
         }
+
     }
 
     /*
@@ -327,6 +336,16 @@ open class CreateNoteFragment : Fragment() {
         }
     }
 
+    /*
+    Listen for changes in title and note editText's
+     */
+    private fun editListener() {
+        var s: CharSequence = ""
+        val title = bindingFrag.createNoteTitleField
+        val note = bindingFrag.createNoteNoteField
+
+    }
+
     private fun pasteText() {
         val clipboardManager = (context.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager)
         val pasteData = clipboardManager.primaryClip.getItemAt(0).text
@@ -347,10 +366,10 @@ open class CreateNoteFragment : Fragment() {
 
     override fun onCreateAnimation(transit: Int, enter: Boolean, nextAnim: Int): Animation {
 
-        if(CurrentFragmentState.backPressed){
+        if (CurrentFragmentState.backPressed) {
             return MoveAnimation.create(MoveAnimation.RIGHT, enter, CurrentFragmentState.FRAGMENT_ANIM_DURATION)
 
-        }else{
+        } else {
             return MoveAnimation.create(MoveAnimation.LEFT, enter, CurrentFragmentState.FRAGMENT_ANIM_DURATION)
         }
     }

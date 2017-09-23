@@ -1,4 +1,4 @@
-package app.note.simple.brulinski.sebastian.com.simplenoteapp.HelperClass
+package app.note.simple.brulinski.sebastian.com.simplenoteapp.Editor
 
 import android.content.Context
 import android.content.res.ColorStateList
@@ -163,18 +163,18 @@ class EditorManager {
             }
 
             fun recogniseAndSetFont(font: String, title: TextView, note: TextView) {
-                if (font.equals(FontStyleManager.DEFAULT_FONT)) {
-                    FontStyleManager.setUpFontStyle(Typeface.DEFAULT, title, note)
-                } else if (font.equals(FontStyleManager.ITALIC_FONT)) {
-                    FontStyleManager.setUpFontStyle(Typeface.ITALIC, title, note)
-                } else if (font.equals(FontStyleManager.BOLD_ITALIC_FONT)) {
-                    FontStyleManager.setUpFontStyle(Typeface.BOLD_ITALIC, title, note)
-                } else if (font.equals(FontStyleManager.SERIF_FONT)) {
-                    FontStyleManager.setUpFontStyle(Typeface.SERIF, title, note)
-                } else if (font.equals(FontStyleManager.SANS_SERIF_FONT)) {
-                    FontStyleManager.setUpFontStyle(Typeface.SANS_SERIF, title, note)
-                } else if (font.equals(FontStyleManager.MONOSPACE_FONT)) {
-                    FontStyleManager.setUpFontStyle(Typeface.MONOSPACE, title, note)
+                if (font.equals(DEFAULT_FONT)) {
+                    setUpFontStyle(Typeface.DEFAULT, title, note)
+                } else if (font.equals(ITALIC_FONT)) {
+                    setUpFontStyle(Typeface.ITALIC, title, note)
+                } else if (font.equals(BOLD_ITALIC_FONT)) {
+                    setUpFontStyle(Typeface.BOLD_ITALIC, title, note)
+                } else if (font.equals(SERIF_FONT)) {
+                    setUpFontStyle(Typeface.SERIF, title, note)
+                } else if (font.equals(SANS_SERIF_FONT)) {
+                    setUpFontStyle(Typeface.SANS_SERIF, title, note)
+                } else if (font.equals(MONOSPACE_FONT)) {
+                    setUpFontStyle(Typeface.MONOSPACE, title, note)
                 }
             }
         }

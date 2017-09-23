@@ -8,4 +8,8 @@
         <item name="colorAccent">#757575</item>
     </style>
 
+    <style name="BottomSheet.StyleDialog" parent="BottomSheet.Dialog">
+
+    </style>
+
 </resources>
