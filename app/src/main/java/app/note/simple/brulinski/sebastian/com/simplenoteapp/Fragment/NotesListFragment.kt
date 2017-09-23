@@ -23,10 +23,12 @@ import app.note.simple.brulinski.sebastian.com.simplenoteapp.RecyclerView.MainRe
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.databinding.NotesListFragmentBinding
 import com.labo.kaji.fragmentanimations.MoveAnimation
 import com.labo.kaji.fragmentanimations.PushPullAnimation
-
-import jp.wasabeef.recyclerview.animators.SlideInRightAnimator
+import jp.wasabeef.recyclerview.animators.FadeInAnimator
+import jp.wasabeef.recyclerview.animators.FadeInDownAnimator
+import jp.wasabeef.recyclerview.animators.ScaleInAnimator
 import org.jetbrains.anko.db.select
 import java.util.*
+
 
 @Suppress("DEPRECATION", "OverridingDeprecatedMember")
 class NotesListFragment : Fragment() {
@@ -134,12 +136,13 @@ class NotesListFragment : Fragment() {
             binding.recyclerView.layoutManager = LinearLayoutManager(context, LinearLayoutManager.VERTICAL, false)
         else binding.recyclerView.layoutManager = StaggeredGridLayoutManager(2, StaggeredGridLayoutManager.VERTICAL)
 
-        binding.recyclerView.itemAnimator = SlideInRightAnimator()
+        binding.recyclerView.itemAnimator = FadeInAnimator()//TODO change recycler view animations
 
         myRecycler = MainRecyclerAdapter(itemsObjectsArray, binding.recyclerView, database, context)
         binding.recyclerView.adapter = myRecycler
         myRecycler.notifyDataSetChanged()
     }
+
 
     fun getAndSetNotes() {
         itemsObjectsArray = ArrayList()
@@ -172,7 +175,7 @@ class NotesListFragment : Fragment() {
     private fun sortNotes() {
         debugNotesArray()
         Log.i("notesArray", "sorting notes...")
-        try{
+        try {
             Collections.sort(itemsObjectsArray, object : Comparator<ItemsHolder> {
                 override fun compare(o1: ItemsHolder, o2: ItemsHolder): Int {
                     if (o1.date == null || o2.date == null) {
@@ -181,7 +184,7 @@ class NotesListFragment : Fragment() {
                     return o2.date!!.compareTo(o1.date!!)
                 }
             })
-        }catch (e: Exception){
+        } catch (e: Exception) {
             e.printStackTrace()
         }
         myRecycler.notifyDataSetChanged()
@@ -279,8 +282,8 @@ class NotesListFragment : Fragment() {
     override fun onCreateAnimation(transit: Int, enter: Boolean, nextAnim: Int): Animation {
 
         if (CurrentFragmentState.backPressed) {
-            return PushPullAnimation.create(PushPullAnimation.DOWN, enter, CurrentFragmentState.FRAGMENT_ANIM_DURATION)
-            // return MoveAnimation.create(MoveAnimation.RIGHT, enter, CurrentFragmentState.FRAGMENT_ANIM_DURATION)
+           // return PushPullAnimation.create(PushPullAnimation.DOWN, enter, CurrentFragmentState.FRAGMENT_ANIM_DURATION)
+             return MoveAnimation.create(MoveAnimation.RIGHT, enter, CurrentFragmentState.FRAGMENT_ANIM_DURATION)
         } else {
             if (enter) {
                 return MoveAnimation.create(MoveAnimation.RIGHT, enter, CurrentFragmentState.FRAGMENT_ANIM_DURATION)

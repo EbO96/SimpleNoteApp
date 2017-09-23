@@ -1,7 +1,8 @@
 package app.note.simple.brulinski.sebastian.com.simplenoteapp.Interfaces
 
 /**
- * Created by sebas on 9/23/2017.
+ Interface using to changing FloatingActionButton from Fragments level.
+ FloatingActionButton with root in MainActivity
  */
 interface ChangeFabIcon {
 

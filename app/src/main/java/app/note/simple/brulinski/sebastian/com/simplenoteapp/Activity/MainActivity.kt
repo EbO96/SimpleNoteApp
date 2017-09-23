@@ -6,6 +6,7 @@ import android.content.SharedPreferences
 import android.databinding.DataBindingUtil
 import android.graphics.drawable.Drawable
 import android.os.Bundle
+import android.os.Handler
 import android.support.v4.app.Fragment
 import android.support.v4.app.FragmentManager
 import android.support.v4.app.FragmentTransaction
@@ -16,6 +17,7 @@ import android.support.v7.widget.SearchView
 import android.view.Menu
 import android.view.MenuInflater
 import android.view.MenuItem
+import android.widget.Toast
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.Fragment.CreateNoteFragment
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.Fragment.EditNoteFragment
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.Fragment.NotePreviewFragment
@@ -47,6 +49,7 @@ class MainActivity : AppCompatActivity(), NotesListFragment.OnListenRecyclerScro
     lateinit var ft: FragmentTransaction
     lateinit var noteFragment: Fragment
     lateinit var managerStyle: LayoutManagerStyle
+    var doubleTapToExit = false
 
     companion object {
         var NOTE_LIST_FRAGMENT_TAG: String = "NOTES" //Fragment TAG
@@ -290,7 +293,19 @@ class MainActivity : AppCompatActivity(), NotesListFragment.OnListenRecyclerScro
             } else if (frag is NotePreviewFragment) {
                 CurrentFragmentState.PREVIOUS = MainActivity.NOTE_PREVIEW_FRAGMENT_TAG
             }
-        } else if (supportFragmentManager.backStackEntryCount <= 1) this.finish()
+        } else if (supportFragmentManager.backStackEntryCount <= 1) {
+            if (doubleTapToExit){
+                this.finish()
+                return
+            }
+
+            Toast.makeText(applicationContext, "One more time to exit", Toast.LENGTH_SHORT).show()
+            doubleTapToExit = true
+
+            Handler().postDelayed({
+                doubleTapToExit = false
+            }, 2000)
+        }
     }
 
     fun editItem(frag: NotesListFragment) {

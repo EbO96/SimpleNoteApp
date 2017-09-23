@@ -76,6 +76,8 @@ class MainRecyclerAdapter(var itemsHolder: ArrayList<ItemsHolder>, var recyclerV
 
                 notifyItemInserted(pos)
 
+                recyclerView.scrollToPosition(pos)
+
             }).setCallback(object : Snackbar.Callback() {
                 override fun onDismissed(transientBottomBar: Snackbar?, event: Int) {
                     notifyDataSetChanged()
