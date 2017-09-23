@@ -24,6 +24,7 @@ import app.note.simple.brulinski.sebastian.com.simplenoteapp.R
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.RecyclerView.MainRecyclerAdapter
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.databinding.NotesListFragmentBinding
 import com.labo.kaji.fragmentanimations.MoveAnimation
+import com.labo.kaji.fragmentanimations.PushPullAnimation
 
 import jp.wasabeef.recyclerview.animators.SlideInRightAnimator
 import org.jetbrains.anko.db.select
@@ -269,7 +270,8 @@ class NotesListFragment : Fragment() {
     override fun onCreateAnimation(transit: Int, enter: Boolean, nextAnim: Int): Animation {
 
         if (CurrentFragmentState.backPressed) {
-            return MoveAnimation.create(MoveAnimation.RIGHT, enter, CurrentFragmentState.FRAGMENT_ANIM_DURATION)
+            return PushPullAnimation.create(PushPullAnimation.DOWN, enter, CurrentFragmentState.FRAGMENT_ANIM_DURATION)
+            // return MoveAnimation.create(MoveAnimation.RIGHT, enter, CurrentFragmentState.FRAGMENT_ANIM_DURATION)
         } else {
             if (enter) {
                 return MoveAnimation.create(MoveAnimation.RIGHT, enter, CurrentFragmentState.FRAGMENT_ANIM_DURATION)

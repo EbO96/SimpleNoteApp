@@ -9,7 +9,7 @@
     android:maxWidth="220dp"
     android:minHeight="130dp"
     android:minWidth="220dp"
-    app:cardCornerRadius="2dp"
+    app:cardCornerRadius="10dp"
     app:cardElevation="2dp">
 
     <RelativeLayout
