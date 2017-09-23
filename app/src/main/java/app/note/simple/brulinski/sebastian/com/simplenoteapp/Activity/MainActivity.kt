@@ -27,6 +27,7 @@ import app.note.simple.brulinski.sebastian.com.simplenoteapp.Interfaces.ChangePa
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.Model.ItemsHolder
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.R
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.databinding.ActivityMainBinding
+import org.jetbrains.anko.editText
 
 
 @Suppress("DEPRECATION")
@@ -83,6 +84,7 @@ class MainActivity : AppCompatActivity(), NotesListFragment.OnListenRecyclerScro
         setSupportActionBar(binding.toolbar)
 
         managerStyle = LayoutManagerStyle(this)
+
 
         /*
         Set main fragment  (NoteListFragment.kt) manually  only once when saveInstanceState is null

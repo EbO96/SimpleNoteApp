@@ -1,39 +1,44 @@
 package app.note.simple.brulinski.sebastian.com.simplenoteapp.Editor
 
-import android.util.Log
+import app.note.simple.brulinski.sebastian.com.simplenoteapp.Interfaces.BlockUndo
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.databinding.CreateNoteFragmentBinding
 
 /**
 Class to handle undo and redo operations
  */
-class UndoRedo(var binding: CreateNoteFragmentBinding) {
+class UndoRedo(var binding: CreateNoteFragmentBinding) : BlockUndo {
+
+    override fun block() {
+        undoUnlocked = false
+    }
 
     private var undoArray = ArrayList<Pair<String, String>>()
-    private var undoArraySize = 0
-    private val maxUndoArraySize = 20
+    private var undoArraySize = -1
+    private val maxUndoArraySize = 2000
     private var from = "title"
     private val fromTitle = "title"
     private val fromNote = "note"
+    private var undoUnlocked = true
 
     fun addUndo(text: String) {
-        Log.i("undo", undoArray.size.toString())
-        try{
-            if (binding.createNoteTitleField.isFocused)
-                from = fromTitle
-            else if (binding.createNoteNoteField.isFocused)
-                from = fromNote
+        if (undoUnlocked) {
+            try {
+                if (binding.createNoteTitleField.isFocused)
+                    from = fromTitle
+                else if (binding.createNoteNoteField.isFocused)
+                    from = fromNote
 
-            if (undoArray.size < maxUndoArraySize) {
-                undoArray.add(Pair<String, String>(from, text))
-                undoArraySize = undoArray.size - 1
-            } else {
-                undoArray.clear()
-                undoArraySize = undoArray.size - 1
+                if (undoArray.size < maxUndoArraySize) {
+                    undoArray.add(Pair<String, String>(from, text))
+                    undoArraySize = undoArray.size - 1
+                } else {
+                    undoArray.clear()
+                    undoArraySize = undoArray.size - 1
+                }
+            } catch (e: Exception) {
+                e.printStackTrace()
             }
-        }catch (e: Exception){
-            e.printStackTrace()
-        }
-
+        } else undoUnlocked = true
     }
 
     fun getUndo() {
@@ -51,6 +56,10 @@ class UndoRedo(var binding: CreateNoteFragmentBinding) {
                     binding.createNoteNoteField.setText(pair.second)
                 }
             }
+        }else{
+            binding.createNoteTitleField.setText(null)
+            binding.createNoteNoteField.setText(null)
         }
     }
+
 }

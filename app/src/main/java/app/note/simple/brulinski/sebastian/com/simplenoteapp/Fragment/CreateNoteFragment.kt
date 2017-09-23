@@ -9,10 +9,7 @@ import android.databinding.DataBindingUtil
 import android.graphics.Typeface
 import android.os.Bundle
 import android.support.v4.app.Fragment
-import android.text.Editable
 import android.text.TextUtils
-import android.text.TextWatcher
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -22,7 +19,6 @@ import app.note.simple.brulinski.sebastian.com.simplenoteapp.Activity.MainActivi
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.Database.LocalSQLAnkoDatabase
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.Editor.EditorManager
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.Editor.UndoRedo
-import app.note.simple.brulinski.sebastian.com.simplenoteapp.Editor.addTextChangedListener
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.HelperClass.CurrentFragmentState
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.HelperClass.MyRowParserNotes
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.Model.Notes
@@ -32,6 +28,7 @@ import com.cocosw.bottomsheet.BottomSheet
 import com.labo.kaji.fragmentanimations.MoveAnimation
 import org.jetbrains.anko.db.insert
 import org.jetbrains.anko.db.select
+import org.jetbrains.anko.sdk25.coroutines.textChangedListener
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -149,8 +146,7 @@ open class CreateNoteFragment : Fragment() {
         }
 
         bindingFrag.copyAll.setOnClickListener {
-            val text = copySelectedText()
-
+            copySelectedText()
         }
 
         bindingFrag.paste.setOnClickListener {
@@ -158,6 +154,7 @@ open class CreateNoteFragment : Fragment() {
         }
 
         bindingFrag.undo.setOnClickListener {
+            undoRedo.block()
             undoRedo.getUndo()
         }
 
@@ -340,10 +337,16 @@ open class CreateNoteFragment : Fragment() {
     Listen for changes in title and note editText's
      */
     private fun editListener() {
-        var s: CharSequence = ""
         val title = bindingFrag.createNoteTitleField
         val note = bindingFrag.createNoteNoteField
 
+        title.textChangedListener {
+            afterTextChanged { text -> undoRedo.addUndo(text = text.toString()) }
+        }
+
+        note.textChangedListener {
+            afterTextChanged { text -> undoRedo.addUndo(text = text.toString()) }
+        }
     }
 
     private fun pasteText() {
