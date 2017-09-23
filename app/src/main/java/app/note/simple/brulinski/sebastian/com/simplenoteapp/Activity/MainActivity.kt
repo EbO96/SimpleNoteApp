@@ -10,7 +10,6 @@ import android.os.Handler
 import android.support.v4.app.Fragment
 import android.support.v4.app.FragmentManager
 import android.support.v4.app.FragmentTransaction
-import android.support.v4.view.MenuItemCompat
 import android.support.v7.app.AppCompatActivity
 import android.support.v7.widget.RecyclerView
 import android.support.v7.widget.SearchView
@@ -24,15 +23,15 @@ import app.note.simple.brulinski.sebastian.com.simplenoteapp.Fragment.NotePrevie
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.Fragment.NotesListFragment
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.HelperClass.CurrentFragmentState
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.HelperClass.LayoutManagerStyle
-import app.note.simple.brulinski.sebastian.com.simplenoteapp.Interfaces.ChangeFabIcon
+import app.note.simple.brulinski.sebastian.com.simplenoteapp.Interfaces.ChangeParentActivity
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.Model.ItemsHolder
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.R
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.databinding.ActivityMainBinding
 
 
 @Suppress("DEPRECATION")
-class MainActivity : AppCompatActivity(), NotesListFragment.OnListenRecyclerScroll, SearchView.OnQueryTextListener, EditNoteFragment.OnInflateNewToolbarListener,
-        NotesListFragment.OnChangeItemVisible, ChangeFabIcon {
+class MainActivity : AppCompatActivity(), NotesListFragment.OnListenRecyclerScroll, SearchView.OnQueryTextListener,
+        ChangeParentActivity {
 
     lateinit var mSearchCallback: OnSearchResultListener
 
@@ -56,9 +55,9 @@ class MainActivity : AppCompatActivity(), NotesListFragment.OnListenRecyclerScro
         var CREATE_NOTE_FRAGMENT_TAG: String = "CREATE" //Fragment TAG
         var EDIT_NOTE_FRAGMENT_TAG: String = "EDIT" //Fragment TAG
         var NOTE_PREVIEW_FRAGMENT_TAG: String = "PREVIEW" //Fragment TAG
-        var menuItemGrid: MenuItem? = null //Toolbar menu item (set recycler view layout as staggered layout)
-        var menuItemLinear: MenuItem? = null //Toolbar menu item (set recycler view layout as linear layout)
-        var menuItemSearch: MenuItem? = null //Toolbar menu item (set recycler view layout as linear layout)
+        lateinit var menuItemGrid: MenuItem //Toolbar menu item (set recycler view layout as staggered layout)
+        lateinit var menuItemLinear: MenuItem//Toolbar menu item (set recycler view layout as linear layout)
+        lateinit var menuItemSearch: MenuItem //Toolbar menu item (set recycler view layout as linear layout)
     }
 
     /*
@@ -95,17 +94,6 @@ class MainActivity : AppCompatActivity(), NotesListFragment.OnListenRecyclerScro
         floatingActionButtonListener() //Listen for floating action button actions and click
 
     } //END OF onCreate(...)
-
-    /*
-    Inflate new toolbar or back to previous
-     */
-    override fun fragmentCreated(visible: Boolean) { //This interface is between this activity and EditNoteFragment
-        if (visible) { //Inflate new toolbar
-            //setSupportActionBar()
-        } else { //Set up previous toolbar
-
-        }
-    }
 
     /*
     This function replace another fragment in FrameLayout container by our main Fragment (NoteListFragment.kt - display our notes)
@@ -202,31 +190,12 @@ class MainActivity : AppCompatActivity(), NotesListFragment.OnListenRecyclerScro
         menuItemLinear = menu.findItem(R.id.main_menu_linear)
         menuItemSearch = menu.findItem(R.id.search)
 
-        val searchView: SearchView = (menu.findItem(R.id.search).getActionView() as SearchView)
+        val searchView: SearchView = (menu.findItem(R.id.search).actionView as SearchView)
         searchView.queryHint = getString(R.string.search_hint) //Set search hint
 
         searchView.setOnQueryTextListener(this)
 
-        /*
-        Listen when search mode is active and when collapse
-         */
-        MenuItemCompat.setOnActionExpandListener(menu!!.findItem(R.id.search), object : MenuItemCompat.OnActionExpandListener {
-            override fun onMenuItemActionCollapse(item: MenuItem?): Boolean {
-                setMenuItemsVisibility(true)
-                return true
-            }
-
-            override fun onMenuItemActionExpand(item: MenuItem?): Boolean {
-                setMenuItemsVisibility(false)
-                return true
-            }
-        })
-
         return true
-    }
-
-    override fun changeMenuItemsVisibility(visible: Boolean) {
-        setMenuItemsVisibility(visible)
     }
 
     override fun onQueryTextSubmit(query: String?): Boolean {
@@ -276,25 +245,9 @@ class MainActivity : AppCompatActivity(), NotesListFragment.OnListenRecyclerScro
 
         if (supportFragmentManager.backStackEntryCount > 1) {
             supportFragmentManager.popBackStack()
-            /*
-            User interface implement only one floating action button in this activity.
-            When user press back button then we changeMenuItemsVisibility icon at floatingActionButton
 
-            Example: Current screen is "Edit Mode" (EditNoteFragment.kt) and user press back button.
-            In result we switch to "Preview Mode" (NotePreviewFragment.kt) and changing icon at floatingActionButton
-            from "Apply" to "Edit"
-             */
-            val frag = supportFragmentManager.findFragmentById(binding.mainContainer.id)
-
-            if (frag is CreateNoteFragment && frag.tag.equals(CREATE_NOTE_FRAGMENT_TAG)) {
-                CurrentFragmentState.PREVIOUS = MainActivity.CREATE_NOTE_FRAGMENT_TAG
-            } else if (frag is EditNoteFragment) { //Update RecyclerView item and return to NoteListFragment
-                CurrentFragmentState.PREVIOUS = MainActivity.EDIT_NOTE_FRAGMENT_TAG
-            } else if (frag is NotePreviewFragment) {
-                CurrentFragmentState.PREVIOUS = MainActivity.NOTE_PREVIEW_FRAGMENT_TAG
-            }
         } else if (supportFragmentManager.backStackEntryCount <= 1) {
-            if (doubleTapToExit){
+            if (doubleTapToExit) {
                 this.finish()
                 return
             }
@@ -333,20 +286,15 @@ class MainActivity : AppCompatActivity(), NotesListFragment.OnListenRecyclerScro
 
             if (frag is NotesListFragment) {
                 setCreateNoteFragment()
-                CurrentFragmentState.PREVIOUS = MainActivity.NOTE_PREVIEW_FRAGMENT_TAG
             } else if (frag is CreateNoteFragment && frag.tag.equals(CREATE_NOTE_FRAGMENT_TAG)) {
                 supportFragmentManager.popBackStack()
-                CurrentFragmentState.PREVIOUS = MainActivity.CREATE_NOTE_FRAGMENT_TAG
             } else if (frag is EditNoteFragment) { //Update RecyclerView item and return to NoteListFragment
                 for (x in 1..2) {
                     supportFragmentManager.popBackStack()
                 }
-                CurrentFragmentState.PREVIOUS = MainActivity.EDIT_NOTE_FRAGMENT_TAG
-                //mUpdateListener.passData(frag.title, frag.note, frag.position)
             } else if (frag is NotePreviewFragment) {
                 setEditNoteFragment(frag.itemId, frag.binding.previewTitleField.text.toString(),
                         frag.binding.previewNoteField.text.toString(), frag.itemPosition, frag.noteObject.get(0))
-                CurrentFragmentState.PREVIOUS = MainActivity.NOTE_PREVIEW_FRAGMENT_TAG
             }
         }
     }
@@ -354,15 +302,39 @@ class MainActivity : AppCompatActivity(), NotesListFragment.OnListenRecyclerScro
     /*
     Change FAB icon
     */
-    override fun changeFabDrawableIcon(from: String) {
+    override fun refreshActivity(from: String) {
         var drawIcon: Drawable? = null
+        var title = resources.getString(R.string.notes)
+        var itemVisibility = false
+
         when (from) {
-            ChangeFabIcon.EDIT -> drawIcon = resources.getDrawable(R.drawable.ic_done_white_24dp)
-            ChangeFabIcon.CREATE -> drawIcon = resources.getDrawable(R.drawable.ic_done_white_24dp)
-            ChangeFabIcon.PREVIEW -> drawIcon = resources.getDrawable(R.drawable.ic_mode_edit_white_24dp)
-            ChangeFabIcon.LIST -> drawIcon = resources.getDrawable(R.drawable.ic_add_white_24dp)
+            EDIT_NOTE_FRAGMENT_TAG -> {
+                drawIcon = resources.getDrawable(R.drawable.ic_done_white_24dp)
+                title = resources.getString(R.string.edit)
+            }
+            CREATE_NOTE_FRAGMENT_TAG -> {
+                drawIcon = resources.getDrawable(R.drawable.ic_done_white_24dp)
+                title = resources.getString(R.string.create)
+            }
+            NOTE_PREVIEW_FRAGMENT_TAG -> {
+                drawIcon = resources.getDrawable(R.drawable.ic_mode_edit_white_24dp)
+                title = resources.getString(R.string.preview)
+            }
+            NOTE_LIST_FRAGMENT_TAG -> {
+                drawIcon = resources.getDrawable(R.drawable.ic_add_white_24dp)
+                title = resources.getString(R.string.notes)
+                itemVisibility = true
+            }
         }
         binding.mainFab.setImageDrawable(drawIcon!!)
+        supportActionBar!!.title = title
+
+        try {
+            menuItemGrid.isVisible = itemVisibility
+            menuItemLinear.isVisible = itemVisibility
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
     }
 
     /*
@@ -371,23 +343,12 @@ class MainActivity : AppCompatActivity(), NotesListFragment.OnListenRecyclerScro
      */
     override fun recyclerScrolling(dx: Int?, dy: Int?, newState: Int?) {
         if (newState == null) {
-            if (dy!! > 0 || dy < 0 && binding.mainFab.isShown())
-                binding.mainFab.hide();
+            if (dy!! > 0 || dy < 0 && binding.mainFab.isShown)
+                binding.mainFab.hide()
         } else {
             if (newState == RecyclerView.SCROLL_STATE_IDLE) {
-                binding.mainFab.show();
+                binding.mainFab.show()
             }
-        }
-    }
-
-    fun setMenuItemsVisibility(visible: Boolean) {
-        try {
-            if (menuItemGrid!!.isVisible != visible)
-                menuItemLinear!!.setVisible(visible)
-            menuItemGrid!!.setVisible(visible)
-            menuItemSearch!!.setVisible(visible)
-        } catch (e: Exception) {
-            e.printStackTrace()
         }
     }
 }

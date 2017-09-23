@@ -15,17 +15,14 @@ import android.view.animation.Animation
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.Activity.MainActivity
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.Database.LocalSQLAnkoDatabase
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.HelperClass.*
-import app.note.simple.brulinski.sebastian.com.simplenoteapp.Interfaces.ChangeFabIcon
+import app.note.simple.brulinski.sebastian.com.simplenoteapp.Interfaces.ChangeParentActivity
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.Model.ItemsHolder
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.Model.NotesProperties
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.R
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.RecyclerView.MainRecyclerAdapter
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.databinding.NotesListFragmentBinding
 import com.labo.kaji.fragmentanimations.MoveAnimation
-import com.labo.kaji.fragmentanimations.PushPullAnimation
 import jp.wasabeef.recyclerview.animators.FadeInAnimator
-import jp.wasabeef.recyclerview.animators.FadeInDownAnimator
-import jp.wasabeef.recyclerview.animators.ScaleInAnimator
 import org.jetbrains.anko.db.select
 import java.util.*
 
@@ -42,12 +39,6 @@ class NotesListFragment : Fragment() {
     lateinit var database: LocalSQLAnkoDatabase
     lateinit var layoutStyle: LayoutManagerStyle
     var styleFlag: Boolean = true
-
-    lateinit var mMenuItemsVisible: OnChangeItemVisible
-
-    interface OnChangeItemVisible {
-        fun changeMenuItemsVisibility(visible: Boolean)
-    }
 
     lateinit var mScrollCallback: OnListenRecyclerScroll
 
@@ -70,9 +61,6 @@ class NotesListFragment : Fragment() {
         binding = DataBindingUtil.inflate(inflater, R.layout.notes_list_fragment, container, false)
 
         CurrentFragmentState.CURRENT = MainActivity.NOTE_LIST_FRAGMENT_TAG
-
-        if (savedInstanceState == null)
-            mMenuItemsVisible.changeMenuItemsVisibility(true)
 
         //Database
         database = LocalSQLAnkoDatabase(context)
@@ -119,8 +107,7 @@ class NotesListFragment : Fragment() {
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
-        (activity as MainActivity).supportActionBar?.setTitle(getString(R.string.notes))
-        (activity as MainActivity).changeFabDrawableIcon(ChangeFabIcon.LIST)
+        (activity as MainActivity).refreshActivity(MainActivity.NOTE_LIST_FRAGMENT_TAG)
     }
 
     private fun initRecyclerAdapter() { //Init recycler view
@@ -210,7 +197,6 @@ class NotesListFragment : Fragment() {
             override fun itemDetails(itemId: String, title: String, note: String, position: Int, noteObject: ItemsHolder) {
                 onEditModeListener_.switch(itemId, title, note, position, noteObject)
                 CurrentFragmentState.backPressed = false
-                CurrentFragmentState.PREVIOUS = MainActivity.NOTE_LIST_FRAGMENT_TAG
             }
         })
     }
@@ -232,7 +218,6 @@ class NotesListFragment : Fragment() {
         super.onAttach(activity)
         try {
             mScrollCallback = (activity as OnListenRecyclerScroll)
-            mMenuItemsVisible = (activity as OnChangeItemVisible)
 
         } catch (e: ClassCastException) {
             throw ClassCastException(activity.toString() + " must implement OnListenRecyclerScroll and OnChangeItemVisible")
@@ -269,27 +254,13 @@ class NotesListFragment : Fragment() {
         })
     }
 
-    override fun onStop() {
-        mMenuItemsVisible.changeMenuItemsVisibility(false)
-        super.onStop()
-    }
-
-    override fun onStart() {
-        mMenuItemsVisible.changeMenuItemsVisibility(true)
-        super.onStart()
-    }
-
     override fun onCreateAnimation(transit: Int, enter: Boolean, nextAnim: Int): Animation {
 
-        if (CurrentFragmentState.backPressed) {
-           // return PushPullAnimation.create(PushPullAnimation.DOWN, enter, CurrentFragmentState.FRAGMENT_ANIM_DURATION)
-             return MoveAnimation.create(MoveAnimation.RIGHT, enter, CurrentFragmentState.FRAGMENT_ANIM_DURATION)
-        } else {
-            if (enter) {
-                return MoveAnimation.create(MoveAnimation.RIGHT, enter, CurrentFragmentState.FRAGMENT_ANIM_DURATION)
-            } else {
-                return MoveAnimation.create(MoveAnimation.LEFT, enter, CurrentFragmentState.FRAGMENT_ANIM_DURATION)
-            }
+        if(CurrentFragmentState.backPressed){
+            return MoveAnimation.create(MoveAnimation.RIGHT, enter, CurrentFragmentState.FRAGMENT_ANIM_DURATION)
+
+        }else{
+            return MoveAnimation.create(MoveAnimation.LEFT, enter, CurrentFragmentState.FRAGMENT_ANIM_DURATION)
         }
     }
 }

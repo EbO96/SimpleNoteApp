@@ -1,6 +1,5 @@
 package app.note.simple.brulinski.sebastian.com.simplenoteapp.Fragment
 
-import android.app.Activity
 import android.content.ContentValues
 import android.os.Bundle
 import android.text.TextUtils
@@ -10,19 +9,11 @@ import app.note.simple.brulinski.sebastian.com.simplenoteapp.Activity.MainActivi
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.Database.LocalSQLAnkoDatabase
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.HelperClass.CurrentFragmentState
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.HelperClass.EditorManager
-import app.note.simple.brulinski.sebastian.com.simplenoteapp.Interfaces.ChangeFabIcon
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.Model.ItemsHolder
-import app.note.simple.brulinski.sebastian.com.simplenoteapp.R
 import com.labo.kaji.fragmentanimations.MoveAnimation
 
 @Suppress("DEPRECATION", "OverridingDeprecatedMember")
 class EditNoteFragment : CreateNoteFragment() {
-
-    lateinit var mToolbarListener: OnInflateNewToolbarListener
-
-    interface OnInflateNewToolbarListener {
-        fun fragmentCreated(visible: Boolean)
-    }
 
     lateinit var title: String
     lateinit var note: String
@@ -31,14 +22,8 @@ class EditNoteFragment : CreateNoteFragment() {
     var noteObject = ArrayList<ItemsHolder>()
 
     override fun onViewCreated(view: View?, savedInstanceState: Bundle?) {
-
         CurrentFragmentState.CURRENT = MainActivity.EDIT_NOTE_FRAGMENT_TAG
 
-        (activity as MainActivity).supportActionBar?.setTitle(getString(R.string.edit)) //Set toolbar title depending on current fragment
-        (activity as MainActivity).changeFabDrawableIcon(ChangeFabIcon.EDIT)
-
-        //Set up toolbar listener
-        mToolbarListener.fragmentCreated(true)
         /*
         Get bundle and set at editText's
          */
@@ -74,6 +59,11 @@ class EditNoteFragment : CreateNoteFragment() {
         bindingFrag.createNoteNoteField.setText(note)
 
         super.onViewCreated(view, savedInstanceState)
+    }
+
+    override fun onStart() {
+        (activity as MainActivity).refreshActivity(MainActivity.EDIT_NOTE_FRAGMENT_TAG)
+        super.onStart()
     }
 
     override fun onSaveInstanceState(outState: Bundle?) {
@@ -124,8 +114,6 @@ class EditNoteFragment : CreateNoteFragment() {
                 delete(LocalSQLAnkoDatabase.TABLE_NOTES_PROPERTIES, whereClause, arrayOf(itemId))
             }
         }
-        //Set up main toolbar
-        mToolbarListener.fragmentCreated(false)
         super.onDestroyView()
     }
 
@@ -137,27 +125,13 @@ class EditNoteFragment : CreateNoteFragment() {
         return !TextUtils.isEmpty(bindingFrag.createNoteTitleField.text.trim()) || !TextUtils.isEmpty(bindingFrag.createNoteNoteField.text.trim())
     }
 
-    override fun onAttach(activity: Activity?) {
-        super.onAttach(activity)
-        try {
-            mToolbarListener = (activity as OnInflateNewToolbarListener)
-        } catch (e: ClassCastException) {
-            e.printStackTrace()
-            throw ClassCastException(activity.toString() + " must implement OnInflateNewToolbarListener and interface")
-        }
-
-    }
-
     override fun onCreateAnimation(transit: Int, enter: Boolean, nextAnim: Int): Animation {
 
-        if (CurrentFragmentState.backPressed) {
+        if(CurrentFragmentState.backPressed){
             return MoveAnimation.create(MoveAnimation.RIGHT, enter, CurrentFragmentState.FRAGMENT_ANIM_DURATION)
-        } else {
-            if (enter) {
-                return MoveAnimation.create(MoveAnimation.LEFT, enter, CurrentFragmentState.FRAGMENT_ANIM_DURATION)
-            } else {
-                return MoveAnimation.create(MoveAnimation.RIGHT, enter, CurrentFragmentState.FRAGMENT_ANIM_DURATION)
-            }
+
+        }else{
+            return MoveAnimation.create(MoveAnimation.LEFT, enter, CurrentFragmentState.FRAGMENT_ANIM_DURATION)
         }
     }
 }

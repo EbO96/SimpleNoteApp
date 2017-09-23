@@ -13,7 +13,6 @@ import app.note.simple.brulinski.sebastian.com.simplenoteapp.Activity.MainActivi
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.Database.LocalSQLAnkoDatabase
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.HelperClass.CurrentFragmentState
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.HelperClass.EditorManager
-import app.note.simple.brulinski.sebastian.com.simplenoteapp.Interfaces.ChangeFabIcon
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.Model.ItemsHolder
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.R
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.databinding.PreviewCardBinding
@@ -30,7 +29,7 @@ class NotePreviewFragment : Fragment() {
     lateinit var binding: PreviewCardBinding
 
     override fun onCreateView(inflater: LayoutInflater?, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        Log.i("frag", "Prev Create")
+        Log.i("fragAnim", "Prev Create")
         binding = DataBindingUtil.inflate(inflater, R.layout.preview_card, container, false)
 
         database = LocalSQLAnkoDatabase(context)
@@ -41,8 +40,7 @@ class NotePreviewFragment : Fragment() {
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
 
-        (activity as MainActivity).supportActionBar?.setTitle(getString(R.string.preview))
-        (activity as MainActivity).changeFabDrawableIcon(ChangeFabIcon.PREVIEW)
+        (activity as MainActivity).refreshActivity(MainActivity.NOTE_PREVIEW_FRAGMENT_TAG)
 
         itemId = arguments.getString("id")
         val title = arguments.getString("title")
@@ -71,22 +69,11 @@ class NotePreviewFragment : Fragment() {
 
     override fun onCreateAnimation(transit: Int, enter: Boolean, nextAnim: Int): Animation {
 
-        if (CurrentFragmentState.backPressed) {
-            if (CurrentFragmentState.PREVIOUS.equals(MainActivity.EDIT_NOTE_FRAGMENT_TAG)) {
-                return MoveAnimation.create(MoveAnimation.RIGHT, enter, CurrentFragmentState.FRAGMENT_ANIM_DURATION)
-            } else {
-                if (enter) {
-                    return MoveAnimation.create(MoveAnimation.LEFT, enter, CurrentFragmentState.FRAGMENT_ANIM_DURATION)
-                } else {
-                    return MoveAnimation.create(MoveAnimation.RIGHT, enter, CurrentFragmentState.FRAGMENT_ANIM_DURATION)
-                }
-            }
-        } else {
-            if (enter) {
-                return MoveAnimation.create(MoveAnimation.LEFT, enter, CurrentFragmentState.FRAGMENT_ANIM_DURATION)
-            } else {
-                return MoveAnimation.create(MoveAnimation.LEFT, enter, CurrentFragmentState.FRAGMENT_ANIM_DURATION)
-            }
+        if(CurrentFragmentState.backPressed){
+            return MoveAnimation.create(MoveAnimation.RIGHT, enter, CurrentFragmentState.FRAGMENT_ANIM_DURATION)
+
+        }else{
+            return MoveAnimation.create(MoveAnimation.LEFT, enter, CurrentFragmentState.FRAGMENT_ANIM_DURATION)
         }
     }
 

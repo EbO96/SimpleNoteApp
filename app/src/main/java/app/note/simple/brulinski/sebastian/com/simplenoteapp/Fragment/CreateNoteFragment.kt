@@ -20,7 +20,7 @@ import app.note.simple.brulinski.sebastian.com.simplenoteapp.Database.LocalSQLAn
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.HelperClass.CurrentFragmentState
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.HelperClass.EditorManager
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.HelperClass.MyRowParserNotes
-import app.note.simple.brulinski.sebastian.com.simplenoteapp.Interfaces.ChangeFabIcon
+import app.note.simple.brulinski.sebastian.com.simplenoteapp.Interfaces.ChangeParentActivity
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.Model.Notes
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.R
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.databinding.CreateNoteFragmentBinding
@@ -73,8 +73,7 @@ open class CreateNoteFragment : Fragment() {
     override fun onViewCreated(view: View?, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        (activity as MainActivity).supportActionBar?.setTitle(getString(R.string.create))
-        (activity as MainActivity).changeFabDrawableIcon(ChangeFabIcon.CREATE)
+        (activity as MainActivity).refreshActivity(MainActivity.CREATE_NOTE_FRAGMENT_TAG)
 
         listenBarOptions()
     }
@@ -347,14 +346,12 @@ open class CreateNoteFragment : Fragment() {
     }
 
     override fun onCreateAnimation(transit: Int, enter: Boolean, nextAnim: Int): Animation {
-        if (CurrentFragmentState.backPressed) {
+
+        if(CurrentFragmentState.backPressed){
             return MoveAnimation.create(MoveAnimation.RIGHT, enter, CurrentFragmentState.FRAGMENT_ANIM_DURATION)
-        } else {
-            if (enter) {
-                return MoveAnimation.create(MoveAnimation.LEFT, enter, CurrentFragmentState.FRAGMENT_ANIM_DURATION)
-            } else {
-                return MoveAnimation.create(MoveAnimation.RIGHT, enter, CurrentFragmentState.FRAGMENT_ANIM_DURATION)
-            }
+
+        }else{
+            return MoveAnimation.create(MoveAnimation.LEFT, enter, CurrentFragmentState.FRAGMENT_ANIM_DURATION)
         }
     }
 
