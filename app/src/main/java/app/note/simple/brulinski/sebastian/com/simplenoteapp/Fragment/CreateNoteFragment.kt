@@ -39,9 +39,14 @@ open class CreateNoteFragment : Fragment() {
     lateinit var database: LocalSQLAnkoDatabase
     lateinit var undoRedo: UndoRedo
 
-    /*
-    Fonts tags
-     */
+    companion object {
+        @SuppressLint("SimpleDateFormat")
+        fun getCurrentDateAndTime(): String { //Get current time from system
+            val calendar = Calendar.getInstance()
+
+            return SimpleDateFormat("yyyy-MM-dd 'at' HH:mm:ss a").format(calendar.getTime())
+        }
+    }
 
     override fun onCreateView(inflater: LayoutInflater?, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         bindingFrag = DataBindingUtil.inflate(inflater, R.layout.create_note_fragment, container, false)
@@ -122,15 +127,6 @@ open class CreateNoteFragment : Fragment() {
 
     }
 
-    companion object {
-        @SuppressLint("SimpleDateFormat")
-        fun getCurrentDateAndTime(): String { //Get current time from system
-            val calendar = Calendar.getInstance()
-
-            return SimpleDateFormat("yyyy-MM-dd 'at' HH:mm:ss a").format(calendar.getTime())
-        }
-    }
-
     override fun onDestroyView() {
         if ((!TextUtils.isEmpty(bindingFrag.createNoteTitleField.text.toString().trim()) || !TextUtils.isEmpty(bindingFrag.createNoteNoteField.text.toString().trim())) &&
                 CurrentFragmentState.CURRENT.equals(MainActivity.CREATE_NOTE_FRAGMENT_TAG) && !CurrentFragmentState.backPressed)
@@ -154,7 +150,7 @@ open class CreateNoteFragment : Fragment() {
         }
 
         bindingFrag.undo.setOnClickListener {
-            undoRedo.block()
+            undoRedo.block(true)
             undoRedo.getUndo()
         }
 
@@ -182,8 +178,27 @@ open class CreateNoteFragment : Fragment() {
      */
 
     private fun deleteAll() {
-        bindingFrag.createNoteTitleField.text = null
-        bindingFrag.createNoteNoteField.text = null
+        val title = bindingFrag.createNoteTitleField
+        val note = bindingFrag.createNoteNoteField
+
+        val titleText = title.text.toString()
+        val noteText = note.text.toString()
+
+        title.clearFocus()
+        note.clearFocus()
+
+        title.requestFocus()
+        undoRedo.addUndo(titleText)
+        title.clearFocus()
+
+        note.requestFocus()
+        undoRedo.addUndo(noteText)
+        note.clearFocus()
+
+        title.text = null
+        note.text = null
+
+        //undoRedo.afterDeleteAll()
     }
 
     private fun showFontMenu() {

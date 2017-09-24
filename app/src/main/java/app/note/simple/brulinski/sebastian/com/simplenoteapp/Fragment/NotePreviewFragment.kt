@@ -1,6 +1,5 @@
 package app.note.simple.brulinski.sebastian.com.simplenoteapp.Fragment
 
-import android.content.Context
 import android.databinding.DataBindingUtil
 import android.os.Bundle
 import android.support.v4.app.Fragment
@@ -11,8 +10,8 @@ import android.view.ViewGroup
 import android.view.animation.Animation
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.Activity.MainActivity
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.Database.LocalSQLAnkoDatabase
-import app.note.simple.brulinski.sebastian.com.simplenoteapp.HelperClass.CurrentFragmentState
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.Editor.EditorManager
+import app.note.simple.brulinski.sebastian.com.simplenoteapp.HelperClass.CurrentFragmentState
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.Model.ItemsHolder
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.R
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.databinding.PreviewCardBinding
@@ -59,20 +58,12 @@ class NotePreviewFragment : Fragment() {
 
     }
 
-    override fun onAttach(context: Context?) {
-        try {
-        } catch (e: ClassCastException) {
-            throw ClassCastException(context.toString() + " must impelent OnPreviewAnimationListener")
-        }
-        super.onAttach(context)
-    }
-
     override fun onCreateAnimation(transit: Int, enter: Boolean, nextAnim: Int): Animation {
 
-        if(CurrentFragmentState.backPressed){
+        if (CurrentFragmentState.backPressed) {
             return MoveAnimation.create(MoveAnimation.RIGHT, enter, CurrentFragmentState.FRAGMENT_ANIM_DURATION)
 
-        }else{
+        } else {
             return MoveAnimation.create(MoveAnimation.LEFT, enter, CurrentFragmentState.FRAGMENT_ANIM_DURATION)
         }
     }

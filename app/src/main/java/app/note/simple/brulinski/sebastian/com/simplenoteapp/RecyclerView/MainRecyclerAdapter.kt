@@ -57,6 +57,7 @@ class MainRecyclerAdapter(var itemsHolder: ArrayList<ItemsHolder>, var recyclerV
 
         holder.itemView?.setOnClickListener {
             pos = recyclerView.getChildAdapterPosition(holder.itemView)
+            MainActivity.noteToEdit = this.itemsHolder[pos]
             onEditItemListener_.itemDetails(this.itemsHolder.get(pos).id, this.itemsHolder.get(pos).title, this.itemsHolder.get(pos).note, pos, this.itemsHolder.get(pos))
         }
 

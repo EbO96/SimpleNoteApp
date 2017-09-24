@@ -1,5 +1,6 @@
 package app.note.simple.brulinski.sebastian.com.simplenoteapp.Editor
 
+import android.util.Log
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.Interfaces.BlockUndo
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.databinding.CreateNoteFragmentBinding
 
@@ -8,8 +9,8 @@ Class to handle undo and redo operations
  */
 class UndoRedo(var binding: CreateNoteFragmentBinding) : BlockUndo {
 
-    override fun block() {
-        undoUnlocked = false
+    override fun block(lock: Boolean) {
+        undoUnlocked = !lock
     }
 
     private var undoArray = ArrayList<Pair<String, String>>()
@@ -20,8 +21,8 @@ class UndoRedo(var binding: CreateNoteFragmentBinding) : BlockUndo {
     private val fromNote = "note"
     private var undoUnlocked = true
 
-    fun addUndo(text: String) {
-        if (undoUnlocked) {
+    fun addUndo(text: String?) {
+        if (undoUnlocked && text != null) {
             try {
                 if (binding.createNoteTitleField.isFocused)
                     from = fromTitle
@@ -39,6 +40,11 @@ class UndoRedo(var binding: CreateNoteFragmentBinding) : BlockUndo {
                 e.printStackTrace()
             }
         } else undoUnlocked = true
+
+        Log.i("array", "--------------------------------")
+        for (x in 0..undoArraySize) {
+            Log.i("array", "${undoArray[x].first}, ${undoArray[x].second}")
+        }
     }
 
     fun getUndo() {
@@ -56,9 +62,21 @@ class UndoRedo(var binding: CreateNoteFragmentBinding) : BlockUndo {
                     binding.createNoteNoteField.setText(pair.second)
                 }
             }
-        }else{
+        } else {
             binding.createNoteTitleField.setText(null)
             binding.createNoteNoteField.setText(null)
+        }
+    }
+
+    fun afterDeleteAll() {
+
+        undoArray.removeAt(undoArraySize)
+        undoArraySize = undoArray.size - 1
+        undoArray.removeAt(undoArraySize)
+        undoArraySize = undoArray.size - 1
+
+        for (x in 0..undoArraySize) {
+            Log.i("array", "${undoArray[x].first}, ${undoArray[x].second}")
         }
     }
 

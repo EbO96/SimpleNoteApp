@@ -1,19 +1,29 @@
 package app.note.simple.brulinski.sebastian.com.simplenoteapp.Fragment
 
 import android.content.ContentValues
+import android.content.Context
 import android.os.Bundle
 import android.text.TextUtils
 import android.view.View
 import android.view.animation.Animation
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.Activity.MainActivity
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.Database.LocalSQLAnkoDatabase
-import app.note.simple.brulinski.sebastian.com.simplenoteapp.HelperClass.CurrentFragmentState
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.Editor.EditorManager
+import app.note.simple.brulinski.sebastian.com.simplenoteapp.HelperClass.CurrentFragmentState
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.Model.ItemsHolder
 import com.labo.kaji.fragmentanimations.MoveAnimation
 
 @Suppress("DEPRECATION", "OverridingDeprecatedMember")
 class EditNoteFragment : CreateNoteFragment() {
+
+    /*
+    Interfaces
+     */
+    lateinit var mEditDestroyCallback: OnEditDestroy
+
+    interface OnEditDestroy {
+        fun editDestroy(noteObject: ItemsHolder)
+    }
 
     lateinit var title: String
     lateinit var note: String
@@ -78,6 +88,8 @@ class EditNoteFragment : CreateNoteFragment() {
         /*
         Update notes in local database
          */
+        mEditDestroyCallback.editDestroy(noteObject[0])
+
         var whereClause = "title=? AND note=?"
 
         if (!CurrentFragmentState.backPressed && validTitleAndNote()) { //When user click FloatingACtionButton and fields are not empty
@@ -127,11 +139,21 @@ class EditNoteFragment : CreateNoteFragment() {
 
     override fun onCreateAnimation(transit: Int, enter: Boolean, nextAnim: Int): Animation {
 
-        if(CurrentFragmentState.backPressed){
+        if (CurrentFragmentState.backPressed) {
             return MoveAnimation.create(MoveAnimation.RIGHT, enter, CurrentFragmentState.FRAGMENT_ANIM_DURATION)
 
-        }else{
+        } else {
             return MoveAnimation.create(MoveAnimation.LEFT, enter, CurrentFragmentState.FRAGMENT_ANIM_DURATION)
         }
+    }
+
+    override fun onAttach(context: Context?) {
+        try {
+            mEditDestroyCallback = (context as OnEditDestroy)
+        } catch (e: ClassCastException) {
+            throw ClassCastException(context.toString() + " must implement OnEditDestroy")
+        }
+        super.onAttach(context)
+
     }
 }

@@ -13,6 +13,7 @@ import android.support.v4.app.FragmentTransaction
 import android.support.v7.app.AppCompatActivity
 import android.support.v7.widget.RecyclerView
 import android.support.v7.widget.SearchView
+import android.util.Log
 import android.view.Menu
 import android.view.MenuInflater
 import android.view.MenuItem
@@ -27,12 +28,11 @@ import app.note.simple.brulinski.sebastian.com.simplenoteapp.Interfaces.ChangePa
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.Model.ItemsHolder
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.R
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.databinding.ActivityMainBinding
-import org.jetbrains.anko.editText
 
 
 @Suppress("DEPRECATION")
 class MainActivity : AppCompatActivity(), NotesListFragment.OnListenRecyclerScroll, SearchView.OnQueryTextListener,
-        ChangeParentActivity {
+        ChangeParentActivity, EditNoteFragment.OnEditDestroy {
 
     lateinit var mSearchCallback: OnSearchResultListener
 
@@ -59,6 +59,7 @@ class MainActivity : AppCompatActivity(), NotesListFragment.OnListenRecyclerScro
         lateinit var menuItemGrid: MenuItem //Toolbar menu item (set recycler view layout as staggered layout)
         lateinit var menuItemLinear: MenuItem//Toolbar menu item (set recycler view layout as linear layout)
         lateinit var menuItemSearch: MenuItem //Toolbar menu item (set recycler view layout as linear layout)
+        var noteToEdit: ItemsHolder? = null
     }
 
     /*
@@ -240,10 +241,23 @@ class MainActivity : AppCompatActivity(), NotesListFragment.OnListenRecyclerScro
         val editor: SharedPreferences.Editor = sharedPref.edit()
         editor.putBoolean(getString(R.string.layout_manager_key), flag)
         editor.apply()
+
     }
 
     override fun onBackPressed() {
         CurrentFragmentState.backPressed = true //Set flag at true. Necessary in onDestroyView() method in CreateNoteFragment.kt
+
+        val frag = supportFragmentManager.findFragmentById(binding.mainContainer.id)
+
+        if (frag != null && frag.isVisible) {
+            if (frag is NotePreviewFragment) {
+                Log.i("destroyInterfaces", "onBackPressed - back from Preview")
+            } else if (frag is EditNoteFragment && frag.tag.equals(EDIT_NOTE_FRAGMENT_TAG)) {
+                Log.i("destroyInterfaces", "onBackPressed - back from Edit")
+            } else if (frag is CreateNoteFragment && frag.tag.equals(CREATE_NOTE_FRAGMENT_TAG)) {
+                Log.i("destroyInterfaces", "onBackPressed - back from Create")
+            }
+        }
 
         if (supportFragmentManager.backStackEntryCount > 1) {
             supportFragmentManager.popBackStack()
@@ -352,5 +366,13 @@ class MainActivity : AppCompatActivity(), NotesListFragment.OnListenRecyclerScro
                 binding.mainFab.show()
             }
         }
+    }
+
+    /*
+    Listen form fragmnt destroyed
+     */
+
+    override fun editDestroy(noteObject: ItemsHolder) {
+        Log.i("destroyInterfaces", "editDestroy()")
     }
 }
