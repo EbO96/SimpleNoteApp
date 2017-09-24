@@ -3,23 +3,6 @@
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <item
-        android:id="@+id/main_menu_settings"
-        android:title="@string/settings"
-        app:showAsAction="never" />
-
-    <item
-        android:id="@+id/main_menu_grid"
-        android:icon="@drawable/ic_dashboard_black_24dp"
-        android:title="Grid"
-        app:showAsAction="always" />
-
-    <item
-        android:id="@+id/main_menu_linear"
-        android:icon="@drawable/ic_view_agenda_black_24dp"
-        android:title="Linear"
-        app:showAsAction="always" />
-
-    <item
         android:id="@+id/search"
         android:icon="@drawable/ic_search_black_24dp"
         android:title="@string/search"
@@ -27,4 +10,15 @@
         app:actionViewClass="android.support.v7.widget.SearchView"
         app:showAsAction="collapseActionView|always" />
 
+    <item
+        android:id="@+id/main_menu_grid"
+        android:icon="@drawable/ic_dashboard_black_24dp"
+        android:title="@string/grid"
+        app:showAsAction="always" />
+
+    <item
+        android:id="@+id/main_menu_linear"
+        android:icon="@drawable/ic_view_agenda_black_24dp"
+        android:title="@string/linear"
+        app:showAsAction="always" />
 </menu>

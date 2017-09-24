@@ -11,6 +11,24 @@ class LocalSQLAnkoDatabase(ctx: Context) : ManagedSQLiteOpenHelper(ctx, "user_no
         val TABLE_NOTES: String = "notes"
         val TABLE_NOTES_PROPERTIES: String = "notes_properties"
 
+        /*
+        Column names notes table
+         */
+
+        val ID = "_id"
+        val TITLE = "title"
+        val NOTE = "note"
+        val DATE = "date"
+
+        /*
+        Column names note_properties table
+         */
+
+        val NOTE_ID = "note_id"
+        val BG_COLOR = "bg_color"
+        val TEXT_COLOR = "text_color"
+        val FONT_STYLE = "font_style"
+
         @Synchronized
         fun getInstance(ctx: Context): LocalSQLAnkoDatabase {
             if (instance == null) {
@@ -21,18 +39,16 @@ class LocalSQLAnkoDatabase(ctx: Context) : ManagedSQLiteOpenHelper(ctx, "user_no
     }
 
     override fun onCreate(p0: SQLiteDatabase) {
-        p0.createTable(TABLE_NOTES, true, "_id" to INTEGER + PRIMARY_KEY, "title" to TEXT, "note" to TEXT,
-                "date" to TEXT)
-        p0.createTable(TABLE_NOTES_PROPERTIES, true, "_id" to INTEGER + PRIMARY_KEY, "note_id" to TEXT,
-                "bg_color" to TEXT, "text_color" to TEXT, "font_style" to TEXT)
+        p0.createTable(TABLE_NOTES, true, ID to INTEGER + PRIMARY_KEY, TITLE to TEXT, NOTE to TEXT,
+                DATE to TEXT)
+        p0.createTable(TABLE_NOTES_PROPERTIES, true, ID to INTEGER + PRIMARY_KEY, NOTE_ID to TEXT,
+                BG_COLOR to TEXT, TEXT_COLOR to TEXT, FONT_STYLE to TEXT)
     }
 
     override fun onUpgrade(p0: SQLiteDatabase, p1: Int, p2: Int) {
         p0.dropTable(TABLE_NOTES, true)
         p0.dropTable(TABLE_NOTES_PROPERTIES, true)
     }
-
-
 }
 
 val Context.database: LocalSQLAnkoDatabase

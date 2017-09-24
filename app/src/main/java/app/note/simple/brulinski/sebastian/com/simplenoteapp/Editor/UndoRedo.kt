@@ -50,7 +50,7 @@ class UndoRedo(var binding: CreateNoteFragmentBinding) : BlockUndo {
     fun getUndo() {
         val pair: Pair<String, String>
 
-        if (undoArraySize > -1) {
+        if (undoArraySize != -1) {
             pair = undoArray.removeAt(undoArraySize)
             undoArraySize = undoArray.size - 1
 
@@ -79,5 +79,4 @@ class UndoRedo(var binding: CreateNoteFragmentBinding) : BlockUndo {
             Log.i("array", "${undoArray[x].first}, ${undoArray[x].second}")
         }
     }
-
 }

@@ -3,6 +3,7 @@ package app.note.simple.brulinski.sebastian.com.simplenoteapp.Editor
 import android.content.Context
 import android.content.res.ColorStateList
 import android.graphics.Typeface
+import android.support.v4.content.ContextCompat
 import android.support.v7.widget.CardView
 import android.widget.EditText
 import android.widget.TextView
@@ -12,20 +13,8 @@ import org.jetbrains.anko.textColor
 
 class EditorManager {
 
-    companion object {
-        fun resetAllToDefault() {
-            ColorManager.currentBgColor = ColorManager.WHITE
-            FontStyleManager.currentFontStyle = FontStyleManager.DEFAULT_FONT
-            ColorManager.currentFontColor = ColorManager.BLACK
-        }
-    }
-
-    @Suppress("DEPRECATION")
-    class ColorManager(val ctx: Context) {
+    class ColorManager(private val ctx: Context) {
         companion object {
-
-            var currentBgColor = "WHITE"
-            var currentFontColor = "BLACK"
 
             val RED = "RED"
             val PINK = "PINK"
@@ -74,65 +63,31 @@ class EditorManager {
             var resColor = 0
 
             when (color) {
-                RED -> {
-                    resColor = ctx.resources.getColor(R.color.material_red)
-                }
-                PINK -> {
-                    resColor = ctx.resources.getColor(R.color.material_pink)
-                }
-                PURPLE -> {
-                    resColor = ctx.resources.getColor(R.color.material_purple)
-                }
-                BLUE -> {
-                    resColor = ctx.resources.getColor(R.color.material_blue)
-
-                }
-                INDIGO -> {
-                    resColor = ctx.resources.getColor(R.color.material_indigo)
-                }
-                GREEN -> {
-                    resColor = ctx.resources.getColor(R.color.material_green)
-
-                }
-                TEAL -> {
-                    resColor = ctx.resources.getColor(R.color.material_teal)
-                }
-                YELLOW -> {
-                    resColor = ctx.resources.getColor(R.color.material_yellow)
-                }
-                WHITE -> {
-                    resColor = ctx.resources.getColor(R.color.material_white)
-                }
-                BLUE_GRAY -> {
-                    resColor = ctx.resources.getColor(R.color.material_blue_grey)
-                }
-                BLACK -> {
-                    resColor = ctx.resources.getColor(R.color.material_black)
-                }
-                BROWN -> {
-                    resColor = ctx.resources.getColor(R.color.material_brown)
-                }
+                RED -> resColor = ContextCompat.getColor(ctx, R.color.material_red)
+                PINK -> resColor = ContextCompat.getColor(ctx,R.color.material_pink)
+                PURPLE -> resColor = ContextCompat.getColor(ctx,R.color.material_purple)
+                BLUE -> resColor = ContextCompat.getColor(ctx,R.color.material_blue)
+                INDIGO -> resColor = ContextCompat.getColor(ctx,R.color.material_indigo)
+                GREEN -> resColor = ContextCompat.getColor(ctx,R.color.material_green)
+                TEAL -> resColor = ContextCompat.getColor(ctx,R.color.material_teal)
+                YELLOW -> resColor = ContextCompat.getColor(ctx,R.color.material_yellow)
+                WHITE -> resColor = ContextCompat.getColor(ctx,R.color.material_white)
+                BLUE_GRAY -> resColor = ContextCompat.getColor(ctx,R.color.material_blue_grey)
+                BLACK -> resColor = ContextCompat.getColor(ctx,R.color.material_black)
+                BROWN -> resColor = ContextCompat.getColor(ctx,R.color.material_brown)
             }
 
-            if(colorOf.equals("BG")){//Color of background
+            if (colorOf.equals("BG")) {//Color of background
                 changeBgColor(viewsArray, resColor)
-            }else if(colorOf.equals("FONT")) { //Color of font
+            } else if (colorOf.equals("FONT")) { //Color of font
                 changeFontColor(viewsArray, resColor)
             }
-        }
-    }
-
-    class FontColorManager {
-        companion object {
-
-
         }
     }
 
     class FontStyleManager {
 
         companion object {
-            var currentFontStyle = "DEFAULT"
             val DEFAULT_FONT = "DEFAULT"
             val ITALIC_FONT = "ITALIC"
             val BOLD_ITALIC_FONT = "BOLD_ITALIC"
@@ -143,15 +98,15 @@ class EditorManager {
             fun setUpFontStyle(font: Any?, viewTitle: Any?, viewNote: Any?) {
                 val recognisedFont: Typeface?
 
-                var title: TextView?
-                var note: TextView?
+                val title: TextView?
+                val note: TextView?
 
                 if (font is Int) {
                     recognisedFont = Typeface.defaultFromStyle(font)
                 } else recognisedFont = (font as Typeface)
 
                 if (viewTitle is TextView) {
-                    title = (viewTitle as TextView)
+                    title = viewTitle
                     note = (viewNote as TextView?)
                 } else {
                     title = (viewTitle as EditText)

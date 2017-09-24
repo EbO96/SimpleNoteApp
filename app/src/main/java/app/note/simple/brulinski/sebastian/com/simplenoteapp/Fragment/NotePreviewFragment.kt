@@ -3,10 +3,8 @@ package app.note.simple.brulinski.sebastian.com.simplenoteapp.Fragment
 import android.databinding.DataBindingUtil
 import android.os.Bundle
 import android.support.v4.app.Fragment
-import android.util.Log
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
+import android.support.v4.content.ContextCompat
+import android.view.*
 import android.view.animation.Animation
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.Activity.MainActivity
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.Database.LocalSQLAnkoDatabase
@@ -19,47 +17,18 @@ import com.labo.kaji.fragmentanimations.MoveAnimation
 
 class NotePreviewFragment : Fragment() {
 
-
-    var itemPosition = 0
-    var itemId = ""
-    var noteObject = ArrayList<ItemsHolder>()
     lateinit var database: LocalSQLAnkoDatabase
-
     lateinit var binding: PreviewCardBinding
+    var noteObj: ItemsHolder? = null
 
     override fun onCreateView(inflater: LayoutInflater?, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        Log.i("fragAnim", "Prev Create")
+        setHasOptionsMenu(true)
         binding = DataBindingUtil.inflate(inflater, R.layout.preview_card, container, false)
-
-        database = LocalSQLAnkoDatabase(context)
 
         return binding.root
     }
 
-    override fun onActivityCreated(savedInstanceState: Bundle?) {
-        super.onActivityCreated(savedInstanceState)
-
-        (activity as MainActivity).refreshActivity(MainActivity.NOTE_PREVIEW_FRAGMENT_TAG)
-
-        itemId = arguments.getString("id")
-        val title = arguments.getString("title")
-        val note = arguments.getString("note")
-        itemPosition = arguments.getInt("position")
-
-        noteObject = arguments.getParcelableArrayList<ItemsHolder>("note_object")
-
-        EditorManager.FontStyleManager.recogniseAndSetFont(noteObject[0].fontStyle, binding.previewTitleField, binding.previewNoteField)
-        val bg = EditorManager.ColorManager(context)
-
-        bg.recogniseAndSetColor(noteObject[0].bgColor, arrayListOf(binding.previewCardParentCard), "BG") //Change note color
-        bg.recogniseAndSetColor(noteObject[0].textColor, arrayListOf(binding.previewTitleField, binding.previewNoteField), "FONT") //Change text color
-        binding.previewTitleField.text = title
-        binding.previewNoteField.text = note
-
-    }
-
     override fun onCreateAnimation(transit: Int, enter: Boolean, nextAnim: Int): Animation {
-
         if (CurrentFragmentState.backPressed) {
             return MoveAnimation.create(MoveAnimation.RIGHT, enter, CurrentFragmentState.FRAGMENT_ANIM_DURATION)
 
@@ -68,4 +37,46 @@ class NotePreviewFragment : Fragment() {
         }
     }
 
+    override fun onActivityCreated(savedInstanceState: Bundle?) {
+        super.onActivityCreated(savedInstanceState)
+
+        (activity as MainActivity).setTitleAndFab(ContextCompat.getDrawable(context, R.drawable.ic_mode_edit_white_24dp),
+                resources.getString(R.string.preview))
+
+        database = LocalSQLAnkoDatabase(context)
+        noteObj = MainActivity.noteToEdit
+
+        val titleView = binding.previewTitleField
+        val noteView = binding.previewNoteField
+        val cardView = binding.previewCardParentCard
+
+        val title = noteObj!!.title
+        val note = noteObj!!.note
+
+        val fontStyle = noteObj!!.fontStyle
+        val textColor = noteObj!!.textColor
+        val bgColor = noteObj!!.bgColor
+
+        EditorManager.FontStyleManager.recogniseAndSetFont(fontStyle, titleView, noteView)
+
+        val colorManager = EditorManager.ColorManager(context)
+
+        colorManager.recogniseAndSetColor(textColor, arrayListOf(titleView, noteView), "FONT") //set font color
+        colorManager.recogniseAndSetColor(bgColor, arrayListOf(cardView), "BG") //set background color
+
+        titleView.text = title
+        noteView.text = note
+    }
+
+    override fun onDestroyView() {
+        MainActivity.noteToEdit
+        super.onDestroyView()
+    }
+
+    override fun onCreateOptionsMenu(menu: Menu?, inflater: MenuInflater?) {
+        menu!!.findItem(R.id.main_menu_grid).isVisible = false
+        menu.findItem(R.id.main_menu_linear).isVisible = false
+        menu.findItem(R.id.search).isVisible = false
+        super.onCreateOptionsMenu(menu, inflater)
+    }
 }

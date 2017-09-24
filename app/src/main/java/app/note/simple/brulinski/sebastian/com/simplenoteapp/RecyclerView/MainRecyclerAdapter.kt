@@ -10,27 +10,18 @@ import android.view.ViewGroup
 import android.widget.TextView
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.Activity.MainActivity
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.Database.LocalSQLAnkoDatabase
-import app.note.simple.brulinski.sebastian.com.simplenoteapp.Fragment.NotesListFragment
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.Editor.EditorManager
+import app.note.simple.brulinski.sebastian.com.simplenoteapp.Fragment.NotesListFragment
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.Model.ItemsHolder
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.R
 
 
 class MainRecyclerAdapter(var itemsHolder: ArrayList<ItemsHolder>, var recyclerView: RecyclerView, var database: LocalSQLAnkoDatabase, var ctx: Context) : RecyclerView.Adapter<MainRecyclerAdapter.ViewHolder>() {
 
-    lateinit var onEditItemListener_: OnEditItemListener
     var deletedItem: ItemsHolder? = null
     var position = 0
     var filterListSize = 0
     var undoClicked = false
-
-    interface OnEditItemListener {
-        fun itemDetails(itemId: String, title: String, note: String, position: Int, noteObject: ItemsHolder)
-    }
-
-    fun setOnEditItemListener(onEditItemListener: OnEditItemListener) {
-        this.onEditItemListener_ = onEditItemListener
-    }
 
     override fun onBindViewHolder(holder: ViewHolder?, position: Int) {
         val itemsHolder: ItemsHolder = itemsHolder[position]
@@ -57,8 +48,7 @@ class MainRecyclerAdapter(var itemsHolder: ArrayList<ItemsHolder>, var recyclerV
 
         holder.itemView?.setOnClickListener {
             pos = recyclerView.getChildAdapterPosition(holder.itemView)
-            MainActivity.noteToEdit = this.itemsHolder[pos]
-            onEditItemListener_.itemDetails(this.itemsHolder.get(pos).id, this.itemsHolder.get(pos).title, this.itemsHolder.get(pos).note, pos, this.itemsHolder.get(pos))
+            (ctx as MainActivity).onNoteClicked(this.itemsHolder[pos])
         }
 
         holder.itemView?.setOnLongClickListener {

@@ -47,5 +47,7 @@
     <string name="note_color">Note color</string>
     <string name="font_color">Font color</string>
     <string name="copied">copied</string>
+    <string name="grid">Grid</string>
+    <string name="linear">Linear</string>
     <!--END-->
 </resources>

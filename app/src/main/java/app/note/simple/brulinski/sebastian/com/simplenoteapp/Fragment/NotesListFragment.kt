@@ -4,18 +4,20 @@ import android.app.Activity
 import android.databinding.DataBindingUtil
 import android.os.Bundle
 import android.support.v4.app.Fragment
+import android.support.v4.content.ContextCompat
 import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView
 import android.support.v7.widget.StaggeredGridLayoutManager
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.view.animation.Animation
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.Activity.MainActivity
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.Database.LocalSQLAnkoDatabase
-import app.note.simple.brulinski.sebastian.com.simplenoteapp.Editor.EditorManager
-import app.note.simple.brulinski.sebastian.com.simplenoteapp.HelperClass.*
+import app.note.simple.brulinski.sebastian.com.simplenoteapp.HelperClass.CurrentFragmentState
+import app.note.simple.brulinski.sebastian.com.simplenoteapp.HelperClass.LayoutManagerStyle
+import app.note.simple.brulinski.sebastian.com.simplenoteapp.HelperClass.MyRowParserNoteProperties
+import app.note.simple.brulinski.sebastian.com.simplenoteapp.HelperClass.MyRowParserNotes
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.Model.ItemsHolder
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.Model.NotesProperties
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.R
@@ -25,7 +27,6 @@ import com.labo.kaji.fragmentanimations.MoveAnimation
 import jp.wasabeef.recyclerview.animators.FadeInAnimator
 import org.jetbrains.anko.db.select
 import java.util.*
-
 
 @Suppress("DEPRECATION", "OverridingDeprecatedMember")
 class NotesListFragment : Fragment() {
@@ -46,26 +47,11 @@ class NotesListFragment : Fragment() {
         fun recyclerScrolling(dx: Int?, dy: Int?, newState: Int?)
     }
 
-    lateinit var onEditModeListener_: OnEditModeListener
-
-    interface OnEditModeListener {
-        fun switch(itemId: String, title: String, note: String, position: Int, noteObject: ItemsHolder)
-    }
-
-    fun setOnEditModeListener(onEditModeListener: OnEditModeListener) {
-        this.onEditModeListener_ = onEditModeListener
-    }
-
     override fun onCreateView(inflater: LayoutInflater?, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        Log.i("frag", "List Create")
         binding = DataBindingUtil.inflate(inflater, R.layout.notes_list_fragment, container, false)
-
-        CurrentFragmentState.CURRENT = MainActivity.NOTE_LIST_FRAGMENT_TAG
-
-        //Database
+        //Get notes
         database = LocalSQLAnkoDatabase(context)
 
-        //Get notes
         if (savedInstanceState == null) {
             getAndSetNotes()
         } else {
@@ -74,12 +60,7 @@ class NotesListFragment : Fragment() {
 
         initRecyclerAdapter()
 
-        sortNotes()
-
-        (activity as MainActivity).editItem(this)
-
-        //Edit note listener
-        editNote()
+        sortNotes() //Sort notes by date and time
 
         //Deleted items listener
         //listenDeletedItems()
@@ -100,18 +81,17 @@ class NotesListFragment : Fragment() {
         //Listen for search
         updateListBySearch()
 
-        EditorManager.resetAllToDefault() //Reset all note properties values to default
-
         return binding.root
     }
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
-        (activity as MainActivity).refreshActivity(MainActivity.NOTE_LIST_FRAGMENT_TAG)
+
+        (activity as MainActivity).setTitleAndFab(ContextCompat.getDrawable(context, R.drawable.ic_add_white_24dp),
+                resources.getString(R.string.notes))
     }
 
     private fun initRecyclerAdapter() { //Init recycler view
-        //Recycler
         binding.recyclerView.setHasFixedSize(true)
 
         layoutStyle = LayoutManagerStyle(this.activity)
@@ -127,11 +107,10 @@ class NotesListFragment : Fragment() {
 
         myRecycler = MainRecyclerAdapter(itemsObjectsArray, binding.recyclerView, database, context)
         binding.recyclerView.adapter = myRecycler
-        myRecycler.notifyDataSetChanged()
     }
 
 
-    fun getAndSetNotes() {
+    private fun getAndSetNotes() {
         itemsObjectsArray = ArrayList()
 
         val notesPropertiesArray: ArrayList<NotesProperties> = ArrayList()
@@ -156,12 +135,11 @@ class NotesListFragment : Fragment() {
                         notesPropertiesArray.get(x).fontColor!!))
             }
         }
-        //debugNotesArray()
+
+
     }
 
     private fun sortNotes() {
-        debugNotesArray()
-        Log.i("notesArray", "sorting notes...")
         try {
             Collections.sort(itemsObjectsArray, object : Comparator<ItemsHolder> {
                 override fun compare(o1: ItemsHolder, o2: ItemsHolder): Int {
@@ -175,41 +153,16 @@ class NotesListFragment : Fragment() {
             e.printStackTrace()
         }
         myRecycler.notifyDataSetChanged()
-        Log.i("notesArray", "sorting complete")
-        debugNotesArray()
     }
 
-    fun debugNotesArray() {
-        for (i in 0 until itemsObjectsArray.size) {
-            Log.i("notesArray", itemsObjectsArray[i].id)
-            Log.i("notesArray", itemsObjectsArray[i].title)
-            Log.i("notesArray", itemsObjectsArray[i].note)
-            Log.i("notesArray", itemsObjectsArray[i].date)
-            Log.i("notesArray", itemsObjectsArray[i].bgColor)
-            Log.i("notesArray", itemsObjectsArray[i].textColor)
-            Log.i("notesArray", itemsObjectsArray[i].fontStyle)
-            Log.i("notesArray", "------------------------------------")
-        }
-    }
-
-    fun editNote() {
-        myRecycler.setOnEditItemListener(object : MainRecyclerAdapter.OnEditItemListener {
-            override fun itemDetails(itemId: String, title: String, note: String, position: Int, noteObject: ItemsHolder) {
-                onEditModeListener_.switch(itemId, title, note, position, noteObject)
-                CurrentFragmentState.backPressed = false
-            }
-        })
-    }
 
     override fun onSaveInstanceState(outState: Bundle?) {
         super.onSaveInstanceState(outState)
         outState?.putBoolean("flag", layoutStyle.flag)
-
         /*
         Save fragment state do Bundle and restore notes from it instead of
         getting this data from database
          */
-
         outState?.putParcelableArrayList("notes", itemsObjectsArray)
     }
 
@@ -224,7 +177,7 @@ class NotesListFragment : Fragment() {
         }
     }
 
-    fun recyclerScrollingListener() {
+    private fun recyclerScrollingListener() {
         binding.recyclerView.addOnScrollListener(object : RecyclerView.OnScrollListener() {
             override fun onScrolled(recyclerView: RecyclerView?, dx: Int, dy: Int) {
                 mScrollCallback.recyclerScrolling(dx, dy, null)
@@ -236,7 +189,7 @@ class NotesListFragment : Fragment() {
         })
     }
 
-    fun updateListBySearch() {
+    private fun updateListBySearch() {
         (activity as MainActivity).setOnSearchResultListener(object : MainActivity.OnSearchResultListener {
             override fun passNewText(newText: String?) {
                 val newList: ArrayList<ItemsHolder> = ArrayList()
@@ -256,11 +209,9 @@ class NotesListFragment : Fragment() {
 
     override fun onCreateAnimation(transit: Int, enter: Boolean, nextAnim: Int): Animation {
 
-        if(CurrentFragmentState.backPressed){
+        if (CurrentFragmentState.backPressed)
             return MoveAnimation.create(MoveAnimation.RIGHT, enter, CurrentFragmentState.FRAGMENT_ANIM_DURATION)
-
-        }else{
+        else
             return MoveAnimation.create(MoveAnimation.LEFT, enter, CurrentFragmentState.FRAGMENT_ANIM_DURATION)
-        }
     }
 }

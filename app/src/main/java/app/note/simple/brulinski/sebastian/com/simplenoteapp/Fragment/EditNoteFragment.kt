@@ -1,13 +1,9 @@
 package app.note.simple.brulinski.sebastian.com.simplenoteapp.Fragment
 
-import android.content.ContentValues
 import android.content.Context
 import android.os.Bundle
-import android.text.TextUtils
-import android.view.View
 import android.view.animation.Animation
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.Activity.MainActivity
-import app.note.simple.brulinski.sebastian.com.simplenoteapp.Database.LocalSQLAnkoDatabase
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.Editor.EditorManager
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.HelperClass.CurrentFragmentState
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.Model.ItemsHolder
@@ -22,120 +18,73 @@ class EditNoteFragment : CreateNoteFragment() {
     lateinit var mEditDestroyCallback: OnEditDestroy
 
     interface OnEditDestroy {
-        fun editDestroy(noteObject: ItemsHolder)
+        fun editDestroy(noteObject: ItemsHolder?)
     }
 
-    lateinit var title: String
-    lateinit var note: String
-    var position = 0
-    var itemId = ""
-    var noteObject = ArrayList<ItemsHolder>()
+    companion object {
+        var noteObject: ItemsHolder? = null
+    }
 
-    override fun onViewCreated(view: View?, savedInstanceState: Bundle?) {
-        CurrentFragmentState.CURRENT = MainActivity.EDIT_NOTE_FRAGMENT_TAG
-
-        /*
-        Get bundle and set at editText's
-         */
-        itemId = arguments.getString("id")
-        title = arguments.getString("title")
-        note = arguments.getString("note")
-        position = arguments.getInt("position")
-
+    override fun onActivityCreated(savedInstanceState: Bundle?) {
         listenBarOptions()
 
-        if (savedInstanceState != null) {
-            noteObject = savedInstanceState.getParcelableArrayList("note_object")
-            noteObject[0].bgColor = EditorManager.ColorManager.currentBgColor
-            noteObject[0].fontStyle = EditorManager.FontStyleManager.currentFontStyle
-            noteObject[0].textColor = EditorManager.ColorManager.currentFontColor
-        } else {
-            noteObject = arguments.getParcelableArrayList<ItemsHolder>("note_object")
-            EditorManager.FontStyleManager.currentFontStyle = noteObject[0].fontStyle
-            EditorManager.ColorManager.currentBgColor = noteObject[0].bgColor
-            EditorManager.ColorManager.currentFontColor = noteObject[0].textColor
-        }
+        val titleView = bindingFrag.createNoteTitleField
+        val noteView = bindingFrag.createNoteNoteField
+        val cardView = bindingFrag.createNoteParentCard
 
-        EditorManager.FontStyleManager.recogniseAndSetFont(noteObject[0].fontStyle, bindingFrag.createNoteTitleField,
-                bindingFrag.createNoteNoteField)
+        noteObject = MainActivity.noteToEdit
 
-        val bg = EditorManager.ColorManager(context)
+        val title = noteObject!!.title
+        val note = noteObject!!.note
+        val bgColor = noteObject!!.bgColor
+        val fontStyle = noteObject!!.fontStyle
+        val textColor = noteObject!!.textColor
 
-        bg.recogniseAndSetColor(noteObject[0].bgColor, arrayListOf(bindingFrag.createNoteParentCard), "BG") //Change note color
+        EditorManager.FontStyleManager.recogniseAndSetFont(fontStyle, titleView, noteView)
 
-        bg.recogniseAndSetColor(noteObject[0].textColor, arrayListOf(bindingFrag.createNoteNoteField, bindingFrag.createNoteTitleField), "FONT") //Change text color
+        val colorManager = EditorManager.ColorManager(context)
 
-        bindingFrag.createNoteTitleField.setText(title)
-        bindingFrag.createNoteNoteField.setText(note)
+        colorManager.recogniseAndSetColor(bgColor, arrayListOf(cardView), "BG")
+        colorManager.recogniseAndSetColor(textColor, arrayListOf(titleView, noteView), "FONT")
 
-        super.onViewCreated(view, savedInstanceState)
+        titleView.setText(title)
+        noteView.setText(note)
+
+        super.onActivityCreated(savedInstanceState)
     }
 
-    override fun onStart() {
-        (activity as MainActivity).refreshActivity(MainActivity.EDIT_NOTE_FRAGMENT_TAG)
-        super.onStart()
-    }
 
     override fun onSaveInstanceState(outState: Bundle?) {
         super.onSaveInstanceState(outState)
-        outState!!.putParcelableArrayList("note_object", noteObject)
+
+        outState!!.putParcelable("note_object", noteObject)
     }
 
     /*
     When this fragment is destroying then user note is updating or deleting from local SQL database
      */
     override fun onDestroyView() {
-        /*
-        Update notes in local database
-         */
-        mEditDestroyCallback.editDestroy(noteObject[0])
+        val title = bindingFrag.createNoteTitleField.text.toString()
+        val note = bindingFrag.createNoteNoteField.text.toString()
+        val date = getCurrentDateAndTime()
+        val fontStyle = MainActivity.noteToEdit!!.fontStyle
+        val textColor = MainActivity.noteToEdit!!.textColor
+        val bgColor = MainActivity.noteToEdit!!.bgColor
 
-        var whereClause = "title=? AND note=?"
+        noteObject!!.title = title
+        noteObject!!.note = note
+        noteObject!!.date = date
+        noteObject!!.fontStyle = fontStyle
+        noteObject!!.textColor = textColor
+        noteObject!!.bgColor = bgColor
 
-        if (!CurrentFragmentState.backPressed && validTitleAndNote()) { //When user click FloatingACtionButton and fields are not empty
-            //Update note in database
-            var values = ContentValues()
-            values.put("title", bindingFrag.createNoteTitleField.text.toString())
-            values.put("note", bindingFrag.createNoteNoteField.text.toString())
-
-            database.use {
-                update(
-                        LocalSQLAnkoDatabase.TABLE_NOTES, values, whereClause, arrayOf(title, note)
-                )
-
-                whereClause = "note_id=?"
-
-                values = ContentValues()
-                values.put("bg_color", EditorManager.ColorManager.currentBgColor)
-                values.put("text_color", EditorManager.ColorManager.currentFontColor)
-                values.put("font_style", EditorManager.FontStyleManager.currentFontStyle)
-
-                database.use {
-                    update(
-                            LocalSQLAnkoDatabase.TABLE_NOTES_PROPERTIES, values, whereClause, arrayOf(itemId)
-                    )
-                }
-            }
-        } else if ((CurrentFragmentState.backPressed || !CurrentFragmentState.backPressed) && !validTitleAndNote()) { //When user click back button and fields are empty
-            //Delete note from database
-            database.use {
-                delete(LocalSQLAnkoDatabase.TABLE_NOTES, whereClause, arrayOf(title, note))
-            }
-            whereClause = "note_id=?"
-            database.use {
-                delete(LocalSQLAnkoDatabase.TABLE_NOTES_PROPERTIES, whereClause, arrayOf(itemId))
-            }
-        }
+        mEditDestroyCallback.editDestroy(noteObject)
         super.onDestroyView()
     }
 
     /*
     Check data validation(Fields can not be empty)
      */
-
-    fun validTitleAndNote(): Boolean {
-        return !TextUtils.isEmpty(bindingFrag.createNoteTitleField.text.trim()) || !TextUtils.isEmpty(bindingFrag.createNoteNoteField.text.trim())
-    }
 
     override fun onCreateAnimation(transit: Int, enter: Boolean, nextAnim: Int): Animation {
 
