@@ -17,7 +17,7 @@
             </intent-filter>
         </activity>
         <activity android:name=".Activity.SettingsActivity" />
-
+        <activity android:name=".Activity.SearchActivity"></activity>
     </application>
 
 </manifest>

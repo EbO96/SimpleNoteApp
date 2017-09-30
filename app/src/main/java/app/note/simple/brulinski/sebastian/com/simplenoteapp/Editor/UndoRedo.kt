@@ -14,8 +14,10 @@ class UndoRedo(var binding: CreateNoteFragmentBinding) : BlockUndo {
     }
 
     private var undoArray = ArrayList<Pair<String, String>>()
+    private var redoArray = ArrayList<Pair<String, String>>()
     private var undoArraySize = -1
     private val maxUndoArraySize = 2000
+    private val maxRedoArraySize = 2000
     private var from = "title"
     private val fromTitle = "title"
     private val fromNote = "note"
@@ -40,11 +42,14 @@ class UndoRedo(var binding: CreateNoteFragmentBinding) : BlockUndo {
                 e.printStackTrace()
             }
         } else undoUnlocked = true
+    }
 
-        Log.i("array", "--------------------------------")
-        for (x in 0..undoArraySize) {
-            Log.i("array", "${undoArray[x].first}, ${undoArray[x].second}")
-        }
+    fun addRedo() {//TODO
+        val pair: Pair<String, String>
+
+        pair = undoArray.get(undoArraySize)
+
+        redoArray.add(pair)
     }
 
     fun getUndo() {
