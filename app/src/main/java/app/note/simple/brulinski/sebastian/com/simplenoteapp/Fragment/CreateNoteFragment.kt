@@ -6,8 +6,10 @@ import android.content.ClipboardManager
 import android.content.Context
 import android.content.DialogInterface
 import android.databinding.DataBindingUtil
+import android.graphics.Color
 import android.graphics.Typeface
 import android.os.Bundle
+import android.support.annotation.ColorInt
 import android.support.v4.app.Fragment
 import android.support.v4.content.ContextCompat
 import android.text.TextUtils
@@ -28,6 +30,7 @@ import app.note.simple.brulinski.sebastian.com.simplenoteapp.R
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.databinding.CreateNoteFragmentBinding
 import com.cocosw.bottomsheet.BottomSheet
 import com.labo.kaji.fragmentanimations.MoveAnimation
+import es.dmoral.toasty.Toasty
 import org.jetbrains.anko.db.insert
 import org.jetbrains.anko.db.select
 import org.jetbrains.anko.sdk25.coroutines.textChangedListener
@@ -40,6 +43,10 @@ open class CreateNoteFragment : Fragment(), SaveNoteInterface {
     lateinit var bindingFrag: CreateNoteFragmentBinding
     private lateinit var database: LocalSQLAnkoDatabase
     private lateinit var undoRedo: UndoRedo
+    private val maxTextLength: Int = 1000
+    @ColorInt
+    private val INFO_COLOR = Color.parseColor("#3F51B5")
+
 
     companion object {
         @SuppressLint("SimpleDateFormat")
@@ -80,6 +87,8 @@ open class CreateNoteFragment : Fragment(), SaveNoteInterface {
         bg.recogniseAndSetColor(fontColor, arrayListOf(titleView, noteView), "FONT") //Change text color
 
         editListener()
+
+        Toasty.Config.getInstance().setInfoColor(INFO_COLOR).apply()
         return bindingFrag.root
     }
 
@@ -95,10 +104,10 @@ open class CreateNoteFragment : Fragment(), SaveNoteInterface {
         super.onActivityCreated(savedInstanceState)
 
         val frag = activity.supportFragmentManager.findFragmentById(activity.findViewById<FrameLayout>(R.id.main_container).id)
-        if (frag is EditNoteFragment && frag.tag.equals(MainActivity.EDIT_NOTE_FRAGMENT_TAG)){
+        if (frag is EditNoteFragment && frag.tag.equals(MainActivity.EDIT_NOTE_FRAGMENT_TAG)) {
             (activity as MainActivity).setTitleAndFab(ContextCompat.getDrawable(context, R.drawable.ic_done_white_24dp),
                     resources.getString(R.string.edit))
-        }else{
+        } else {
             (activity as MainActivity).setTitleAndFab(ContextCompat.getDrawable(context, R.drawable.ic_done_white_24dp),
                     resources.getString(R.string.create))
         }
@@ -353,7 +362,12 @@ open class CreateNoteFragment : Fragment(), SaveNoteInterface {
         }
 
         note.textChangedListener {
-            afterTextChanged { text -> undoRedo.addUndo(text = text.toString()) }
+            afterTextChanged { text ->
+                if (text.toString().length > maxTextLength) {
+                    Toasty.info(activity, "Max note size is 1000 characters", Toast.LENGTH_SHORT, true).show()
+                    bindingFrag.createNoteNoteField.setText(bindingFrag.createNoteNoteField.text.subSequence(0, bindingFrag.createNoteNoteField.text.length - 2))
+                } else undoRedo.addUndo(text = text.toString())
+            }
         }
     }
 
