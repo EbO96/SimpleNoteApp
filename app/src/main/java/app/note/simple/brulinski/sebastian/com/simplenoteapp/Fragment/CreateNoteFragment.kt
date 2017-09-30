@@ -46,6 +46,7 @@ open class CreateNoteFragment : Fragment(), SaveNoteInterface {
     private val maxTextLength: Int = 1000
     @ColorInt
     private val INFO_COLOR = Color.parseColor("#3F51B5")
+    private var infoToastShowedAtStart: Boolean = false
 
 
     companion object {
@@ -89,6 +90,8 @@ open class CreateNoteFragment : Fragment(), SaveNoteInterface {
         editListener()
 
         Toasty.Config.getInstance().setInfoColor(INFO_COLOR).apply()
+
+        infoToastShowedAtStart = true
         return bindingFrag.root
     }
 
@@ -363,12 +366,21 @@ open class CreateNoteFragment : Fragment(), SaveNoteInterface {
 
         note.textChangedListener {
             afterTextChanged { text ->
-                if (text.toString().length > maxTextLength) {
-                    Toasty.info(activity, "Max note size is 1000 characters", Toast.LENGTH_SHORT, true).show()
-                    bindingFrag.createNoteNoteField.setText(bindingFrag.createNoteNoteField.text.subSequence(0, bindingFrag.createNoteNoteField.text.length - 2))
+                if (checkNoteLenghth()) {
+                    if (!infoToastShowedAtStart)
+                        showInfoToast(R.string.max_note_size_toast.toString() + maxTextLength)
+                    infoToastShowedAtStart = false
                 } else undoRedo.addUndo(text = text.toString())
             }
         }
+    }
+
+    private fun checkNoteLenghth(): Boolean {
+        return bindingFrag.createNoteNoteField.text.length == maxTextLength //1000 characters
+    }
+
+    private fun showInfoToast(message: String) { //Show info toast
+        Toasty.info(activity, getString(R.string.max_note_size_toast) + maxTextLength, Toast.LENGTH_SHORT, true).show()
     }
 
     private fun pasteText() {

@@ -49,5 +49,6 @@
     <string name="copied">copied</string>
     <string name="grid">Grid</string>
     <string name="linear">Linear</string>
+    <string name="max_note_size_toast">Max characters of note is </string>
     <!--END-->
 </resources>

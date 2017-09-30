@@ -147,7 +147,7 @@
                         android:gravity="top|start"
                         android:hint="@string/note"
                         android:padding="6dp"
-                        android:maxLength="1001"
+                        android:maxLength="1000"
                         android:textAlignment="gravity"
                         android:textSize="18sp" />
                 </ScrollView>
