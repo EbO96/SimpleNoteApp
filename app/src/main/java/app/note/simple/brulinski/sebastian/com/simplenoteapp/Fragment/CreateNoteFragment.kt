@@ -9,6 +9,7 @@ import android.databinding.DataBindingUtil
 import android.graphics.Color
 import android.graphics.Typeface
 import android.os.Bundle
+import android.os.Handler
 import android.support.annotation.ColorInt
 import android.support.v4.app.Fragment
 import android.support.v4.content.ContextCompat
@@ -47,6 +48,7 @@ open class CreateNoteFragment : Fragment(), SaveNoteInterface {
     @ColorInt
     private val INFO_COLOR = Color.parseColor("#3F51B5")
     private var infoToastShowedAtStart: Boolean = false
+    private val showFabAfterTime = 2000L
 
 
     companion object {
@@ -365,6 +367,7 @@ open class CreateNoteFragment : Fragment(), SaveNoteInterface {
         }
 
         note.textChangedListener {
+
             afterTextChanged { text ->
                 if (checkNoteLenghth()) {
                     if (!infoToastShowedAtStart)
@@ -372,6 +375,14 @@ open class CreateNoteFragment : Fragment(), SaveNoteInterface {
                     infoToastShowedAtStart = false
                 } else undoRedo.addUndo(text = text.toString())
             }
+
+            onTextChanged{p0, p1, p2, p3 ->
+                if(bindingFrag.createNoteNoteField.isFocused){
+                (activity as MainActivity).binding.mainFab.hide()
+                Handler().postDelayed({
+                    (activity as MainActivity).binding.mainFab.show()
+                }, showFabAfterTime)
+            }}
         }
     }
 

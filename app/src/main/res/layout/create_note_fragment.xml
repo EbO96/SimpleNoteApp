@@ -139,17 +139,17 @@
                     android:layout_height="match_parent"
                     android:paddingTop="8dp">
 
-                    <EditText
+                    <com.rengwuxian.materialedittext.MaterialEditText
                         android:id="@+id/create_note_note_field"
                         android:layout_width="match_parent"
-                        android:layout_height="match_parent"
-                        android:background="@android:color/transparent"
+                        android:layout_height="wrap_content"
                         android:gravity="top|start"
                         android:hint="@string/note"
                         android:padding="6dp"
                         android:maxLength="1000"
                         android:textAlignment="gravity"
-                        android:textSize="18sp" />
+                        android:textSize="18sp"
+                        app:met_maxCharacters="1000"/>
                 </ScrollView>
 
             </LinearLayout>

@@ -3,7 +3,9 @@ package app.note.simple.brulinski.sebastian.com.simplenoteapp.Activity
 import android.content.ContentValues
 import android.content.Context
 import android.content.SharedPreferences
+import android.content.res.Configuration
 import android.databinding.DataBindingUtil
+import android.graphics.Rect
 import android.graphics.drawable.Drawable
 import android.os.Bundle
 import android.os.Handler
@@ -14,9 +16,11 @@ import android.support.v4.app.FragmentTransaction
 import android.support.v7.app.AppCompatActivity
 import android.support.v7.widget.RecyclerView
 import android.support.v7.widget.SearchView
+import android.util.Log
 import android.view.Menu
 import android.view.MenuInflater
 import android.view.MenuItem
+import android.view.ViewTreeObserver
 import android.widget.FrameLayout
 import android.widget.Toast
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.Database.LocalSQLAnkoDatabase
@@ -95,7 +99,7 @@ class MainActivity : AppCompatActivity(), NotesListFragment.OnListenRecyclerScro
         At the same time we getting layout manager type from SharedPreferences
          */
         if (savedInstanceState == null)
-           setNotesListFragment()
+            setNotesListFragment()
 
         floatingActionButtonListener() //Listen for floating action button actions and click
 
@@ -211,11 +215,11 @@ class MainActivity : AppCompatActivity(), NotesListFragment.OnListenRecyclerScro
         return true
     }
 
-    fun setTitleAndFab(icon: Drawable?, title: String){
-        try{
+    fun setTitleAndFab(icon: Drawable?, title: String) {
+        try {
             supportActionBar!!.title = title
             findViewById<FloatingActionButton>(R.id.main_fab).setImageDrawable(icon)
-        }catch (e: Exception){
+        } catch (e: Exception) {
             e.printStackTrace()
         }
     }
@@ -373,4 +377,5 @@ class MainActivity : AppCompatActivity(), NotesListFragment.OnListenRecyclerScro
         noteToEdit = noteObject
         setNotePreviewFragment()
     }
+
 }

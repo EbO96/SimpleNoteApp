@@ -1,7 +1,8 @@
 package app.note.simple.brulinski.sebastian.com.simplenoteapp.Activity
 
-import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
+import android.support.v7.app.AppCompatActivity
+import app.note.simple.brulinski.sebastian.com.simplenoteapp.R
 
 class SearchActivity : AppCompatActivity() {
 

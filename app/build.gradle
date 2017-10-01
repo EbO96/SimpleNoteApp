@@ -47,6 +47,7 @@ dependencies {
     compile "org.jetbrains.anko:anko-sdk25-coroutines:0.10.1"
     compile "org.jetbrains.anko:anko-appcompat-v7:0.10.1"
     compile 'com.github.GrenderG:Toasty:1.2.5'
+    compile 'com.rengwuxian.materialedittext:library:2.1.4'
 }
 
 kapt {
