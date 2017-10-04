@@ -70,7 +70,8 @@ class SearchActivity : AppCompatActivity(), SearchView.OnQueryTextListener {
 
         if (query != "" && query != null) {
             for (x in 0 until noteObjectsArray.size) {
-                if (noteObjectsArray[x].title.contains(query) || noteObjectsArray[x].note.contains(query))
+                if (noteObjectsArray[x].title.toLowerCase().contains(query.toLowerCase()) ||
+                        noteObjectsArray[x].note.toLowerCase().contains(query.toLowerCase()))
                     filterArray.add(noteObjectsArray[x])
             }
         }
