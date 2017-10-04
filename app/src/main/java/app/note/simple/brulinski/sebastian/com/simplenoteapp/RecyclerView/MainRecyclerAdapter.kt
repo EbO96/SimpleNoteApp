@@ -80,7 +80,7 @@ class MainRecyclerAdapter(var itemsHolder: ArrayList<ItemsHolder>, var recyclerV
                 }
             }).show()
 
-            this.itemsHolder.removeAt(pos)
+            deletedItem = this.itemsHolder.removeAt(pos)
             notifyItemRemoved(pos)
 
             true

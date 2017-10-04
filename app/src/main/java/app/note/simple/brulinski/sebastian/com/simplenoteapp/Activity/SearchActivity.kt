@@ -40,12 +40,10 @@ class SearchActivity : AppCompatActivity(), SearchView.OnQueryTextListener {
         searchView.queryHint = getString(R.string.search_hint) //Set search hint
 
         searchView.setOnQueryTextListener(this)
-        //searchView.requestFocus()
         searchItem.expandActionView()
 
         return true
     }
-
 
     override fun onQueryTextSubmit(query: String?): Boolean {
         return true

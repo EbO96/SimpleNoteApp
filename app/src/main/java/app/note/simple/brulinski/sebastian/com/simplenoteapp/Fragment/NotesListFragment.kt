@@ -74,7 +74,6 @@ class NotesListFragment : Fragment() {
 
         //Listen for recycler scrolling
         recyclerScrollingListener()
-
         return binding.root
     }
 

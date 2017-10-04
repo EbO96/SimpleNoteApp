@@ -288,7 +288,7 @@ class MainActivity : AppCompatActivity(), NotesListFragment.OnListenRecyclerScro
                 setCreateNoteFragment()
             } else if (frag is CreateNoteFragment && frag.tag.equals(CREATE_NOTE_FRAGMENT_TAG)) {
                 frag.onSaveNote()
-                //supportFragmentManager.popBackStack()
+                supportFragmentManager.popBackStack()
             } else if (frag is EditNoteFragment) { //Update RecyclerView item and return to NoteListFragment
                 for (x in 1..2) {
                     supportFragmentManager.popBackStack()

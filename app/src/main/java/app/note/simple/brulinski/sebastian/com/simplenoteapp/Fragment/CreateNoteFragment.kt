@@ -427,7 +427,6 @@ open class CreateNoteFragment : Fragment(), SaveNoteInterface {
         menu.findItem(R.id.main_menu_linear).isVisible = false
         super.onCreateOptionsMenu(menu, inflater)
     }
-
 }
 
 
