@@ -76,7 +76,6 @@ class NotePreviewFragment : Fragment() {
     override fun onCreateOptionsMenu(menu: Menu?, inflater: MenuInflater?) {
         menu!!.findItem(R.id.main_menu_grid).isVisible = false
         menu.findItem(R.id.main_menu_linear).isVisible = false
-        menu.findItem(R.id.search).isVisible = false
         super.onCreateOptionsMenu(menu, inflater)
     }
 }

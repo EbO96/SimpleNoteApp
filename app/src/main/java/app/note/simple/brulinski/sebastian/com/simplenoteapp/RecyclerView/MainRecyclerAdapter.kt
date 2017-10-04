@@ -19,8 +19,6 @@ import app.note.simple.brulinski.sebastian.com.simplenoteapp.R
 class MainRecyclerAdapter(var itemsHolder: ArrayList<ItemsHolder>, var recyclerView: RecyclerView, var database: LocalSQLAnkoDatabase, var ctx: Context) : RecyclerView.Adapter<MainRecyclerAdapter.ViewHolder>() {
 
     var deletedItem: ItemsHolder? = null
-    var position = 0
-    var filterListSize = 0
     var undoClicked = false
 
     override fun onBindViewHolder(holder: ViewHolder?, position: Int) {
@@ -61,10 +59,6 @@ class MainRecyclerAdapter(var itemsHolder: ArrayList<ItemsHolder>, var recyclerV
                 undoClicked = true
                 this.itemsHolder.add(pos, deletedItem!!)
 
-                //Execute this if statement only when deleting item is call from search mode
-                if (filterListSize != 0)
-                    NotesListFragment.itemsObjectsArray.add(this.position, deletedItem!!)
-
                 notifyItemInserted(pos)
 
                 recyclerView.scrollToPosition(pos)
@@ -86,14 +80,7 @@ class MainRecyclerAdapter(var itemsHolder: ArrayList<ItemsHolder>, var recyclerV
                 }
             }).show()
 
-
-            deletedItem = this.itemsHolder[pos]
-            this.position = pos
             this.itemsHolder.removeAt(pos)
-            this.position = NotesListFragment.itemsObjectsArray.indexOf(deletedItem!!)
-            //Execute this if statement only when deleting item is call from search mode
-            if (filterListSize != 0)
-                NotesListFragment.itemsObjectsArray.removeAt(this.position)
             notifyItemRemoved(pos)
 
             true
@@ -105,7 +92,6 @@ class MainRecyclerAdapter(var itemsHolder: ArrayList<ItemsHolder>, var recyclerV
         return ViewHolder(view)
     }
 
-
     override fun getItemCount(): Int {
         return itemsHolder.size
     }
@@ -115,13 +101,4 @@ class MainRecyclerAdapter(var itemsHolder: ArrayList<ItemsHolder>, var recyclerV
         val note = itemView.findViewById<TextView>(R.id.noteTextView)
         val card = itemView.findViewById<CardView>(R.id.item_card_parent_card)
     }
-
-    fun setFilter(newItemList: ArrayList<ItemsHolder>) {
-        filterListSize = newItemList.size
-        itemsHolder = ArrayList()
-        itemsHolder.addAll(newItemList)
-        notifyDataSetChanged()
-    }
-
-
 }

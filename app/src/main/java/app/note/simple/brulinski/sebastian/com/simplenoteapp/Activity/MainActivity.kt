@@ -2,10 +2,9 @@ package app.note.simple.brulinski.sebastian.com.simplenoteapp.Activity
 
 import android.content.ContentValues
 import android.content.Context
+import android.content.Intent
 import android.content.SharedPreferences
-import android.content.res.Configuration
 import android.databinding.DataBindingUtil
-import android.graphics.Rect
 import android.graphics.drawable.Drawable
 import android.os.Bundle
 import android.os.Handler
@@ -15,12 +14,9 @@ import android.support.v4.app.FragmentManager
 import android.support.v4.app.FragmentTransaction
 import android.support.v7.app.AppCompatActivity
 import android.support.v7.widget.RecyclerView
-import android.support.v7.widget.SearchView
-import android.util.Log
 import android.view.Menu
 import android.view.MenuInflater
 import android.view.MenuItem
-import android.view.ViewTreeObserver
 import android.widget.FrameLayout
 import android.widget.Toast
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.Database.LocalSQLAnkoDatabase
@@ -38,7 +34,7 @@ import app.note.simple.brulinski.sebastian.com.simplenoteapp.databinding.Activit
 
 
 @Suppress("DEPRECATION")
-class MainActivity : AppCompatActivity(), NotesListFragment.OnListenRecyclerScroll, SearchView.OnQueryTextListener,
+class MainActivity : AppCompatActivity(), NotesListFragment.OnListenRecyclerScroll,
         EditNoteFragment.OnEditDestroy, RecyclerMainInterface {
 
 
@@ -181,12 +177,7 @@ class MainActivity : AppCompatActivity(), NotesListFragment.OnListenRecyclerScro
 
         menuItemGrid = menu!!.findItem(R.id.main_menu_grid)
         menuItemLinear = menu.findItem(R.id.main_menu_linear)
-        menuItemSearch = menu.findItem(R.id.search)
-
-        val searchView: SearchView = (menu.findItem(R.id.search).actionView as SearchView)
-        searchView.queryHint = getString(R.string.search_hint) //Set search hint
-
-        searchView.setOnQueryTextListener(this)
+        menuItemSearch = menu.findItem(R.id.search_main)
 
         val frag = supportFragmentManager.findFragmentById(findViewById<FrameLayout>(R.id.main_container).id)
 
@@ -224,16 +215,6 @@ class MainActivity : AppCompatActivity(), NotesListFragment.OnListenRecyclerScro
         }
     }
 
-
-    override fun onQueryTextSubmit(query: String?): Boolean {
-        return true
-    }
-
-    override fun onQueryTextChange(newText: String?): Boolean {
-        if (supportFragmentManager.findFragmentById(binding.mainContainer.id) is NotesListFragment)
-            mSearchCallback.passNewText(newText)
-        return true
-    }
     /*
     Select menu item at Toolbar and execute action
      */
@@ -247,6 +228,11 @@ class MainActivity : AppCompatActivity(), NotesListFragment.OnListenRecyclerScro
             R.id.main_menu_linear -> {
                 saveLayoutManagerStyle(true) //Save layout manager style to SharedPreference file
                 mLayoutListener.passData(true)
+            }
+            R.id.search_main -> {
+                val intent = Intent(this, SearchActivity::class.java)
+                intent.putParcelableArrayListExtra("notesArray", NotesListFragment.itemsObjectsArray)
+                startActivity(intent)
             }
         }
         return super.onOptionsItemSelected(item)
@@ -302,7 +288,7 @@ class MainActivity : AppCompatActivity(), NotesListFragment.OnListenRecyclerScro
                 setCreateNoteFragment()
             } else if (frag is CreateNoteFragment && frag.tag.equals(CREATE_NOTE_FRAGMENT_TAG)) {
                 frag.onSaveNote()
-                supportFragmentManager.popBackStack()
+                //supportFragmentManager.popBackStack()
             } else if (frag is EditNoteFragment) { //Update RecyclerView item and return to NoteListFragment
                 for (x in 1..2) {
                     supportFragmentManager.popBackStack()

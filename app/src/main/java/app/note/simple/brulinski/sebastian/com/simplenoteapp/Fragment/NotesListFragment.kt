@@ -62,9 +62,6 @@ class NotesListFragment : Fragment() {
 
         sortNotes() //Sort notes by date and time
 
-        //Deleted items listener
-        //listenDeletedItems()
-
         //Change layout manager
         (activity as MainActivity).setOnChangeLayoutListener(object : MainActivity.OnChangeLayoutListener {
             override fun passData(flag: Boolean) {
@@ -77,9 +74,6 @@ class NotesListFragment : Fragment() {
 
         //Listen for recycler scrolling
         recyclerScrollingListener()
-
-        //Listen for search
-        updateListBySearch()
 
         return binding.root
     }
@@ -185,24 +179,6 @@ class NotesListFragment : Fragment() {
 
             override fun onScrollStateChanged(recyclerView: RecyclerView?, newState: Int) {
                 mScrollCallback.recyclerScrolling(null, null, newState)
-            }
-        })
-    }
-
-    private fun updateListBySearch() {
-        (activity as MainActivity).setOnSearchResultListener(object : MainActivity.OnSearchResultListener {
-            override fun passNewText(newText: String?) {
-                val newList: ArrayList<ItemsHolder> = ArrayList()
-
-                for (itemsHolder: ItemsHolder in itemsObjectsArray) {
-                    val title = itemsHolder.title.toLowerCase()
-                    val note = itemsHolder.note.toLowerCase()
-
-                    if (title.contains(newText!!.toLowerCase()) || note.contains(newText.toLowerCase())) {
-                        newList.add(itemsHolder)
-                    }
-                }
-                myRecycler.setFilter(newList)
             }
         })
     }
