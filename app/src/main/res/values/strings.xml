@@ -51,5 +51,6 @@
     <string name="linear">Linear</string>
     <string name="max_note_size_toast">Max characters of note is </string>
     <string name="search_for_notes">Search for notes</string>
+    <string name="archives">Archives</string>
     <!--END-->
 </resources>
