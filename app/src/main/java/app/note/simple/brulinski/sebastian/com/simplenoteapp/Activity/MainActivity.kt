@@ -243,6 +243,11 @@ class MainActivity : AppCompatActivity(), NotesListFragment.OnListenRecyclerScro
                 startActivity(intent)
                 this.finish()
             }
+            R.id.archives -> {
+                val intent = Intent(this, ArchivesActivity::class.java)
+                startActivity(intent)
+                this.finish()
+            }
         }
         return super.onOptionsItemSelected(item)
     }
