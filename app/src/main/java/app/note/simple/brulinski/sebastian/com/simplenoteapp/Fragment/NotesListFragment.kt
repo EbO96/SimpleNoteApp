@@ -114,7 +114,7 @@ class NotesListFragment : Fragment() {
 
             for (x in 0..size) {
                 notesPropertiesArray.add(NotesProperties(properties[x].get(x).id, properties[x].get(x).bgColor,
-                        properties[x].get(x).textColor, properties[x].get(x).fontColor))
+                        properties[x].get(x).textColor, properties[x].get(x).fontStyle))
             }
         }
 
@@ -125,7 +125,7 @@ class NotesListFragment : Fragment() {
             for (x in 0 until size) {
                 itemsObjectsArray.add(ItemsHolder(notes[x].get(x).id!!, notes[x].get(x).title!!, notes[x].get(x).note!!,
                         notes[x][x].date!!, notesPropertiesArray[x].bgColor!!, notesPropertiesArray[x].textColor!!,
-                        notesPropertiesArray.get(x).fontColor!!))
+                        notesPropertiesArray.get(x).fontStyle!!))
             }
         }
     }
