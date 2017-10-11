@@ -1,5 +1,6 @@
 package app.note.simple.brulinski.sebastian.com.simplenoteapp.RecyclerView
 
+import android.content.ContentValues
 import android.content.Context
 import android.support.design.widget.Snackbar
 import android.support.v7.widget.CardView
@@ -10,6 +11,7 @@ import android.view.ViewGroup
 import android.widget.TextView
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.Activity.MainActivity
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.Database.LocalSQLAnkoDatabase
+import app.note.simple.brulinski.sebastian.com.simplenoteapp.Database.database
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.Editor.EditorManager
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.Model.ItemsHolder
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.R
@@ -18,7 +20,6 @@ import app.note.simple.brulinski.sebastian.com.simplenoteapp.R
 class MainRecyclerAdapter(var itemsHolder: ArrayList<ItemsHolder>, var recyclerView: RecyclerView, var database: LocalSQLAnkoDatabase, var ctx: Context) : RecyclerView.Adapter<MainRecyclerAdapter.ViewHolder>() {
 
     var deletedItem: ItemsHolder? = null
-    var undoClicked = false
 
     override fun onBindViewHolder(holder: ViewHolder?, position: Int) {
         val itemsHolder: ItemsHolder = itemsHolder[position]
@@ -51,38 +52,36 @@ class MainRecyclerAdapter(var itemsHolder: ArrayList<ItemsHolder>, var recyclerV
         holder.itemView?.setOnLongClickListener {
             pos = recyclerView.getChildAdapterPosition(holder.itemView)
 
-            val itemId: String = this.itemsHolder.get(pos).id
-
             @Suppress("DEPRECATION")
             Snackbar.make((ctx as MainActivity).binding.root, ctx.getString(R.string.note_deleted), Snackbar.LENGTH_LONG).setAction(ctx.getString(R.string.undo), {
-                undoClicked = true
                 this.itemsHolder.add(pos, deletedItem!!)
-
                 notifyItemInserted(pos)
-
                 recyclerView.scrollToPosition(pos)
 
-            }).setCallback(object : Snackbar.Callback() {
-                override fun onDismissed(transientBottomBar: Snackbar?, event: Int) {
-                    notifyDataSetChanged()
-                    if (!undoClicked) {
-                        database.use {
-                            delete(
-                                    LocalSQLAnkoDatabase.TABLE_NOTES, "${LocalSQLAnkoDatabase.ID}=?", arrayOf(itemId)
-                            )
-                        }
-                        database.use {
-                            delete(LocalSQLAnkoDatabase.TABLE_NOTES_PROPERTIES, "${LocalSQLAnkoDatabase.NOTE_ID}=?", arrayOf(itemId))
-                        }
-                    }
-                    undoClicked = false
-                }
+                addDeleteFlag(deletedItem!!.id, false)
+
             }).show()
 
             deletedItem = this.itemsHolder.removeAt(pos)
             notifyItemRemoved(pos)
 
+            addDeleteFlag(deletedItem!!.id, true)
             true
+        }
+    }
+
+    private fun addDeleteFlag(itemId: String, flag: Boolean) {
+        val isDeletedValue = ContentValues()
+        isDeletedValue.put(LocalSQLAnkoDatabase.IS_DELETED, flag.toString())
+
+        ctx.database.use {
+            //Delete from database
+            update(
+                    LocalSQLAnkoDatabase.TABLE_NOTES, isDeletedValue, "${LocalSQLAnkoDatabase.ID}=?", arrayOf(itemId)
+            )
+            update(
+                    LocalSQLAnkoDatabase.TABLE_NOTES_PROPERTIES, isDeletedValue, "${LocalSQLAnkoDatabase.ID}=?", arrayOf(itemId)
+            )
         }
     }
 

@@ -129,11 +129,12 @@ open class CreateNoteFragment : Fragment(), SaveNoteInterface {
             val titleCol = Pair<String, String>(LocalSQLAnkoDatabase.TITLE, bindingFrag.createNoteTitleField.text.toString().trim())
             val noteCol = Pair<String, String>(LocalSQLAnkoDatabase.NOTE, bindingFrag.createNoteNoteField.text.toString().trim())
             val dateCol = Pair<String, String>(LocalSQLAnkoDatabase.DATE, getCurrentDateAndTime())
+            val isDeletedCol = Pair<String, String>(LocalSQLAnkoDatabase.IS_DELETED, false.toString())
             var idList: List<List<Notes.Note>>? = null
             var size = 0
 
             database.use {
-                insert(LocalSQLAnkoDatabase.TABLE_NOTES, titleCol, noteCol, dateCol)
+                insert(LocalSQLAnkoDatabase.TABLE_NOTES, titleCol, noteCol, dateCol, isDeletedCol)
             }
 
             database.use {
@@ -148,7 +149,7 @@ open class CreateNoteFragment : Fragment(), SaveNoteInterface {
             val fontStyleCol = Pair<String, String>(LocalSQLAnkoDatabase.FONT_STYLE, noteObject!!.fontStyle)
 
             database.use {
-                insert(LocalSQLAnkoDatabase.TABLE_NOTES_PROPERTIES, noteIdCol, bgColorCol, textColorCol, fontStyleCol)
+                insert(LocalSQLAnkoDatabase.TABLE_NOTES_PROPERTIES, noteIdCol, bgColorCol, textColorCol, fontStyleCol, isDeletedCol)
             }
         } catch (e: Exception) {
             e.printStackTrace()
@@ -376,13 +377,14 @@ open class CreateNoteFragment : Fragment(), SaveNoteInterface {
                 } else undoRedo.addUndo(text = text.toString())
             }
 
-            onTextChanged{p0, p1, p2, p3 ->
-                if(bindingFrag.createNoteNoteField.isFocused){
-                (activity as MainActivity).binding.mainFab.hide()
-                Handler().postDelayed({
-                    (activity as MainActivity).binding.mainFab.show()
-                }, showFabAfterTime)
-            }}
+            onTextChanged { p0, p1, p2, p3 ->
+                if (bindingFrag.createNoteNoteField.isFocused) {
+                    (activity as MainActivity).binding.mainFab.hide()
+                    Handler().postDelayed({
+                        (activity as MainActivity).binding.mainFab.show()
+                    }, showFabAfterTime)
+                }
+            }
         }
     }
 

@@ -19,6 +19,7 @@ class LocalSQLAnkoDatabase(ctx: Context) : ManagedSQLiteOpenHelper(ctx, "user_no
         val TITLE = "title"
         val NOTE = "note"
         val DATE = "date"
+        val IS_DELETED = "is_deleted"
 
         /*
         Column names note_properties table
@@ -40,9 +41,9 @@ class LocalSQLAnkoDatabase(ctx: Context) : ManagedSQLiteOpenHelper(ctx, "user_no
 
     override fun onCreate(p0: SQLiteDatabase) {
         p0.createTable(TABLE_NOTES, true, ID to INTEGER + PRIMARY_KEY, TITLE to TEXT, NOTE to TEXT,
-                DATE to TEXT)
+                DATE to TEXT, IS_DELETED to TEXT)
         p0.createTable(TABLE_NOTES_PROPERTIES, true, ID to INTEGER + PRIMARY_KEY, NOTE_ID to TEXT,
-                BG_COLOR to TEXT, TEXT_COLOR to TEXT, FONT_STYLE to TEXT)
+                BG_COLOR to TEXT, TEXT_COLOR to TEXT, FONT_STYLE to TEXT, IS_DELETED to TEXT)
     }
 
     override fun onUpgrade(p0: SQLiteDatabase, p1: Int, p2: Int) {

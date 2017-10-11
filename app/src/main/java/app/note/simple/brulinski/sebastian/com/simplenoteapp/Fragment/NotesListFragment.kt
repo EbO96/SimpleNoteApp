@@ -109,27 +109,25 @@ class NotesListFragment : Fragment() {
         val notesPropertiesArray: ArrayList<NotesProperties> = ArrayList()
 
         database.use {
-            val properties = select(LocalSQLAnkoDatabase.TABLE_NOTES_PROPERTIES).parseList(MyRowParserNoteProperties())
+            val properties = select(LocalSQLAnkoDatabase.TABLE_NOTES_PROPERTIES).whereSimple("${LocalSQLAnkoDatabase.IS_DELETED}=?", "false").parseList(MyRowParserNoteProperties())
             val size = properties.size - 1
 
             for (x in 0..size) {
-                notesPropertiesArray.add(NotesProperties(properties.get(x).get(x).id, properties.get(x).get(x).bgColor,
-                        properties.get(x).get(x).textColor, properties.get(x).get(x).fontColor))
+                notesPropertiesArray.add(NotesProperties(properties[x].get(x).id, properties[x].get(x).bgColor,
+                        properties[x].get(x).textColor, properties[x].get(x).fontColor))
             }
         }
 
         database.use {
-            val notes = select(LocalSQLAnkoDatabase.TABLE_NOTES).parseList(MyRowParserNotes())
+            val notes = select(LocalSQLAnkoDatabase.TABLE_NOTES).whereSimple("${LocalSQLAnkoDatabase.IS_DELETED}=?", "false").parseList(MyRowParserNotes())
             val size = notes.size
 
             for (x in 0 until size) {
-                itemsObjectsArray.add(ItemsHolder(notes.get(x).get(x).id!!, notes.get(x).get(x).title!!, notes.get(x).get(x).note!!,
-                        notes.get(x).get(x).date!!, notesPropertiesArray.get(x).bgColor!!, notesPropertiesArray.get(x).textColor!!,
+                itemsObjectsArray.add(ItemsHolder(notes[x].get(x).id!!, notes[x].get(x).title!!, notes[x].get(x).note!!,
+                        notes[x][x].date!!, notesPropertiesArray[x].bgColor!!, notesPropertiesArray[x].textColor!!,
                         notesPropertiesArray.get(x).fontColor!!))
             }
         }
-
-
     }
 
     private fun sortNotes() {
