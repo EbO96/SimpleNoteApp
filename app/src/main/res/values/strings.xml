@@ -53,5 +53,8 @@
     <string name="archives">Archives</string>
     <string name="note_title">Note title</string>
     <string name="note">Note</string>
+    <string name="delete_this_note">Delete this note?</string>
+    <string name="yes">Yes</string>
+    <string name="no">No</string>
     <!--END-->
 </resources>
