@@ -57,5 +57,6 @@
     <string name="yes">Yes</string>
     <string name="no">No</string>
     <string name="restore_this_note">Restore this note?</string>
+    <string name="empty">Empty</string>
     <!--END-->
 </resources>

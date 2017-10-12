@@ -7,11 +7,9 @@
         android:layout_height="match_parent"
         tools:context="app.note.simple.brulinski.sebastian.com.simplenoteapp.Activity.ArchivesActivity">
 
-        <FrameLayout
-            android:id="@+id/archived_notes_fragment_container"
+        <android.support.v7.widget.RecyclerView
+            android:id="@+id/archivesRecycler"
             android:layout_width="match_parent"
             android:layout_height="match_parent" />
-
     </LinearLayout>
 </layout>
-

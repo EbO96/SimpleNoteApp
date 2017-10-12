@@ -4,45 +4,62 @@ import android.content.Intent
 import android.databinding.DataBindingUtil
 import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
-import android.support.v7.widget.LinearLayoutManager
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.Database.LocalSQLAnkoDatabase
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.Database.database
+import app.note.simple.brulinski.sebastian.com.simplenoteapp.Fragment.ArchivedNotesFragment
+import app.note.simple.brulinski.sebastian.com.simplenoteapp.Fragment.NoArchivedNotesFragment
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.HelperClass.MyRowParserNoteProperties
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.HelperClass.MyRowParserNotes
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.Model.ItemsHolder
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.Model.NotesProperties
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.R
-import app.note.simple.brulinski.sebastian.com.simplenoteapp.RecyclerView.ArchivesRecycler
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.databinding.ActivityArchivesBinding
-import jp.wasabeef.recyclerview.animators.SlideInRightAnimator
 import org.jetbrains.anko.db.select
 
 class ArchivesActivity : AppCompatActivity() {
 
-    private lateinit var myRecycler: ArchivesRecycler
+    private var archivedNotesArrayList = ArrayList<ItemsHolder>()
     private lateinit var binding: ActivityArchivesBinding
-    private lateinit var archivedNotesArrayList: ArrayList<ItemsHolder>
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = DataBindingUtil.setContentView(this, R.layout.activity_archives)
 
-        getArchivedNotes()
-        initRecycler()
+        val notes = getArchivedNotes()
+        val args = Bundle()
+        args.putParcelableArrayList("archivedNoteObject", notes)
+
+        if (notes.size == 0) {
+            setNoArchivedNotesFragment()
+        } else {
+            setArchivedNotesFragment(args)
+        }
     }
 
-    private fun initRecycler() {
-        val recycler = binding.archivesRecycler
-        recycler.itemAnimator = SlideInRightAnimator()
-        recycler.layoutManager = LinearLayoutManager(this)
+    private fun setNoArchivedNotesFragment() {
+        val fragmentManager = supportFragmentManager
+        val fragmentTransaction = fragmentManager.beginTransaction()
 
-        myRecycler = ArchivesRecycler(archivedNotesArrayList, recycler, this)
+        val fragment = NoArchivedNotesFragment()
 
-        recycler.adapter = myRecycler
+        fragmentTransaction.replace(binding.archivedNotesFragmentContainer.id, fragment).commit()
+        fragmentManager.executePendingTransactions()
     }
 
-    private fun getArchivedNotes() {
+    private fun setArchivedNotesFragment(notesBundle: Bundle) {
+        val fragmentManager = supportFragmentManager
+        val fragmentTransaction = fragmentManager.beginTransaction()
+
+        val fragment = ArchivedNotesFragment()
+        fragment.arguments = notesBundle
+
+        fragmentTransaction.replace(binding.archivedNotesFragmentContainer.id, fragment).commit()
+        fragmentManager.executePendingTransactions()
+    }
+
+    private fun getArchivedNotes(): ArrayList<ItemsHolder> {
         archivedNotesArrayList = ArrayList()
+
         val propertiesArray = ArrayList<NotesProperties>()
 
         database.use {
@@ -56,6 +73,7 @@ class ArchivesActivity : AppCompatActivity() {
                 propertiesArray.add(NotesProperties(item.id, item.bgColor, item.textColor, item.fontStyle))
             }
         }
+
         database.use {
             val notes = select(LocalSQLAnkoDatabase.TABLE_NOTES).whereSimple("${LocalSQLAnkoDatabase.IS_DELETED}=?", "true").
                     parseList(MyRowParserNotes())
@@ -68,6 +86,7 @@ class ArchivesActivity : AppCompatActivity() {
                 archivedNotesArrayList.add(noteObject)
             }
         }
+        return archivedNotesArrayList
     }
 
     override fun onBackPressed() {
