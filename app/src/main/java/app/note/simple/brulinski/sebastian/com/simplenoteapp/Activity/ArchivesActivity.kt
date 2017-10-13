@@ -4,6 +4,7 @@ import android.content.Intent
 import android.databinding.DataBindingUtil
 import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
+import android.util.Log
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.Database.LocalSQLAnkoDatabase
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.Database.database
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.Fragment.ArchivedNotesFragment
@@ -36,6 +37,14 @@ class ArchivesActivity : AppCompatActivity() {
         }
     }
 
+    private fun listenForReplaceFragmentEvent(fragment: ArchivedNotesFragment) {
+        fragment.setOnChangeScreenListener(object : ArchivedNotesFragment.OnChangeScreenListener {
+            override fun replaceFragment() {
+                setNoArchivedNotesFragment()
+            }
+        })
+    }
+
     private fun setNoArchivedNotesFragment() {
         val fragmentManager = supportFragmentManager
         val fragmentTransaction = fragmentManager.beginTransaction()
@@ -55,6 +64,8 @@ class ArchivesActivity : AppCompatActivity() {
 
         fragmentTransaction.replace(binding.archivedNotesFragmentContainer.id, fragment).commit()
         fragmentManager.executePendingTransactions()
+
+        listenForReplaceFragmentEvent(fragment)
     }
 
     private fun getArchivedNotes(): ArrayList<ItemsHolder> {

@@ -4,6 +4,7 @@ import android.databinding.DataBindingUtil
 import android.os.Bundle
 import android.support.v4.app.Fragment
 import android.support.v7.widget.LinearLayoutManager
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -14,6 +15,16 @@ import app.note.simple.brulinski.sebastian.com.simplenoteapp.databinding.Archive
 import jp.wasabeef.recyclerview.animators.SlideInRightAnimator
 
 class ArchivedNotesFragment : Fragment() {
+
+    lateinit var mChangeScreenCallback: OnChangeScreenListener
+
+    interface OnChangeScreenListener{
+        fun replaceFragment()
+    }
+
+    fun setOnChangeScreenListener(mChangeScreenCallback: OnChangeScreenListener){
+        this.mChangeScreenCallback = mChangeScreenCallback
+    }
 
     private lateinit var binding: ArchivedNotesFragmentBinding
     private lateinit var myRecycler: ArchivesRecycler
@@ -28,6 +39,7 @@ class ArchivedNotesFragment : Fragment() {
         super.onActivityCreated(savedInstanceState)
 
         initRecycler(arguments.getParcelableArrayList<ItemsHolder>("archivedNoteObject"))
+        listenRecyclerSize()
     }
 
     private fun initRecycler(itemsHolderArrayList: ArrayList<ItemsHolder>) {
@@ -40,4 +52,13 @@ class ArchivedNotesFragment : Fragment() {
         recycler.adapter = myRecycler
     }
 
+    private fun listenRecyclerSize() {
+        myRecycler.setOnRecyclerSizeListener(object : ArchivesRecycler.OnRecyclerSizeListener {
+            override fun recyclerSize(size: Int) {
+                if(size == 0)
+                    mChangeScreenCallback.replaceFragment()
+
+            }
+        })
+    }
 }

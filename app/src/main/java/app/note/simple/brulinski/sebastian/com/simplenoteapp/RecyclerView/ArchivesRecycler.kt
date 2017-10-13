@@ -18,6 +18,17 @@ import app.note.simple.brulinski.sebastian.com.simplenoteapp.Model.ItemsHolder
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.R
 
 class ArchivesRecycler(private val notesArrayList: ArrayList<ItemsHolder>, private val recycler: RecyclerView, private val ctx: Context) : RecyclerView.Adapter<ArchivesRecycler.MyViewHolder>() {
+
+    lateinit var mSizeCallback: OnRecyclerSizeListener
+
+    interface OnRecyclerSizeListener {
+        fun recyclerSize(size: Int)
+    }
+
+    fun setOnRecyclerSizeListener(mSizeCallback: OnRecyclerSizeListener) {
+        this.mSizeCallback = mSizeCallback
+    }
+
     override fun onBindViewHolder(holder: MyViewHolder?, position: Int) {
         val noteObject = notesArrayList[position]
 
@@ -52,6 +63,8 @@ class ArchivesRecycler(private val notesArrayList: ArrayList<ItemsHolder>, priva
 
                 notesArrayList.removeAt(itemPosition)
                 notifyItemRemoved(itemPosition)
+
+                mSizeCallback.recyclerSize(notesArrayList.size)
             })
 
             alert.setButton(AlertDialog.BUTTON_NEGATIVE, ctx.getString(R.string.no), { _, i ->
@@ -79,6 +92,8 @@ class ArchivesRecycler(private val notesArrayList: ArrayList<ItemsHolder>, priva
                 }
                 notesArrayList.removeAt(itemPosition)
                 notifyItemRemoved(itemPosition)
+
+                mSizeCallback.recyclerSize(notesArrayList.size)
             })
 
             alert.setButton(AlertDialog.BUTTON_NEGATIVE, ctx.getString(R.string.no), { _, i ->
@@ -90,7 +105,8 @@ class ArchivesRecycler(private val notesArrayList: ArrayList<ItemsHolder>, priva
     }
 
     override fun getItemCount(): Int {
-        return notesArrayList.size
+        val size = notesArrayList.size
+        return size
     }
 
     override fun onCreateViewHolder(parent: ViewGroup?, viewType: Int): MyViewHolder {
