@@ -34,6 +34,7 @@ dependencies {
     implementation 'com.android.support:design:26.1.0'
     implementation 'com.android.support.constraint:constraint-layout:1.0.2'
     implementation 'com.google.firebase:firebase-crash:11.0.4'
+    implementation 'com.google.firebase:firebase-core:11.0.4'
     kapt "com.android.databinding:compiler:3.0.0-beta6"
     testImplementation 'junit:junit:4.12'
     androidTestImplementation 'com.android.support.test:runner:1.0.1'
@@ -60,6 +61,7 @@ kotlin {
         coroutines "enable"
     }
 }
+
 
 
 apply plugin: 'com.google.gms.google-services'
