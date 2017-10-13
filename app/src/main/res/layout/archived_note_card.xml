@@ -37,30 +37,40 @@
             android:layout_marginTop="15dp"
             android:hint="@string/note" />
 
-        <LinearLayout
+        <android.support.v7.widget.CardView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:gravity="end"
-            android:orientation="horizontal">
+            android:layout_margin="6dp"
+            app:cardCornerRadius="10dp"
+            app:cardElevation="2dp">
 
-            <ImageButton
-                android:id="@+id/deleteArchivedNoteImageButtonArch"
-                android:layout_width="wrap_content"
+            <LinearLayout
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_margin="3dp"
-                android:background="@null"
-                android:padding="10dp"
-                android:src="@drawable/ic_delete_black_24dp" />
+                android:gravity="end"
+                android:orientation="horizontal">
 
-            <ImageButton
-                android:id="@+id/restoreArchivedNoteImageButtonArch"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_margin="3dp"
-                android:background="@null"
-                android:src="@drawable/ic_restore_black_24dp"
-                android:padding="10dp" />
-        </LinearLayout>
+                <ImageButton
+                    android:id="@+id/deleteArchivedNoteImageButtonArch"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_margin="3dp"
+                    android:background="@null"
+                    android:padding="10dp"
+                    android:src="@drawable/ic_delete_black_24dp" />
+
+                <ImageButton
+                    android:id="@+id/restoreArchivedNoteImageButtonArch"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_margin="3dp"
+                    android:background="@null"
+                    android:src="@drawable/ic_restore_black_24dp"
+                    android:padding="10dp" />
+            </LinearLayout>
+        </android.support.v7.widget.CardView>
+
+
 
     </LinearLayout>
 
