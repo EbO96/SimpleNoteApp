@@ -322,7 +322,7 @@ class MainActivity : AppCompatActivity(), NotesListFragment.OnListenRecyclerScro
             } else if (frag is CreateNoteFragment && frag.tag.equals(CREATE_NOTE_FRAGMENT_TAG)) {
                 try {
                     frag.onSaveNote()
-//                    supportFragmentManager.popBackStack()
+                    supportFragmentManager.popBackStack()
                 } catch (e: Exception) {
                     e.printStackTrace()
                 }

@@ -1,7 +1,6 @@
 package app.note.simple.brulinski.sebastian.com.simplenoteapp.Fragment
 
 import android.annotation.SuppressLint
-import android.app.Service
 import android.content.ClipData
 import android.content.ClipboardManager
 import android.content.Context
@@ -16,7 +15,6 @@ import android.support.v4.content.ContextCompat
 import android.text.TextUtils
 import android.view.*
 import android.view.animation.Animation
-import android.view.inputmethod.InputMethodManager
 import android.widget.FrameLayout
 import android.widget.Toast
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.Activity.MainActivity
@@ -153,7 +151,6 @@ open class CreateNoteFragment : Fragment(), SaveNoteInterface {
 
             database.use {
                 insert(LocalSQLAnkoDatabase.TABLE_NOTES_PROPERTIES, noteIdCol, bgColorCol, textColorCol, fontStyleCol, isDeletedCol)
-                (context as MainActivity).supportFragmentManager.popBackStack()
             }
         } catch (e: Exception) {
             e.printStackTrace()
