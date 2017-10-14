@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <android.support.v7.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:layout_width="match_parent"
     android:id="@+id/archives_card"
+    android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:layout_margin="6dp"
     android:maxHeight="130dp"
@@ -17,35 +17,16 @@
         android:layout_height="wrap_content"
         android:orientation="vertical">
 
-        <TextView
-            android:id="@+id/titleTextViewArch"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginLeft="15dp"
-            android:layout_marginRight="15dp"
-            android:layout_marginTop="20dp"
-            android:hint="@string/note_title"
-            android:textSize="22sp"
-            android:textStyle="bold" />
-
-        <TextView
-            android:id="@+id/noteTextViewArch"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginLeft="15dp"
-            android:layout_marginRight="15dp"
-            android:layout_marginTop="15dp"
-            android:hint="@string/note" />
-
         <android.support.v7.widget.CardView
-            android:layout_width="match_parent"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_gravity="end"
             android:layout_margin="6dp"
             app:cardCornerRadius="10dp"
-            app:cardElevation="2dp">
+            app:cardElevation="0dp">
 
             <LinearLayout
-                android:layout_width="match_parent"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:gravity="end"
                 android:orientation="horizontal">
@@ -65,12 +46,31 @@
                     android:layout_height="wrap_content"
                     android:layout_margin="3dp"
                     android:background="@null"
-                    android:src="@drawable/ic_restore_black_24dp"
-                    android:padding="10dp" />
+                    android:padding="10dp"
+                    android:src="@drawable/ic_restore_black_24dp" />
             </LinearLayout>
         </android.support.v7.widget.CardView>
 
+        <TextView
+            android:id="@+id/titleTextViewArch"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="15dp"
+            android:layout_marginRight="15dp"
+            android:layout_marginTop="5dp"
+            android:hint="@string/note_title"
+            android:textSize="22sp"
+            android:textStyle="bold" />
 
+        <TextView
+            android:id="@+id/noteTextViewArch"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="15dp"
+            android:layout_marginRight="15dp"
+            android:layout_marginTop="15dp"
+            android:hint="@string/note"
+            android:paddingBottom="8dp" />
 
     </LinearLayout>
 

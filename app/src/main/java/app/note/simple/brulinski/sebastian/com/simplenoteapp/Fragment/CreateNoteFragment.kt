@@ -153,6 +153,7 @@ open class CreateNoteFragment : Fragment(), SaveNoteInterface {
 
             database.use {
                 insert(LocalSQLAnkoDatabase.TABLE_NOTES_PROPERTIES, noteIdCol, bgColorCol, textColorCol, fontStyleCol, isDeletedCol)
+                (context as MainActivity).supportFragmentManager.popBackStack()
             }
         } catch (e: Exception) {
             e.printStackTrace()

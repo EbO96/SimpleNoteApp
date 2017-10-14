@@ -17,7 +17,7 @@ import app.note.simple.brulinski.sebastian.com.simplenoteapp.Model.ItemsHolder
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.R
 
 
-class MainRecyclerAdapter(var itemsHolder: ArrayList<ItemsHolder>, var recyclerView: RecyclerView, var database: LocalSQLAnkoDatabase, var ctx: Context) : RecyclerView.Adapter<MainRecyclerAdapter.ViewHolder>() {
+class MainRecyclerAdapter(var itemsHolder: ArrayList<ItemsHolder>, var recyclerView: RecyclerView, var ctx: Context) : RecyclerView.Adapter<MainRecyclerAdapter.ViewHolder>() {
 
     var deletedItem: ItemsHolder? = null
 

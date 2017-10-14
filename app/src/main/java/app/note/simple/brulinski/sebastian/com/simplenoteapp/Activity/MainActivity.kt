@@ -312,8 +312,12 @@ class MainActivity : AppCompatActivity(), NotesListFragment.OnListenRecyclerScro
             if (frag is NotesListFragment) {
                 setCreateNoteFragment()
             } else if (frag is CreateNoteFragment && frag.tag.equals(CREATE_NOTE_FRAGMENT_TAG)) {
-                frag.onSaveNote()
-                supportFragmentManager.popBackStack()
+                try{
+                    frag.onSaveNote()
+//                    supportFragmentManager.popBackStack()
+                }catch (e: Exception){
+                    e.printStackTrace()
+                }
             } else if (frag is EditNoteFragment) { //Update RecyclerView item and return to NoteListFragment
                 for (x in 1..2) {
                     supportFragmentManager.popBackStack()

@@ -14,6 +14,7 @@ import android.view.ViewGroup
 import android.view.animation.Animation
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.Activity.MainActivity
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.Database.LocalSQLAnkoDatabase
+import app.note.simple.brulinski.sebastian.com.simplenoteapp.Database.database
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.HelperClass.CurrentFragmentState
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.HelperClass.LayoutManagerStyle
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.HelperClass.MyRowParserNoteProperties
@@ -37,7 +38,6 @@ class NotesListFragment : Fragment() {
 
     lateinit var binding: NotesListFragmentBinding
     lateinit var myRecycler: MainRecyclerAdapter
-    lateinit var database: LocalSQLAnkoDatabase
     lateinit var layoutStyle: LayoutManagerStyle
     var styleFlag: Boolean = true
 
@@ -49,8 +49,6 @@ class NotesListFragment : Fragment() {
 
     override fun onCreateView(inflater: LayoutInflater?, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         binding = DataBindingUtil.inflate(inflater, R.layout.notes_list_fragment, container, false)
-        //Get notes
-        database = LocalSQLAnkoDatabase(context)
 
         if (savedInstanceState == null) {
             getAndSetNotes()
@@ -98,7 +96,7 @@ class NotesListFragment : Fragment() {
 
         binding.recyclerView.itemAnimator = SlideInRightAnimator()
 
-        myRecycler = MainRecyclerAdapter(itemsObjectsArray, binding.recyclerView, database, context)
+        myRecycler = MainRecyclerAdapter(itemsObjectsArray, binding.recyclerView, context)
         binding.recyclerView.adapter = myRecycler
     }
 
@@ -108,7 +106,7 @@ class NotesListFragment : Fragment() {
 
         val notesPropertiesArray: ArrayList<NotesProperties> = ArrayList()
 
-        database.use {
+        context.database.use {
             val properties = select(LocalSQLAnkoDatabase.TABLE_NOTES_PROPERTIES).whereSimple("${LocalSQLAnkoDatabase.IS_DELETED}=?", "false").parseList(MyRowParserNoteProperties())
             val size = properties.size - 1
 
@@ -118,7 +116,7 @@ class NotesListFragment : Fragment() {
             }
         }
 
-        database.use {
+        context.database.use {
             val notes = select(LocalSQLAnkoDatabase.TABLE_NOTES).whereSimple("${LocalSQLAnkoDatabase.IS_DELETED}=?", "false").parseList(MyRowParserNotes())
             val size = notes.size
 

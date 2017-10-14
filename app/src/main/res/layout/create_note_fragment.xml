@@ -61,15 +61,6 @@
                     android:src="@drawable/ic_undo_black_24dp" />
 
                 <ImageButton
-                    android:id="@+id/redo"
-                    android:layout_width="wrap_content"
-                    android:layout_height="?attr/actionBarSize"
-                    android:background="@android:color/transparent"
-                    android:contentDescription="@string/redo_changes"
-                    android:minWidth="70dp"
-                    android:src="@drawable/ic_redo_black_24dp" />
-
-                <ImageButton
                     android:id="@+id/font_style"
                     android:layout_width="wrap_content"
                     android:layout_height="?attr/actionBarSize"
