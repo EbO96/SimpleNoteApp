@@ -1,6 +1,7 @@
 package app.note.simple.brulinski.sebastian.com.simplenoteapp.Fragment
 
 import android.annotation.SuppressLint
+import android.app.Service
 import android.content.ClipData
 import android.content.ClipboardManager
 import android.content.Context
@@ -9,14 +10,13 @@ import android.databinding.DataBindingUtil
 import android.graphics.Color
 import android.graphics.Typeface
 import android.os.Bundle
-import android.os.Handler
 import android.support.annotation.ColorInt
 import android.support.v4.app.Fragment
 import android.support.v4.content.ContextCompat
 import android.text.TextUtils
-import android.util.Log
 import android.view.*
 import android.view.animation.Animation
+import android.view.inputmethod.InputMethodManager
 import android.widget.FrameLayout
 import android.widget.Toast
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.Activity.MainActivity
@@ -59,7 +59,7 @@ open class CreateNoteFragment : Fragment(), SaveNoteInterface {
         fun getCurrentDateAndTime(): String { //Get current time from system
             val calendar = Calendar.getInstance()
 
-            return SimpleDateFormat("yyyy-MM-dd 'at' HH:mm:ss a").format(calendar.getTime())
+            return SimpleDateFormat("yyyy-MM-dd 'at' HH:mm:ss a").format(calendar.time)
         }
 
         var noteObject: ItemsHolder? = null
@@ -372,7 +372,6 @@ open class CreateNoteFragment : Fragment(), SaveNoteInterface {
         }
 
         note.textChangedListener {
-
             afterTextChanged { text ->
                 if (checkNoteLenghth()) {
                     if (!infoToastShowedAtStart)
@@ -383,12 +382,7 @@ open class CreateNoteFragment : Fragment(), SaveNoteInterface {
             }
 
             onTextChanged { p0, p1, p2, p3 ->
-                if (bindingFrag.createNoteNoteField.isFocused) {
-                    (activity as MainActivity).binding.mainFab.hide()
-                    Handler().postDelayed({
-                        (activity as MainActivity).binding.mainFab.show()
-                    }, showFabAfterTime)
-                }
+
                 incrementCharacterCounter(p0!!.length)
             }
         }
@@ -396,7 +390,7 @@ open class CreateNoteFragment : Fragment(), SaveNoteInterface {
 
     private fun incrementCharacterCounter(charLength: Int) {
         bindingFrag.charactersCounterTextView.text = "$charLength/1000"
-        if(charLength >= 1000)
+        if (charLength >= 1000)
             bindingFrag.charactersCounterTextView.textColor = ContextCompat.getColor(context, R.color.material_red)
         else bindingFrag.charactersCounterTextView.textColor = ContextCompat.getColor(context, R.color.material_blue_grey)
     }

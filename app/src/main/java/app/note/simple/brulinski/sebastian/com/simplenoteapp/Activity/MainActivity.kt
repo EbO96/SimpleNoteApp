@@ -14,9 +14,9 @@ import android.support.design.widget.FloatingActionButton
 import android.support.v4.app.Fragment
 import android.support.v4.app.FragmentManager
 import android.support.v4.app.FragmentTransaction
-import android.support.v4.content.ContextCompat
 import android.support.v7.app.AppCompatActivity
 import android.support.v7.widget.RecyclerView
+import android.util.Log
 import android.view.Menu
 import android.view.MenuInflater
 import android.view.MenuItem
@@ -35,6 +35,8 @@ import app.note.simple.brulinski.sebastian.com.simplenoteapp.Model.ItemsHolder
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.R
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.databinding.ActivityMainBinding
 import es.dmoral.toasty.Toasty
+import net.yslibrary.android.keyboardvisibilityevent.KeyboardVisibilityEvent
+import net.yslibrary.android.keyboardvisibilityevent.KeyboardVisibilityEventListener
 
 
 @Suppress("DEPRECATION")
@@ -119,6 +121,15 @@ class MainActivity : AppCompatActivity(), NotesListFragment.OnListenRecyclerScro
         Toasty.Config.getInstance().setErrorColor(ERROR_COLOR).apply()
 
         infoToastShowedAtStart = true
+
+        KeyboardVisibilityEvent.setEventListener(
+                this, object : KeyboardVisibilityEventListener {
+            override fun onVisibilityChanged(isOpen: Boolean) {
+                if(isOpen) binding.mainFab.hide()
+                else binding.mainFab.show()
+            }
+        }
+        )
     } //END OF onCreate(...)
 
     /*
@@ -314,10 +325,10 @@ class MainActivity : AppCompatActivity(), NotesListFragment.OnListenRecyclerScro
             if (frag is NotesListFragment) {
                 setCreateNoteFragment()
             } else if (frag is CreateNoteFragment && frag.tag.equals(CREATE_NOTE_FRAGMENT_TAG)) {
-                try{
+                try {
                     frag.onSaveNote()
 //                    supportFragmentManager.popBackStack()
-                }catch (e: Exception){
+                } catch (e: Exception) {
                     e.printStackTrace()
                 }
             } else if (frag is EditNoteFragment) { //Update RecyclerView item and return to NoteListFragment

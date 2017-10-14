@@ -50,6 +50,7 @@ dependencies {
     compile 'org.jetbrains.anko:anko-appcompat-v7:0.10.1'
     implementation 'com.github.GrenderG:Toasty:1.2.5'
     compile 'com.rengwuxian.materialedittext:library:2.1.4'
+    compile 'net.yslibrary.keyboardvisibilityevent:keyboardvisibilityevent:2.1.0'
 }
 
 kapt {
