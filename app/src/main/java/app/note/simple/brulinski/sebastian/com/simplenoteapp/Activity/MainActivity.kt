@@ -5,9 +5,11 @@ import android.content.Context
 import android.content.Intent
 import android.content.SharedPreferences
 import android.databinding.DataBindingUtil
+import android.graphics.Color
 import android.graphics.drawable.Drawable
 import android.os.Bundle
 import android.os.Handler
+import android.support.annotation.ColorInt
 import android.support.design.widget.FloatingActionButton
 import android.support.v4.app.Fragment
 import android.support.v4.app.FragmentManager
@@ -31,6 +33,7 @@ import app.note.simple.brulinski.sebastian.com.simplenoteapp.Interfaces.Recycler
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.Model.ItemsHolder
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.R
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.databinding.ActivityMainBinding
+import es.dmoral.toasty.Toasty
 
 
 @Suppress("DEPRECATION")
@@ -54,6 +57,11 @@ class MainActivity : AppCompatActivity(), NotesListFragment.OnListenRecyclerScro
     lateinit var noteFragment: Fragment
     lateinit var managerStyle: LayoutManagerStyle
     var doubleTapToExit = false
+
+    @ColorInt
+    private val INFO_COLOR = Color.parseColor("#3F51B5")
+    private var infoToastShowedAtStart: Boolean = false
+    private val showFabAfterTime = 2000L
 
     companion object {
         var NOTE_LIST_FRAGMENT_TAG: String = "NOTES" //Fragment TAG
@@ -107,6 +115,9 @@ class MainActivity : AppCompatActivity(), NotesListFragment.OnListenRecyclerScro
 
         floatingActionButtonListener() //Listen for floating action button actions and click
 
+        Toasty.Config.getInstance().setInfoColor(INFO_COLOR).apply()
+
+        infoToastShowedAtStart = true
     } //END OF onCreate(...)
 
     /*
@@ -277,7 +288,7 @@ class MainActivity : AppCompatActivity(), NotesListFragment.OnListenRecyclerScro
                 return
             }
 
-            Toast.makeText(applicationContext, "One more time to exit", Toast.LENGTH_SHORT).show()
+            Toasty.info(this, getString(R.string.exit_toast), Toast.LENGTH_SHORT, true).show()
             doubleTapToExit = true
 
             Handler().postDelayed({

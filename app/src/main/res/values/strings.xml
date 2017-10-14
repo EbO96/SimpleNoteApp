@@ -58,5 +58,6 @@
     <string name="no">No</string>
     <string name="restore_this_note">Restore this note?</string>
     <string name="empty">Empty</string>
+    <string name="exit_toast">One more time to exit</string>
     <!--END-->
 </resources>

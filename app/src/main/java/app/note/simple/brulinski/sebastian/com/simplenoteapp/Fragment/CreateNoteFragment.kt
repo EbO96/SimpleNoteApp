@@ -47,6 +47,7 @@ open class CreateNoteFragment : Fragment(), SaveNoteInterface {
     private lateinit var database: LocalSQLAnkoDatabase
     private lateinit var undoRedo: UndoRedo
     private val maxTextLength: Int = 1000
+
     @ColorInt
     private val INFO_COLOR = Color.parseColor("#3F51B5")
     private var infoToastShowedAtStart: Boolean = false
