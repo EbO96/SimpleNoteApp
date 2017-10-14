@@ -16,7 +16,6 @@ import android.support.v4.app.FragmentManager
 import android.support.v4.app.FragmentTransaction
 import android.support.v7.app.AppCompatActivity
 import android.support.v7.widget.RecyclerView
-import android.util.Log
 import android.view.Menu
 import android.view.MenuInflater
 import android.view.MenuItem
@@ -107,13 +106,11 @@ class MainActivity : AppCompatActivity(), NotesListFragment.OnListenRecyclerScro
          */
         if (savedInstanceState == null) {
             setNotesListFragment()
-            //TODO get object
             val v: ItemsHolder? = intent.getParcelableExtra<ItemsHolder>("noteObject")
             if (v != null) {
                 onNoteClicked(v)
                 intent.removeExtra("noteObject")
             }
-
         }
 
         floatingActionButtonListener() //Listen for floating action button actions and click
@@ -125,7 +122,7 @@ class MainActivity : AppCompatActivity(), NotesListFragment.OnListenRecyclerScro
         KeyboardVisibilityEvent.setEventListener(
                 this, object : KeyboardVisibilityEventListener {
             override fun onVisibilityChanged(isOpen: Boolean) {
-                if(isOpen) binding.mainFab.hide()
+                if (isOpen) binding.mainFab.hide()
                 else binding.mainFab.show()
             }
         }
@@ -135,7 +132,7 @@ class MainActivity : AppCompatActivity(), NotesListFragment.OnListenRecyclerScro
     /*
     This function replace another fragment in FrameLayout container by our main Fragment (NoteListFragment.kt - display our notes)
      */
-    private fun setNotesListFragment() {
+    fun setNotesListFragment() {
         fm = supportFragmentManager
         ft = fm.beginTransaction()
 
@@ -265,12 +262,10 @@ class MainActivity : AppCompatActivity(), NotesListFragment.OnListenRecyclerScro
                 val intent = Intent(this, SearchActivity::class.java)
                 intent.putParcelableArrayListExtra("notesArray", NotesListFragment.itemsObjectsArray)
                 startActivity(intent)
-                this.finish()
             }
             R.id.archives -> {
                 val intent = Intent(this, ArchivesActivity::class.java)
                 startActivity(intent)
-                this.finish()
             }
         }
         return super.onOptionsItemSelected(item)
@@ -404,6 +399,14 @@ class MainActivity : AppCompatActivity(), NotesListFragment.OnListenRecyclerScro
         CurrentFragmentState.backPressed = false
         noteToEdit = noteObject
         setNotePreviewFragment()
+    }
+
+    override fun onResume() {
+        val frag = supportFragmentManager.findFragmentById(binding.mainContainer.id)
+        if (frag is NotesListFragment) {
+            frag.refreshAdapter()
+        }
+        super.onResume()
     }
 
 }

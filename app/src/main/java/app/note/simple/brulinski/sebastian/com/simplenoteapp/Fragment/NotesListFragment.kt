@@ -8,6 +8,7 @@ import android.support.v4.content.ContextCompat
 import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView
 import android.support.v7.widget.StaggeredGridLayoutManager
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -51,7 +52,7 @@ class NotesListFragment : Fragment() {
         binding = DataBindingUtil.inflate(inflater, R.layout.notes_list_fragment, container, false)
 
         if (savedInstanceState == null) {
-            getAndSetNotes()
+            getNotesFromDatabase()
         } else {
             itemsObjectsArray = savedInstanceState.getParcelableArrayList<ItemsHolder>("notes")
         }
@@ -101,7 +102,8 @@ class NotesListFragment : Fragment() {
     }
 
 
-    private fun getAndSetNotes() {
+    private fun getNotesFromDatabase() {
+        Log.d("ResumeLog", "Resume")
         itemsObjectsArray = ArrayList()
 
         val notesPropertiesArray: ArrayList<NotesProperties> = ArrayList()
@@ -184,5 +186,11 @@ class NotesListFragment : Fragment() {
             return MoveAnimation.create(MoveAnimation.RIGHT, enter, CurrentFragmentState.FRAGMENT_ANIM_DURATION)
         else
             return MoveAnimation.create(MoveAnimation.LEFT, enter, CurrentFragmentState.FRAGMENT_ANIM_DURATION)
+    }
+
+    fun refreshAdapter(){
+        getNotesFromDatabase()
+        initRecyclerAdapter()
+        sortNotes()
     }
 }
