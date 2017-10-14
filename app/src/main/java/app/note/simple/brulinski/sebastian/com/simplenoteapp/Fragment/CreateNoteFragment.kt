@@ -14,6 +14,7 @@ import android.support.annotation.ColorInt
 import android.support.v4.app.Fragment
 import android.support.v4.content.ContextCompat
 import android.text.TextUtils
+import android.util.Log
 import android.view.*
 import android.view.animation.Animation
 import android.widget.FrameLayout
@@ -35,6 +36,7 @@ import es.dmoral.toasty.Toasty
 import org.jetbrains.anko.db.insert
 import org.jetbrains.anko.db.select
 import org.jetbrains.anko.sdk25.coroutines.textChangedListener
+import org.jetbrains.anko.textColor
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -375,6 +377,7 @@ open class CreateNoteFragment : Fragment(), SaveNoteInterface {
                         showInfoToast(R.string.max_note_size_toast.toString() + maxTextLength)
                     infoToastShowedAtStart = false
                 } else undoRedo.addUndo(text = text.toString())
+
             }
 
             onTextChanged { p0, p1, p2, p3 ->
@@ -384,8 +387,16 @@ open class CreateNoteFragment : Fragment(), SaveNoteInterface {
                         (activity as MainActivity).binding.mainFab.show()
                     }, showFabAfterTime)
                 }
+                incrementCharacterCounter(p0!!.length)
             }
         }
+    }
+
+    private fun incrementCharacterCounter(charLength: Int) {
+        bindingFrag.charactersCounterTextView.text = "$charLength/1000"
+        if(charLength >= 1000)
+            bindingFrag.charactersCounterTextView.textColor = ContextCompat.getColor(context, R.color.material_red)
+        else bindingFrag.charactersCounterTextView.textColor = ContextCompat.getColor(context, R.color.material_blue_grey)
     }
 
     private fun checkNoteLenghth(): Boolean {
