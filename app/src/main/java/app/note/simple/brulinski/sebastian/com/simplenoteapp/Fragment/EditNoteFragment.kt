@@ -2,6 +2,7 @@ package app.note.simple.brulinski.sebastian.com.simplenoteapp.Fragment
 
 import android.content.Context
 import android.os.Bundle
+import android.util.Log
 import android.view.animation.Animation
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.Activity.MainActivity
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.Editor.EditorManager

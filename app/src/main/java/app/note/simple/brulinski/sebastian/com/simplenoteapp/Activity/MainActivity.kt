@@ -14,6 +14,7 @@ import android.support.design.widget.FloatingActionButton
 import android.support.v4.app.Fragment
 import android.support.v4.app.FragmentManager
 import android.support.v4.app.FragmentTransaction
+import android.support.v4.content.ContextCompat
 import android.support.v7.app.AppCompatActivity
 import android.support.v7.widget.RecyclerView
 import android.view.Menu
@@ -59,7 +60,7 @@ class MainActivity : AppCompatActivity(), NotesListFragment.OnListenRecyclerScro
     var doubleTapToExit = false
 
     @ColorInt
-    private val INFO_COLOR = Color.parseColor("#3F51B5")
+    private val ERROR_COLOR = Color.parseColor("#D50000")
     private var infoToastShowedAtStart: Boolean = false
     private val showFabAfterTime = 2000L
 
@@ -115,7 +116,7 @@ class MainActivity : AppCompatActivity(), NotesListFragment.OnListenRecyclerScro
 
         floatingActionButtonListener() //Listen for floating action button actions and click
 
-        Toasty.Config.getInstance().setInfoColor(INFO_COLOR).apply()
+        Toasty.Config.getInstance().setErrorColor(ERROR_COLOR).apply()
 
         infoToastShowedAtStart = true
     } //END OF onCreate(...)
@@ -207,6 +208,7 @@ class MainActivity : AppCompatActivity(), NotesListFragment.OnListenRecyclerScro
         if (frag is NotesListFragment) {
             drawIcon = resources.getDrawable(R.drawable.ic_add_white_24dp)
             title = resources.getString(R.string.notes)
+            //supportActionBar!!.setIcon(ContextCompat.getDrawable(this, R.mipmap.ic_launcher))
 
         } else if (frag is NotePreviewFragment) {
             drawIcon = resources.getDrawable(R.drawable.ic_mode_edit_white_24dp)
@@ -288,7 +290,7 @@ class MainActivity : AppCompatActivity(), NotesListFragment.OnListenRecyclerScro
                 return
             }
 
-            Toasty.info(this, getString(R.string.exit_toast), Toast.LENGTH_SHORT, true).show()
+            Toasty.error(this, getString(R.string.exit_toast), Toast.LENGTH_SHORT, true).show()
             doubleTapToExit = true
 
             Handler().postDelayed({
