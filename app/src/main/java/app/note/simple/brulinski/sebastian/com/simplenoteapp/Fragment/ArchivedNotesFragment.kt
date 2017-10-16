@@ -1,6 +1,7 @@
 package app.note.simple.brulinski.sebastian.com.simplenoteapp.Fragment
 
 import android.app.AlertDialog
+import android.content.ContentValues
 import android.databinding.DataBindingUtil
 import android.os.Bundle
 import android.support.v4.app.Fragment
@@ -22,7 +23,7 @@ class ArchivedNotesFragment : Fragment() {
     lateinit var archivedNotesArrayList: ArrayList<ItemsHolder>
     private lateinit var deleteMenuItem: MenuItem
     private lateinit var restoreMenuItem: MenuItem
-    private lateinit var itemsToDelete: ArrayList<String>
+    private lateinit var itemsToDeleteOrRestore: ArrayList<String>
 
     interface OnChangeScreenListener {
         fun replaceFragment()
@@ -70,7 +71,6 @@ class ArchivedNotesFragment : Fragment() {
     }
 
     private fun deleteSelectedItems(itemsIdArrayList: ArrayList<String>) {
-
         context.database.use {
             for (x in 0 until itemsIdArrayList.size) {
                 delete(
@@ -81,7 +81,11 @@ class ArchivedNotesFragment : Fragment() {
                 )
             }
         }
+        deleteNotesFromRecyclerAfterRemoveOrRestore(itemsIdArrayList)
+        resetInterfaceAndValuesAfterMultipleDelete()
+    }
 
+    private fun deleteNotesFromRecyclerAfterRemoveOrRestore(itemsIdArrayList: ArrayList<String>) {
         for (x in 0 until itemsIdArrayList.size) {
             var indexOfItem = 0
             for (y in 0 until archivedNotesArrayList.size) {
@@ -92,41 +96,79 @@ class ArchivedNotesFragment : Fragment() {
             }
             archivedNotesArrayList.removeAt(indexOfItem)
             myRecycler.notifyItemRemoved(indexOfItem)
-
-            myRecycler.selectedItemsIdArrayList = ArrayList<String>()
-            //Reset toolbar and arrays
-            (activity as ArchivesActivity).supportActionBar!!.title = getString(R.string.archives)
-            deleteMenuItem.isVisible = false
-            restoreMenuItem.isVisible = false
-            itemsToDelete = ArrayList()
         }
+    }
+
+    private fun restoreSelectedItems(itemsToRestore: ArrayList<String>) {
+
+        val isDeletedValue = ContentValues()
+        isDeletedValue.put(LocalSQLAnkoDatabase.IS_DELETED, false.toString())
+
+        context.database.use {
+
+            for (x in 0 until itemsToRestore.size) {
+                update(LocalSQLAnkoDatabase.TABLE_NOTES, isDeletedValue, "${LocalSQLAnkoDatabase.ID}=?", arrayOf(itemsToRestore[x]))
+                update(LocalSQLAnkoDatabase.TABLE_NOTES_PROPERTIES, isDeletedValue, "${LocalSQLAnkoDatabase.NOTE_ID}=?", arrayOf(itemsToRestore[x]))
+
+            }
+            deleteNotesFromRecyclerAfterRemoveOrRestore(itemsToRestore)
+            resetInterfaceAndValuesAfterMultipleDelete()
+        }
+    }
+
+    private fun resetInterfaceAndValuesAfterMultipleDelete() {
+        myRecycler.selectedItemsIdArrayList = ArrayList<String>()
+        //Reset toolbar and arrays
+        (activity as ArchivesActivity).supportActionBar!!.title = getString(R.string.archives)
+        deleteMenuItem.isVisible = false
+        restoreMenuItem.isVisible = false
+        itemsToDeleteOrRestore = ArrayList()
+
+        if (archivedNotesArrayList.size == 0)
+            mChangeScreenCallback.replaceFragment()
     }
 
     override fun onCreateOptionsMenu(menu: Menu?, inflater: MenuInflater?) {
         val menuInflater: MenuInflater = activity.menuInflater
         menuInflater.inflate(R.menu.archives_menu, menu)
         deleteMenuItem = menu!!.findItem(R.id.archives_delete).setVisible(false)
-        restoreMenuItem = menu!!.findItem(R.id.archives_restore).setVisible(false)
+        restoreMenuItem = menu.findItem(R.id.archives_restore).setVisible(false)
         super.onCreateOptionsMenu(menu, inflater)
     }
 
     override fun onOptionsItemSelected(item: MenuItem?): Boolean {
+        var message = ""
+        val itemsSize = itemsToDeleteOrRestore.size
+
         when (item!!.itemId) {
             R.id.archives_delete -> {
-                makeDeleteConfirmDialog()
+
+                message = "${getString(R.string.delete)} ${getString(R.string.notesLowerCase)}? (${itemsToDeleteOrRestore.size})"
+
+                makeDeleteOrRestoreConfirmDialog(message,
+                        R.drawable.ic_delete_black_24dp, true) //True means that method delete items
+            }
+            R.id.archives_restore -> {
+
+                message = "${getString(R.string.restore)} ${getString(R.string.notesLowerCase)}? (${itemsToDeleteOrRestore.size})"
+
+                makeDeleteOrRestoreConfirmDialog(message,
+                        R.drawable.ic_restore_black_24dp, false) //False means that method delete items
             }
         }
         return super.onOptionsItemSelected(item)
     }
 
-    private fun makeDeleteConfirmDialog() {
+    private fun makeDeleteOrRestoreConfirmDialog(title: String, icon: Int, isDeleteOrRestore: Boolean) {
         val alert = AlertDialog.Builder(context).create()
 
-        alert.setIcon(ContextCompat.getDrawable(context, R.drawable.ic_delete_black_24dp))
-        alert.setTitle("${getString(R.string.delete)} ${itemsToDelete.size} ${getString(R.string.notesLowerCase)}?")
+        alert.setIcon(ContextCompat.getDrawable(context, icon))
+        alert.setTitle(title)
 
         alert.setButton(AlertDialog.BUTTON_POSITIVE, getString(R.string.yes), { _, i ->
-            deleteSelectedItems(itemsToDelete)
+            if (isDeleteOrRestore) //Delete items
+                deleteSelectedItems(itemsToDeleteOrRestore)
+            else restoreSelectedItems(itemsToDeleteOrRestore) //Restore items
         })
 
         alert.setButton(AlertDialog.BUTTON_NEGATIVE, getString(R.string.no), { _, i ->
@@ -134,6 +176,7 @@ class ArchivedNotesFragment : Fragment() {
         })
         alert.show()
     }
+
 
     fun onCheckBoxesListener(numberOfItems: Int, itemsIdArrayList: ArrayList<String>?) {
         if (numberOfItems > 0) {
@@ -146,6 +189,6 @@ class ArchivedNotesFragment : Fragment() {
             (activity as ArchivesActivity).setToolbarTitle(getString(R.string.archives))
         }
         if (itemsIdArrayList != null)  //After delete
-            itemsToDelete = itemsIdArrayList
+            itemsToDeleteOrRestore = itemsIdArrayList
     }
 }

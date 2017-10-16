@@ -6,6 +6,7 @@
     <string name="notes">Notes</string>
     <string name="notesLowerCase">notes</string>
 
+
     <!--Shared Preferences Values-->
     <string name="layout_manager_key">grid_or_linear</string>
     <string name="preview">Preview</string>
@@ -64,5 +65,7 @@
     <string name="items_selected">items selected</string>
     <string name="delete_selected">Delete selected</string>
     <string name="restore_selected">Restore selected</string>
+    <string name="restore">Restore</string>
+    <string name="restoreLowerCase">restore</string>
     <!--END-->
 </resources>
