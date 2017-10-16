@@ -9,17 +9,21 @@ import android.support.v7.widget.RecyclerView
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.CheckBox
 import android.widget.ImageButton
 import android.widget.TextView
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.Database.LocalSQLAnkoDatabase
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.Database.database
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.Editor.EditorManager
+import app.note.simple.brulinski.sebastian.com.simplenoteapp.Fragment.ArchivedNotesFragment
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.Model.ItemsHolder
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.R
 
-class ArchivesRecycler(private val notesArrayList: ArrayList<ItemsHolder>, private val recycler: RecyclerView, private val ctx: Context) : RecyclerView.Adapter<ArchivesRecycler.MyViewHolder>() {
+class ArchivesRecycler(private val notesArrayList: ArrayList<ItemsHolder>, private val recycler: RecyclerView, private val ctx: Context, private val fragment: ArchivedNotesFragment) : RecyclerView.Adapter<ArchivesRecycler.MyViewHolder>() {
 
     lateinit var mSizeCallback: OnRecyclerSizeListener
+    var selectedItemsIdArrayList = ArrayList<String>()
+    var isInActionMode = false
 
     interface OnRecyclerSizeListener {
         fun recyclerSize(size: Int)
@@ -102,6 +106,18 @@ class ArchivesRecycler(private val notesArrayList: ArrayList<ItemsHolder>, priva
 
             alert.show()
         }
+
+        holder.checkBox.setOnCheckedChangeListener { _, p1 ->
+            if (p1) {
+                holder.buttonsCard.visibility = View.INVISIBLE
+                selectedItemsIdArrayList.add(noteObject.id)
+            } else {
+                holder.buttonsCard.visibility = View.VISIBLE
+                selectedItemsIdArrayList.removeAt(selectedItemsIdArrayList.indexOf(noteObject.id))
+            }
+
+            fragment.mActionModeCallback.selectedItems(selectedItemsIdArrayList.size, selectedItemsIdArrayList)
+        }
     }
 
     override fun getItemCount(): Int {
@@ -120,5 +136,7 @@ class ArchivesRecycler(private val notesArrayList: ArrayList<ItemsHolder>, priva
         val deleteImageButton = itemView.findViewById<ImageButton>(R.id.deleteArchivedNoteImageButtonArch)
         val restoreImageButton = itemView.findViewById<ImageButton>(R.id.restoreArchivedNoteImageButtonArch)
         val card = itemView.findViewById<CardView>(R.id.archives_card)
+        val buttonsCard = itemView.findViewById<CardView>(R.id.archived_note_card_buttons_card)
+        val checkBox = itemView.findViewById<CheckBox>(R.id.archived_note_card_checkBox)
     }
 }

@@ -60,5 +60,6 @@
     <string name="empty">Empty</string>
     <string name="exit_toast">One more time to exit</string>
     <string name="delete">Delete</string>
+    <string name="items_selected">items selected</string>
     <!--END-->
 </resources>

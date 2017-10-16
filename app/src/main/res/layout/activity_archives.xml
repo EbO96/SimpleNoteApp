@@ -11,7 +11,8 @@
         <android.support.v7.widget.Toolbar
             android:id="@+id/archived_notes_toolbar"
             android:layout_width="match_parent"
-            android:layout_height="?attr/actionBarSize"/>
+            android:layout_height="?attr/actionBarSize">
+        </android.support.v7.widget.Toolbar>
 
         <FrameLayout
             android:id="@+id/archived_notes_fragment_container"
