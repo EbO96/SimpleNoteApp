@@ -3,6 +3,9 @@ package app.note.simple.brulinski.sebastian.com.simplenoteapp.Activity
 import android.databinding.DataBindingUtil
 import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
+import android.view.Menu
+import android.view.MenuInflater
+import android.view.MenuItem
 import android.widget.FrameLayout
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.Database.LocalSQLAnkoDatabase
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.Database.database
@@ -25,6 +28,12 @@ class ArchivesActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = DataBindingUtil.setContentView(this, R.layout.activity_archives)
+
+        /*
+        Set Toolbar
+         */
+        setSupportActionBar(binding.archivedNotesToolbar)
+        supportActionBar!!.title = getString(R.string.archives)
 
         val notes = getArchivedNotes()
         val args = Bundle()
@@ -100,6 +109,12 @@ class ArchivesActivity : AppCompatActivity() {
         return archivedNotesArrayList
     }
 
+    override fun onCreateOptionsMenu(menu: Menu?): Boolean {
+        val menuInflater: MenuInflater = menuInflater
+        menuInflater.inflate(R.menu.archives_menu, menu)
+        menu!!.findItem(R.id.archives_delete).setVisible(false)
+        return super.onCreateOptionsMenu(menu)
+    }
     override fun onBackPressed() {
         super.onBackPressed()
         this.finish()

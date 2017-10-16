@@ -72,6 +72,22 @@
             android:hint="@string/note"
             android:paddingBottom="8dp" />
 
+        <android.support.v7.widget.CardView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_margin="8dp"
+            android:layout_gravity="end"
+            app:cardCornerRadius="10dp"
+            app:cardElevation="0dp">
+
+            <CheckBox
+                android:id="@+id/archived_note_card_checkBox"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_margin="1dp"
+                android:background="@color/material_white" />
+        </android.support.v7.widget.CardView>
+
     </LinearLayout>
 
 </android.support.v7.widget.CardView>
