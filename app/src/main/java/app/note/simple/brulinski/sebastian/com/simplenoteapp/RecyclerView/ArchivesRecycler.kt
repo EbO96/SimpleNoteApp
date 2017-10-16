@@ -23,7 +23,6 @@ class ArchivesRecycler(private val notesArrayList: ArrayList<ItemsHolder>, priva
 
     lateinit var mSizeCallback: OnRecyclerSizeListener
     var selectedItemsIdArrayList = ArrayList<String>()
-    var isInActionMode = false
 
     interface OnRecyclerSizeListener {
         fun recyclerSize(size: Int)
@@ -116,7 +115,7 @@ class ArchivesRecycler(private val notesArrayList: ArrayList<ItemsHolder>, priva
                 selectedItemsIdArrayList.removeAt(selectedItemsIdArrayList.indexOf(noteObject.id))
             }
 
-            fragment.mActionModeCallback.selectedItems(selectedItemsIdArrayList.size, selectedItemsIdArrayList)
+            fragment.onCheckBoxesListener(selectedItemsIdArrayList.size, selectedItemsIdArrayList)
         }
     }
 
