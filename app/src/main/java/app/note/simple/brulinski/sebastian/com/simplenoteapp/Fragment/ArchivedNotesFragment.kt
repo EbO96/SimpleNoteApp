@@ -21,6 +21,7 @@ class ArchivedNotesFragment : Fragment() {
     lateinit var mChangeScreenCallback: OnChangeScreenListener
     lateinit var archivedNotesArrayList: ArrayList<ItemsHolder>
     private lateinit var deleteMenuItem: MenuItem
+    private lateinit var restoreMenuItem: MenuItem
     private lateinit var itemsToDelete: ArrayList<String>
 
     interface OnChangeScreenListener {
@@ -96,6 +97,7 @@ class ArchivedNotesFragment : Fragment() {
             //Reset toolbar and arrays
             (activity as ArchivesActivity).supportActionBar!!.title = getString(R.string.archives)
             deleteMenuItem.isVisible = false
+            restoreMenuItem.isVisible = false
             itemsToDelete = ArrayList()
         }
     }
@@ -104,6 +106,7 @@ class ArchivedNotesFragment : Fragment() {
         val menuInflater: MenuInflater = activity.menuInflater
         menuInflater.inflate(R.menu.archives_menu, menu)
         deleteMenuItem = menu!!.findItem(R.id.archives_delete).setVisible(false)
+        restoreMenuItem = menu!!.findItem(R.id.archives_restore).setVisible(false)
         super.onCreateOptionsMenu(menu, inflater)
     }
 
@@ -129,16 +132,17 @@ class ArchivedNotesFragment : Fragment() {
         alert.setButton(AlertDialog.BUTTON_NEGATIVE, getString(R.string.no), { _, i ->
             //Do nothing
         })
-
         alert.show()
     }
 
     fun onCheckBoxesListener(numberOfItems: Int, itemsIdArrayList: ArrayList<String>?) {
         if (numberOfItems > 0) {
             deleteMenuItem.isVisible = true
+            restoreMenuItem.isVisible = true
             (activity as ArchivesActivity).setToolbarTitle("$numberOfItems ${getString(R.string.items_selected)}")
         } else {
             deleteMenuItem.isVisible = false
+            restoreMenuItem.isVisible = false
             (activity as ArchivesActivity).setToolbarTitle(getString(R.string.archives))
         }
         if (itemsIdArrayList != null)  //After delete

@@ -62,5 +62,7 @@
     <string name="exit_toast">One more time to exit</string>
     <string name="delete">Delete</string>
     <string name="items_selected">items selected</string>
+    <string name="delete_selected">Delete selected</string>
+    <string name="restore_selected">Restore selected</string>
     <!--END-->
 </resources>
