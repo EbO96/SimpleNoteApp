@@ -107,18 +107,6 @@ class MainRecyclerAdapter(var itemsHolder: ArrayList<ItemsHolder>, var recyclerV
         }
     }
 
-    private fun deleteNote(itemId: String) {
-        ctx.database.use {
-            delete(
-                    LocalSQLAnkoDatabase.TABLE_NOTES, "${LocalSQLAnkoDatabase.ID}=?", arrayOf(itemId)
-            )
-
-            delete(
-                    LocalSQLAnkoDatabase.TABLE_NOTES_PROPERTIES, "${LocalSQLAnkoDatabase.NOTE_ID}=?", arrayOf(itemId)
-            )
-        }
-    }
-
     private fun addDeleteFlag(itemId: String, flag: Boolean) {
         val isDeletedValue = ContentValues()
         isDeletedValue.put(LocalSQLAnkoDatabase.IS_DELETED, flag.toString())
