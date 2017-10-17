@@ -40,6 +40,7 @@ class ArchivedNotesFragment : Fragment() {
         binding = DataBindingUtil.inflate(inflater, R.layout.archived_notes_fragment, container, false)
         setHasOptionsMenu(true)
 
+
         return binding.root
     }
 

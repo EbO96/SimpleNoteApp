@@ -44,13 +44,14 @@ open class CreateNoteFragment : Fragment(), SaveNoteInterface {
     lateinit var bindingFrag: CreateNoteFragmentBinding
     private lateinit var database: LocalSQLAnkoDatabase
     private lateinit var undoRedo: UndoRedo
-    private val maxTextLength: Int = 1000
+    private val noteCharactersLimit = 1000
+    private val titleCharactersLimit = 50
+    private var actualLimit = titleCharactersLimit
 
     @ColorInt
     private val INFO_COLOR = Color.parseColor("#3F51B5")
     private var infoToastShowedAtStart: Boolean = false
     private val showFabAfterTime = 2000L
-
 
     companion object {
         @SuppressLint("SimpleDateFormat")
@@ -95,6 +96,8 @@ open class CreateNoteFragment : Fragment(), SaveNoteInterface {
         Toasty.Config.getInstance().setInfoColor(INFO_COLOR).apply()
 
         infoToastShowedAtStart = true
+
+        onTitleAndNoteFieldFocusListener()
         return bindingFrag.root
     }
 
@@ -104,6 +107,19 @@ open class CreateNoteFragment : Fragment(), SaveNoteInterface {
         undoRedo = UndoRedo(bindingFrag) //Setup UndoRedo class to handle operations at undo and redo actions
 
         listenBarOptions()
+    }
+
+    private fun onTitleAndNoteFieldFocusListener() {
+        bindingFrag.createNoteTitleField.setOnFocusChangeListener { p0, p1 ->
+            actualLimit = titleCharactersLimit
+            setCounterText(bindingFrag.createNoteTitleField.text.length)
+
+        }
+
+        bindingFrag.createNoteNoteField.setOnFocusChangeListener { p0, p1 ->
+            actualLimit = noteCharactersLimit
+            setCounterText(bindingFrag.createNoteNoteField.text.length)
+        }
     }
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
@@ -366,38 +382,46 @@ open class CreateNoteFragment : Fragment(), SaveNoteInterface {
 
         title.textChangedListener {
             afterTextChanged { text -> undoRedo.addUndo(text = text.toString()) }
+
+            onTextChanged { p0, p1, p2, p3 ->
+                if (actualLimit == titleCharactersLimit)
+                    incrementCharacterCounter(p0!!.length)
+            }
         }
 
         note.textChangedListener {
             afterTextChanged { text ->
                 if (checkNoteLenghth()) {
                     if (!infoToastShowedAtStart)
-                        showInfoToast(R.string.max_note_size_toast.toString() + maxTextLength)
+                        showInfoToast(R.string.max_note_size_toast.toString() + actualLimit)
                     infoToastShowedAtStart = false
                 } else undoRedo.addUndo(text = text.toString())
-
             }
 
             onTextChanged { p0, p1, p2, p3 ->
-
-                incrementCharacterCounter(p0!!.length)
+                if (actualLimit == noteCharactersLimit)
+                    incrementCharacterCounter(p0!!.length)
             }
         }
     }
 
     private fun incrementCharacterCounter(charLength: Int) {
-        bindingFrag.charactersCounterTextView.text = "$charLength/1000"
-        if (charLength >= 1000)
+        setCounterText(charLength)
+        if (charLength >= actualLimit)
             bindingFrag.charactersCounterTextView.textColor = ContextCompat.getColor(context, R.color.material_red)
         else bindingFrag.charactersCounterTextView.textColor = ContextCompat.getColor(context, R.color.material_blue_grey)
     }
 
+    private fun setCounterText(text: Int) {
+        bindingFrag.charactersCounterTextView.text = "$text/$actualLimit"
+    }
+
     private fun checkNoteLenghth(): Boolean {
-        return bindingFrag.createNoteNoteField.text.length == maxTextLength //1000 characters
+        return bindingFrag.createNoteNoteField.text.length == actualLimit
     }
 
     private fun showInfoToast(message: String) { //Show info toast
-        Toasty.info(activity, getString(R.string.max_note_size_toast) + maxTextLength, Toast.LENGTH_SHORT, true).show()
+        Toasty.info(activity, message, Toast.LENGTH_SHORT, true).show()
     }
 
     private fun pasteText() {
