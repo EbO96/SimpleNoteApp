@@ -24,4 +24,9 @@
         android:id="@+id/archives"
         android:title="@string/archives"
         app:showAsAction="never"/>
+
+    <item
+        android:id="@+id/settings"
+        android:title="@string/settings"
+        app:showAsAction="never"/>
 </menu>

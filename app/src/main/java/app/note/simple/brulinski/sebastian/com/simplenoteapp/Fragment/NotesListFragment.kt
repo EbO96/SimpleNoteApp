@@ -119,13 +119,13 @@ class NotesListFragment : Fragment() {
         }
 
         context.database.use {
-            val notes = select(LocalSQLAnkoDatabase.TABLE_NOTES).whereSimple("${LocalSQLAnkoDatabase.IS_DELETED}=?", "false").parseList(MyRowParserNotes())
+            val notes = select(LocalSQLAnkoDatabase.TABLE_NOTES).whereSimple("${LocalSQLAnkoDatabase.IS_DELETED}=?", false.toString()).parseList(MyRowParserNotes())
             val size = notes.size
 
             for (x in 0 until size) {
                 itemsObjectsArray.add(ItemsHolder(notes[x].get(x).id!!, notes[x].get(x).title!!, notes[x].get(x).note!!,
                         notes[x][x].date!!, notesPropertiesArray[x].bgColor!!, notesPropertiesArray[x].textColor!!,
-                        notesPropertiesArray.get(x).fontStyle!!))
+                        notesPropertiesArray.get(x).fontStyle!!, false))
             }
         }
     }
@@ -188,7 +188,7 @@ class NotesListFragment : Fragment() {
             return MoveAnimation.create(MoveAnimation.LEFT, enter, CurrentFragmentState.FRAGMENT_ANIM_DURATION)
     }
 
-    fun refreshAdapter(){
+    fun refreshAdapter() {
         getNotesFromDatabase()
         initRecyclerAdapter()
         sortNotes()

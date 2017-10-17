@@ -2,6 +2,8 @@ package app.note.simple.brulinski.sebastian.com.simplenoteapp.RecyclerView
 
 import android.content.ContentValues
 import android.content.Context
+import android.content.SharedPreferences
+import android.preference.PreferenceManager
 import android.support.design.widget.Snackbar
 import android.support.v7.widget.CardView
 import android.support.v7.widget.RecyclerView
@@ -11,6 +13,7 @@ import android.view.ViewGroup
 import android.widget.TextView
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.Activity.MainActivity
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.Database.LocalSQLAnkoDatabase
+import app.note.simple.brulinski.sebastian.com.simplenoteapp.Database.ObjectToDatabaseOperations
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.Database.database
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.Editor.EditorManager
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.Model.ItemsHolder
@@ -19,7 +22,22 @@ import app.note.simple.brulinski.sebastian.com.simplenoteapp.R
 
 class MainRecyclerAdapter(var itemsHolder: ArrayList<ItemsHolder>, var recyclerView: RecyclerView, var ctx: Context) : RecyclerView.Adapter<MainRecyclerAdapter.ViewHolder>() {
 
-    var deletedItem: ItemsHolder? = null
+    private var deletedItem: ItemsHolder? = null
+    private lateinit var preferences: SharedPreferences
+    private var undoSnackbar = Snackbar.make((ctx as MainActivity).binding.root, ctx.getString(R.string.note_deleted), Snackbar.LENGTH_LONG)
+
+
+    interface OnSnackbarDismissListener {
+        fun snackState(isDismiss: Boolean)
+    }
+
+    companion object {
+        lateinit var mSnackCallback: OnSnackbarDismissListener
+
+        fun setOnSnackbarDismissListener(mSnackCallback: OnSnackbarDismissListener) {
+            this.mSnackCallback = mSnackCallback
+        }
+    }
 
     override fun onBindViewHolder(holder: ViewHolder?, position: Int) {
         val itemsHolder: ItemsHolder = itemsHolder[position]
@@ -52,21 +70,52 @@ class MainRecyclerAdapter(var itemsHolder: ArrayList<ItemsHolder>, var recyclerV
         holder.itemView?.setOnLongClickListener {
             pos = recyclerView.getChildAdapterPosition(holder.itemView)
 
+            preferences = PreferenceManager.getDefaultSharedPreferences(ctx)
+            val flag = preferences.getBoolean(ctx.getString(R.string.pref_key_archives), true)
+
+            /*
+           Make UNDO snackbar after delete
+             */
             @Suppress("DEPRECATION")
-            Snackbar.make((ctx as MainActivity).binding.root, ctx.getString(R.string.note_deleted), Snackbar.LENGTH_LONG).setAction(ctx.getString(R.string.undo), {
+            undoSnackbar.setAction(ctx.getString(R.string.undo), {
                 this.itemsHolder.add(pos, deletedItem!!)
                 notifyItemInserted(pos)
                 recyclerView.scrollToPosition(pos)
 
-                addDeleteFlag(deletedItem!!.id, false)
+                if (flag)
+                    addDeleteFlag(deletedItem!!.id, false)
+                else ObjectToDatabaseOperations.insertNoteObject(deletedItem!!, ctx)
 
+            }).setCallback(object : Snackbar.Callback() {
+                override fun onDismissed(transientBottomBar: Snackbar?, event: Int) {
+                    mSnackCallback.snackState(true)
+                }
+
+                override fun onShown(sb: Snackbar?) {
+                    mSnackCallback.snackState(false)
+                    super.onShown(sb)
+                }
             }).show()
 
             deletedItem = this.itemsHolder.removeAt(pos)
             notifyItemRemoved(pos)
 
-            addDeleteFlag(deletedItem!!.id, true)
+            if (flag)
+                addDeleteFlag(deletedItem!!.id, true)
+            else ObjectToDatabaseOperations.deleteNoteObject(deletedItem!!, ctx)
             true
+        }
+    }
+
+    private fun deleteNote(itemId: String) {
+        ctx.database.use {
+            delete(
+                    LocalSQLAnkoDatabase.TABLE_NOTES, "${LocalSQLAnkoDatabase.ID}=?", arrayOf(itemId)
+            )
+
+            delete(
+                    LocalSQLAnkoDatabase.TABLE_NOTES_PROPERTIES, "${LocalSQLAnkoDatabase.NOTE_ID}=?", arrayOf(itemId)
+            )
         }
     }
 

@@ -106,7 +106,7 @@ class ArchivesActivity : AppCompatActivity() {
             for (x in 0 until size) {
                 val item = notes[x].get(x)
                 val noteObject = ItemsHolder(item.id!!, item.title!!, item.note!!, item.date!!, propertiesArray[x].bgColor.toString(),
-                        propertiesArray[x].textColor.toString(), propertiesArray[x].fontStyle.toString())
+                        propertiesArray[x].textColor.toString(), propertiesArray[x].fontStyle.toString(), true)
                 archivedNotesArrayList.add(noteObject)
             }
         }

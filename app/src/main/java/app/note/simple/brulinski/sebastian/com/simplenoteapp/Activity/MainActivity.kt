@@ -32,6 +32,7 @@ import app.note.simple.brulinski.sebastian.com.simplenoteapp.HelperClass.LayoutM
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.Interfaces.RecyclerMainInterface
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.Model.ItemsHolder
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.R
+import app.note.simple.brulinski.sebastian.com.simplenoteapp.RecyclerView.MainRecyclerAdapter
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.databinding.ActivityMainBinding
 import es.dmoral.toasty.Toasty
 import net.yslibrary.android.keyboardvisibilityevent.KeyboardVisibilityEvent
@@ -97,7 +98,6 @@ class MainActivity : AppCompatActivity(), NotesListFragment.OnListenRecyclerScro
         super.onCreate(savedInstanceState)
         binding = DataBindingUtil.setContentView(this, R.layout.activity_main)
         setSupportActionBar(binding.toolbar)
-
         managerStyle = LayoutManagerStyle(this)
 
         /*
@@ -206,6 +206,13 @@ class MainActivity : AppCompatActivity(), NotesListFragment.OnListenRecyclerScro
         menuItemGrid = menu!!.findItem(R.id.main_menu_grid)
         menuItemLinear = menu.findItem(R.id.main_menu_linear)
         menuItemSearch = menu.findItem(R.id.search_main)
+        val menuItemArchives = menu.findItem(R.id.archives)
+
+        MainRecyclerAdapter.setOnSnackbarDismissListener(object : MainRecyclerAdapter.OnSnackbarDismissListener {
+            override fun snackState(isDismiss: Boolean) {
+                menuItemArchives.isVisible = isDismiss
+            }
+        })
 
         val frag = supportFragmentManager.findFragmentById(findViewById<FrameLayout>(R.id.main_container).id)
 
@@ -265,6 +272,10 @@ class MainActivity : AppCompatActivity(), NotesListFragment.OnListenRecyclerScro
             }
             R.id.archives -> {
                 val intent = Intent(this, ArchivesActivity::class.java)
+                startActivity(intent)
+            }
+            R.id.settings -> {
+                val intent = Intent(this, SettingsActivity::class.java)
                 startActivity(intent)
             }
         }

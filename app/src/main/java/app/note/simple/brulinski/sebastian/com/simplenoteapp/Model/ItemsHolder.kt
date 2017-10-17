@@ -5,7 +5,8 @@ import android.os.Parcelable
 
 
 class ItemsHolder(var id: String, var title: String, var note: String, var date: String?, var bgColor: String, var textColor: String,
-                  var fontStyle: String) : Parcelable {
+                  var fontStyle: String, var isDeleted: Boolean) : Parcelable {
+
     constructor(parcel: Parcel) : this(
             parcel.readString(),
             parcel.readString(),
@@ -13,17 +14,19 @@ class ItemsHolder(var id: String, var title: String, var note: String, var date:
             parcel.readString(),
             parcel.readString(),
             parcel.readString(),
-            parcel.readString()) {
+            parcel.readString(),
+            parcel.readByte() != 0.toByte()) {
     }
 
     override fun writeToParcel(parcel: Parcel, flags: Int) {
         parcel.writeString(id)
         parcel.writeString(title)
         parcel.writeString(note)
-        parcel.writeString(date!!)
+        parcel.writeString(date)
         parcel.writeString(bgColor)
         parcel.writeString(textColor)
         parcel.writeString(fontStyle)
+        parcel.writeByte(if (isDeleted) 1 else 0)
     }
 
     override fun describeContents(): Int {

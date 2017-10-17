@@ -75,7 +75,7 @@ open class CreateNoteFragment : Fragment(), SaveNoteInterface {
 
         if (savedInstanceState == null) {
             noteObject = ItemsHolder("", "", "", "", EditorManager.ColorManager.WHITE,
-                    EditorManager.ColorManager.BLACK, EditorManager.FontStyleManager.DEFAULT_FONT)
+                    EditorManager.ColorManager.BLACK, EditorManager.FontStyleManager.DEFAULT_FONT, false)
         } else {
             noteObject = savedInstanceState.getParcelable("note_object")
         }
