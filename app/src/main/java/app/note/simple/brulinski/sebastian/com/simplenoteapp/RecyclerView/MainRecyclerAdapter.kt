@@ -5,6 +5,7 @@ import android.content.Context
 import android.content.SharedPreferences
 import android.preference.PreferenceManager
 import android.support.design.widget.Snackbar
+import android.support.v4.content.ContextCompat
 import android.support.v7.widget.CardView
 import android.support.v7.widget.RecyclerView
 import android.view.LayoutInflater
@@ -24,7 +25,7 @@ class MainRecyclerAdapter(var itemsHolder: ArrayList<ItemsHolder>, var recyclerV
 
     private var deletedItem: ItemsHolder? = null
     private lateinit var preferences: SharedPreferences
-    private var undoSnackbar = Snackbar.make((ctx as MainActivity).binding.root, ctx.getString(R.string.note_deleted), Snackbar.LENGTH_LONG)
+    private lateinit var undoSnackbar: Snackbar
 
 
     interface OnSnackbarDismissListener {
@@ -76,6 +77,16 @@ class MainRecyclerAdapter(var itemsHolder: ArrayList<ItemsHolder>, var recyclerV
             /*
            Make UNDO snackbar after delete
              */
+
+            if (flag) {
+                undoSnackbar = Snackbar.make((ctx as MainActivity).binding.root, ctx.getString(R.string.note_archived), Snackbar.LENGTH_LONG)
+                undoSnackbar.setActionTextColor(ContextCompat.getColor(ctx, R.color.material_white))
+            } else if (!flag) {
+                undoSnackbar = Snackbar.make((ctx as MainActivity).binding.root, ctx.getString(R.string.note_deleted), Snackbar.LENGTH_LONG)
+                undoSnackbar.setActionTextColor(ContextCompat.getColor(ctx, R.color.material_red))
+            }
+
+
             @Suppress("DEPRECATION")
             undoSnackbar.setAction(ctx.getString(R.string.undo), {
                 this.itemsHolder.add(pos, deletedItem!!)

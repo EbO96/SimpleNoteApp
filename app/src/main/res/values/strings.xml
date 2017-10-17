@@ -10,6 +10,7 @@
     <string name="layout_manager_key">grid_or_linear</string>
     <string name="preview">Preview</string>
     <string name="note_deleted">Note deleted</string>
+    <string name="note_archived">Note archived</string>
     <string name="undo">UNDO</string>
     <string name="title">Title</string>
     <string name="search">Search</string>
