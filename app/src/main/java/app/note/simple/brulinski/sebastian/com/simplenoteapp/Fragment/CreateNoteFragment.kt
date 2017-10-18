@@ -51,7 +51,6 @@ open class CreateNoteFragment : Fragment(), SaveNoteInterface {
     @ColorInt
     private val INFO_COLOR = Color.parseColor("#3F51B5")
     private var infoToastShowedAtStart: Boolean = false
-    private val showFabAfterTime = 2000L
 
     companion object {
         @SuppressLint("SimpleDateFormat")
@@ -152,6 +151,7 @@ open class CreateNoteFragment : Fragment(), SaveNoteInterface {
 
             database.use {
                 insert(LocalSQLAnkoDatabase.TABLE_NOTES, titleCol, noteCol, dateCol, isDeletedCol)
+                select(LocalSQLAnkoDatabase.TABLE_NOTES)
             }
 
             database.use {

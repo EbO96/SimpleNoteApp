@@ -22,7 +22,11 @@ import app.note.simple.brulinski.sebastian.com.simplenoteapp.R
 class ArchivesRecycler(private val notesArrayList: ArrayList<ItemsHolder>, private val recycler: RecyclerView, private val ctx: Context, private val fragment: ArchivedNotesFragment) : RecyclerView.Adapter<ArchivesRecycler.MyViewHolder>() {
 
     lateinit var mSizeCallback: OnRecyclerSizeListener
-    var selectedItemsIdArrayList = ArrayList<String>()
+
+    companion object {
+        var selectedItemsIdArrayList = ArrayList<String>()
+        var parentSavedInstanceState: Boolean = false
+    }
 
     interface OnRecyclerSizeListener {
         fun recyclerSize(size: Int)
@@ -106,17 +110,27 @@ class ArchivesRecycler(private val notesArrayList: ArrayList<ItemsHolder>, priva
             alert.show()
         }
 
-        holder.checkBox.setOnCheckedChangeListener { _, p1 ->
-            if (p1) {
+        for (x in 0 until selectedItemsIdArrayList.size) {
+            if (noteObject.id.equals(selectedItemsIdArrayList[x])) {
+                holder.checkBox.isChecked = true
                 holder.buttonsCard.visibility = View.INVISIBLE
-                selectedItemsIdArrayList.add(noteObject.id)
-            } else {
-                holder.buttonsCard.visibility = View.VISIBLE
-                selectedItemsIdArrayList.removeAt(selectedItemsIdArrayList.indexOf(noteObject.id))
             }
-
-            fragment.onCheckBoxesListener(selectedItemsIdArrayList.size, selectedItemsIdArrayList)
         }
+
+        holder.checkBox.setOnCheckedChangeListener { _, checked ->
+            checkThatNoteCheckBoxIsChecked(checked, holder, noteObject)
+        }
+    }
+
+    private fun checkThatNoteCheckBoxIsChecked(checked: Boolean, holder: MyViewHolder?, noteObject: ItemsHolder) {
+        if (checked) {
+            holder!!.buttonsCard.visibility = View.INVISIBLE
+            selectedItemsIdArrayList.add(noteObject.id)
+        } else {
+            holder!!.buttonsCard.visibility = View.VISIBLE
+            selectedItemsIdArrayList.removeAt(selectedItemsIdArrayList.indexOf(noteObject.id))
+        }
+        fragment.onCheckBoxesListener(selectedItemsIdArrayList.size, selectedItemsIdArrayList)
     }
 
     override fun getItemCount(): Int {

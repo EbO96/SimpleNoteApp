@@ -21,8 +21,10 @@ import app.note.simple.brulinski.sebastian.com.simplenoteapp.HelperClass.LayoutM
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.HelperClass.MyRowParserNoteProperties
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.HelperClass.MyRowParserNotes
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.Model.ItemsHolder
+import app.note.simple.brulinski.sebastian.com.simplenoteapp.Model.Notes
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.Model.NotesProperties
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.R
+import app.note.simple.brulinski.sebastian.com.simplenoteapp.R.string.notes
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.RecyclerView.MainRecyclerAdapter
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.databinding.NotesListFragmentBinding
 import com.labo.kaji.fragmentanimations.MoveAnimation
@@ -117,16 +119,18 @@ class NotesListFragment : Fragment() {
                         properties[x].get(x).textColor, properties[x].get(x).fontStyle))
             }
         }
+        var size = 0
+        var notes: List<List<Notes.Note>>? = null
 
         context.database.use {
-            val notes = select(LocalSQLAnkoDatabase.TABLE_NOTES).whereSimple("${LocalSQLAnkoDatabase.IS_DELETED}=?", false.toString()).parseList(MyRowParserNotes())
-            val size = notes.size
+            notes = select(LocalSQLAnkoDatabase.TABLE_NOTES).whereSimple("${LocalSQLAnkoDatabase.IS_DELETED}=?", false.toString()).parseList(MyRowParserNotes())
+            size = notes!!.size
+        }
 
-            for (x in 0 until size) {
-                itemsObjectsArray.add(ItemsHolder(notes[x].get(x).id!!, notes[x].get(x).title!!, notes[x].get(x).note!!,
-                        notes[x][x].date!!, notesPropertiesArray[x].bgColor!!, notesPropertiesArray[x].textColor!!,
-                        notesPropertiesArray.get(x).fontStyle!!, false))
-            }
+        for (x in 0 until size) {
+            itemsObjectsArray.add(ItemsHolder(notes!![x].get(x).id!!, notes!![x].get(x).title!!, notes!![x].get(x).note!!,
+                    notes!![x].get(x).date!!, notesPropertiesArray[x].bgColor!!, notesPropertiesArray[x].textColor!!,
+                    notesPropertiesArray.get(x).fontStyle!!, false))
         }
     }
 

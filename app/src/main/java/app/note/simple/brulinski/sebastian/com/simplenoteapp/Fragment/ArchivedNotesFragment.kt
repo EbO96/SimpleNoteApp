@@ -24,6 +24,7 @@ class ArchivedNotesFragment : Fragment() {
     private lateinit var deleteMenuItem: MenuItem
     private lateinit var restoreMenuItem: MenuItem
     private lateinit var itemsToDeleteOrRestore: ArrayList<String>
+    private val CHECKED_INSTANCE_KEY = "checkedNotes"
 
     interface OnChangeScreenListener {
         fun replaceFragment()
@@ -40,16 +41,22 @@ class ArchivedNotesFragment : Fragment() {
         binding = DataBindingUtil.inflate(inflater, R.layout.archived_notes_fragment, container, false)
         setHasOptionsMenu(true)
 
+        archivedNotesArrayList = arguments.getParcelableArrayList<ItemsHolder>("archivedNoteObject")
+        initRecycler(archivedNotesArrayList)
+        listenRecyclerSize()
+
+        if (savedInstanceState != null) {
+            val array = savedInstanceState.getStringArrayList(CHECKED_INSTANCE_KEY)
+            ArchivesRecycler.selectedItemsIdArrayList = array
+
+        }
 
         return binding.root
     }
 
-    override fun onActivityCreated(savedInstanceState: Bundle?) {
-        super.onActivityCreated(savedInstanceState)
-
-        archivedNotesArrayList = arguments.getParcelableArrayList<ItemsHolder>("archivedNoteObject")
-        initRecycler(archivedNotesArrayList)
-        listenRecyclerSize()
+    override fun onSaveInstanceState(outState: Bundle?) {
+        outState!!.putStringArrayList(CHECKED_INSTANCE_KEY, ArchivesRecycler.selectedItemsIdArrayList)
+        super.onSaveInstanceState(outState)
     }
 
     private fun initRecycler(itemsHolderArrayList: ArrayList<ItemsHolder>) {
@@ -118,7 +125,7 @@ class ArchivedNotesFragment : Fragment() {
     }
 
     private fun resetInterfaceAndValuesAfterMultipleDelete() {
-        myRecycler.selectedItemsIdArrayList = ArrayList<String>()
+        ArchivesRecycler.selectedItemsIdArrayList = ArrayList<String>()
         //Reset toolbar and arrays
         (activity as ArchivesActivity).supportActionBar!!.title = getString(R.string.archives)
         deleteMenuItem.isVisible = false
@@ -134,6 +141,10 @@ class ArchivedNotesFragment : Fragment() {
         menuInflater.inflate(R.menu.archives_menu, menu)
         deleteMenuItem = menu!!.findItem(R.id.archives_delete).setVisible(false)
         restoreMenuItem = menu.findItem(R.id.archives_restore).setVisible(false)
+        val array = ArchivesRecycler.selectedItemsIdArrayList
+
+        onCheckBoxesListener(array.size, array)
+
         super.onCreateOptionsMenu(menu, inflater)
     }
 
@@ -177,7 +188,6 @@ class ArchivedNotesFragment : Fragment() {
         })
         alert.show()
     }
-
 
     fun onCheckBoxesListener(numberOfItems: Int, itemsIdArrayList: ArrayList<String>?) {
         if (numberOfItems > 0) {
