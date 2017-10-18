@@ -1,12 +1,9 @@
 package app.note.simple.brulinski.sebastian.com.simplenoteapp.Activity
 
-import android.app.AlertDialog
 import android.databinding.DataBindingUtil
 import android.os.Bundle
-import android.support.v4.content.ContextCompat
+import android.support.v4.app.NavUtils
 import android.support.v7.app.AppCompatActivity
-import android.view.Menu
-import android.view.MenuInflater
 import android.view.MenuItem
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.Database.LocalSQLAnkoDatabase
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.Database.database
@@ -33,6 +30,7 @@ class ArchivesActivity : AppCompatActivity() {
         Set Toolbar
         */
         setSupportActionBar(binding.archivedNotesToolbar)
+        supportActionBar!!.setDisplayHomeAsUpEnabled(true)
         setToolbarTitle(getString(R.string.archives))
 
         val notes = getArchivedNotes()
@@ -113,8 +111,17 @@ class ArchivesActivity : AppCompatActivity() {
         return archivedNotesArrayList
     }
 
+    override fun onOptionsItemSelected(item: MenuItem?): Boolean {
+        when(item!!.itemId){
+            R.id.home -> {
+                NavUtils.navigateUpFromSameTask(this)
+            }
+        }
+        return super.onOptionsItemSelected(item)
+    }
+
     override fun onBackPressed() {
+        NavUtils.navigateUpFromSameTask(this)
         super.onBackPressed()
-        this.finish()
     }
 }

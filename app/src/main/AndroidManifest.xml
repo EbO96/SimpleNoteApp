@@ -21,13 +21,32 @@
         </activity>
         <activity
             android:name=".Activity.SearchActivity"
-            tools:ignore="InnerclassSeparator" />
+            android:parentActivityName=".Activity.MainActivity"
+            tools:ignore="InnerclassSeparator">
+
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value=".Activity.MainActivity" />
+        </activity>
+
         <activity
             android:name=".Activity.ArchivesActivity"
-            tools:ignore="InnerclassSeparator" />
+            android:parentActivityName=".Activity.MainActivity"
+            tools:ignore="InnerclassSeparator">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value=".Activity.MainActivity" />
+        </activity>
+
         <activity
             android:name=".Activity.SettingsActivity"
-            android:label="@string/title_activity_settings" />
+            android:label="@string/title_activity_settings"
+            android:parentActivityName=".Activity.MainActivity">
+
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value=".Activity.MainActivity" />
+        </activity>
     </application>
 
 </manifest>
