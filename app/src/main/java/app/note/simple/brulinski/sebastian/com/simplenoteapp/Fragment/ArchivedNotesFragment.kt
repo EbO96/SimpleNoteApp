@@ -7,11 +7,12 @@ import android.os.Bundle
 import android.support.v4.app.Fragment
 import android.support.v4.content.ContextCompat
 import android.support.v7.widget.LinearLayoutManager
+import android.util.Log
 import android.view.*
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.Activity.ArchivesActivity
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.Database.LocalSQLAnkoDatabase
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.Database.database
-import app.note.simple.brulinski.sebastian.com.simplenoteapp.Model.ItemsHolder
+import app.note.simple.brulinski.sebastian.com.simplenoteapp.Model.ArchivedNotesItemsHolder
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.R
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.RecyclerView.ArchivesRecycler
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.databinding.ArchivedNotesFragmentBinding
@@ -20,10 +21,10 @@ import jp.wasabeef.recyclerview.animators.SlideInRightAnimator
 class ArchivedNotesFragment : Fragment() {
 
     lateinit var mChangeScreenCallback: OnChangeScreenListener
-    lateinit var archivedNotesArrayList: ArrayList<ItemsHolder>
+    lateinit var archivedNotesArrayList: ArrayList<ArchivedNotesItemsHolder>
     private lateinit var deleteMenuItem: MenuItem
     private lateinit var restoreMenuItem: MenuItem
-    private lateinit var itemsToDeleteOrRestore: ArrayList<String>
+    private var itemsToDeleteOrRestore = ArrayList<ArchivedNotesItemsHolder>()
     private val CHECKED_INSTANCE_KEY = "checkedNotes"
 
     interface OnChangeScreenListener {
@@ -41,25 +42,32 @@ class ArchivedNotesFragment : Fragment() {
         binding = DataBindingUtil.inflate(inflater, R.layout.archived_notes_fragment, container, false)
         setHasOptionsMenu(true)
 
-        archivedNotesArrayList = arguments.getParcelableArrayList<ItemsHolder>("archivedNoteObject")
-        initRecycler(archivedNotesArrayList)
-        listenRecyclerSize()
-
-        if (savedInstanceState != null) {
-            val array = savedInstanceState.getStringArrayList(CHECKED_INSTANCE_KEY)
-            ArchivesRecycler.selectedItemsIdArrayList = array
-
+        if (savedInstanceState == null) {
+            archivedNotesArrayList = arguments.getParcelableArrayList<ArchivedNotesItemsHolder>("archivedNoteObject")
+            initRecycler(archivedNotesArrayList)
         }
+        else {
+            archivedNotesArrayList = savedInstanceState.getParcelableArrayList(CHECKED_INSTANCE_KEY)
+            myRecycler.notifyDataSetChanged()
+        }
+
+        listenRecyclerSize()
 
         return binding.root
     }
 
     override fun onSaveInstanceState(outState: Bundle?) {
-        outState!!.putStringArrayList(CHECKED_INSTANCE_KEY, ArchivesRecycler.selectedItemsIdArrayList)
+
+        val a = myRecycler.getArray()
+        for (x in 0 until a.size) {
+            if (a[x].isSelected)
+                Log.i("abcd", x.toString())
+        }
+        outState!!.putParcelableArrayList(CHECKED_INSTANCE_KEY, myRecycler.getArray())
         super.onSaveInstanceState(outState)
     }
 
-    private fun initRecycler(itemsHolderArrayList: ArrayList<ItemsHolder>) {
+    private fun initRecycler(itemsHolderArrayList: ArrayList<ArchivedNotesItemsHolder>) {
         val recycler = binding.archivesRecycler
         recycler.itemAnimator = SlideInRightAnimator()
         recycler.layoutManager = LinearLayoutManager(context)
@@ -78,36 +86,22 @@ class ArchivedNotesFragment : Fragment() {
         })
     }
 
-    private fun deleteSelectedItems(itemsIdArrayList: ArrayList<String>) {
+    private fun deleteSelectedItems(itemsArrayList: ArrayList<ArchivedNotesItemsHolder>) {
         context.database.use {
-            for (x in 0 until itemsIdArrayList.size) {
+            for (x in 0 until itemsArrayList.size) {
                 delete(
-                        LocalSQLAnkoDatabase.TABLE_NOTES, "${LocalSQLAnkoDatabase.ID}=?", arrayOf(itemsIdArrayList[x])
+                        LocalSQLAnkoDatabase.TABLE_NOTES, "${LocalSQLAnkoDatabase.ID}=?", arrayOf(itemsArrayList[x].id)
                 )
                 delete(
-                        LocalSQLAnkoDatabase.TABLE_NOTES_PROPERTIES, "${LocalSQLAnkoDatabase.NOTE_ID}=?", arrayOf(itemsIdArrayList[x])
+                        LocalSQLAnkoDatabase.TABLE_NOTES_PROPERTIES, "${LocalSQLAnkoDatabase.NOTE_ID}=?", arrayOf(itemsArrayList[x].id)
                 )
             }
         }
-        deleteNotesFromRecyclerAfterRemoveOrRestore(itemsIdArrayList)
+        removeSelectedItems()
         resetInterfaceAndValuesAfterMultipleDelete()
     }
 
-    private fun deleteNotesFromRecyclerAfterRemoveOrRestore(itemsIdArrayList: ArrayList<String>) {
-        for (x in 0 until itemsIdArrayList.size) {
-            var indexOfItem = 0
-            for (y in 0 until archivedNotesArrayList.size) {
-                if (archivedNotesArrayList[y].id.equals(itemsIdArrayList[x])) {
-                    indexOfItem = y
-                    break
-                }
-            }
-            archivedNotesArrayList.removeAt(indexOfItem)
-            myRecycler.notifyItemRemoved(indexOfItem)
-        }
-    }
-
-    private fun restoreSelectedItems(itemsToRestore: ArrayList<String>) {
+    private fun restoreSelectedItems(itemsToRestore: ArrayList<ArchivedNotesItemsHolder>) {
 
         val isDeletedValue = ContentValues()
         isDeletedValue.put(LocalSQLAnkoDatabase.IS_DELETED, false.toString())
@@ -115,17 +109,24 @@ class ArchivedNotesFragment : Fragment() {
         context.database.use {
 
             for (x in 0 until itemsToRestore.size) {
-                update(LocalSQLAnkoDatabase.TABLE_NOTES, isDeletedValue, "${LocalSQLAnkoDatabase.ID}=?", arrayOf(itemsToRestore[x]))
-                update(LocalSQLAnkoDatabase.TABLE_NOTES_PROPERTIES, isDeletedValue, "${LocalSQLAnkoDatabase.NOTE_ID}=?", arrayOf(itemsToRestore[x]))
+                update(LocalSQLAnkoDatabase.TABLE_NOTES, isDeletedValue, "${LocalSQLAnkoDatabase.ID}=?", arrayOf(itemsToRestore[x].id))
+                update(LocalSQLAnkoDatabase.TABLE_NOTES_PROPERTIES, isDeletedValue, "${LocalSQLAnkoDatabase.NOTE_ID}=?", arrayOf(itemsToRestore[x].id))
 
             }
-            deleteNotesFromRecyclerAfterRemoveOrRestore(itemsToRestore)
+            removeSelectedItems()
             resetInterfaceAndValuesAfterMultipleDelete()
         }
     }
 
+    private fun removeSelectedItems() {
+        for (x in 0 until itemsToDeleteOrRestore.size) {
+            archivedNotesArrayList.removeAt(archivedNotesArrayList.indexOf(itemsToDeleteOrRestore[x]))
+        }
+        myRecycler.notifyDataSetChanged()
+    }
+
+
     private fun resetInterfaceAndValuesAfterMultipleDelete() {
-        ArchivesRecycler.selectedItemsIdArrayList = ArrayList<String>()
         //Reset toolbar and arrays
         (activity as ArchivesActivity).supportActionBar!!.title = getString(R.string.archives)
         deleteMenuItem.isVisible = false
@@ -141,10 +142,8 @@ class ArchivedNotesFragment : Fragment() {
         menuInflater.inflate(R.menu.archives_menu, menu)
         deleteMenuItem = menu!!.findItem(R.id.archives_delete).setVisible(false)
         restoreMenuItem = menu.findItem(R.id.archives_restore).setVisible(false)
-        val array = ArchivesRecycler.selectedItemsIdArrayList
 
-        onCheckBoxesListener(array.size, array)
-
+        onCheckBoxesListener(archivedNotesArrayList)
         super.onCreateOptionsMenu(menu, inflater)
     }
 
@@ -155,14 +154,14 @@ class ArchivedNotesFragment : Fragment() {
         when (item!!.itemId) {
             R.id.archives_delete -> {
 
-                message = "${getString(R.string.delete)} ${getString(R.string.notesLowerCase)}? (${itemsToDeleteOrRestore.size})"
+                message = "${getString(R.string.delete)} ${getString(R.string.notesLowerCase)}? (${itemsSize})"
 
                 makeDeleteOrRestoreConfirmDialog(message,
                         R.drawable.ic_delete_black_24dp, true) //True means that method delete items
             }
             R.id.archives_restore -> {
 
-                message = "${getString(R.string.restore)} ${getString(R.string.notesLowerCase)}? (${itemsToDeleteOrRestore.size})"
+                message = "${getString(R.string.restore)} ${getString(R.string.notesLowerCase)}? (${itemsSize})"
 
                 makeDeleteOrRestoreConfirmDialog(message,
                         R.drawable.ic_restore_black_24dp, false) //False means that method delete items
@@ -189,17 +188,24 @@ class ArchivedNotesFragment : Fragment() {
         alert.show()
     }
 
-    fun onCheckBoxesListener(numberOfItems: Int, itemsIdArrayList: ArrayList<String>?) {
-        if (numberOfItems > 0) {
+    fun onCheckBoxesListener(itemsIdArrayList: ArrayList<ArchivedNotesItemsHolder>) {
+        itemsToDeleteOrRestore.clear()
+
+        for (x in 0 until itemsIdArrayList.size) {
+            if (itemsIdArrayList[x].isSelected)
+                itemsToDeleteOrRestore.add(itemsIdArrayList[x]!!)
+        }
+
+        val arraySize = itemsToDeleteOrRestore.size
+
+        if (itemsToDeleteOrRestore.size > 0) {
             deleteMenuItem.isVisible = true
             restoreMenuItem.isVisible = true
-            (activity as ArchivesActivity).setToolbarTitle("$numberOfItems ${getString(R.string.items_selected)}")
+            (activity as ArchivesActivity).setToolbarTitle("$arraySize ${getString(R.string.items_selected)}")
         } else {
             deleteMenuItem.isVisible = false
             restoreMenuItem.isVisible = false
             (activity as ArchivesActivity).setToolbarTitle(getString(R.string.archives))
         }
-        if (itemsIdArrayList != null)  //After delete
-            itemsToDeleteOrRestore = itemsIdArrayList
     }
 }

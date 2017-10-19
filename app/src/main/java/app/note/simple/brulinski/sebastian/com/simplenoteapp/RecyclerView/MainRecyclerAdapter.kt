@@ -21,11 +21,11 @@ import app.note.simple.brulinski.sebastian.com.simplenoteapp.Model.ItemsHolder
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.R
 
 
-class MainRecyclerAdapter(var itemsHolder: ArrayList<ItemsHolder>, var recyclerView: RecyclerView, var ctx: Context) : RecyclerView.Adapter<MainRecyclerAdapter.ViewHolder>() {
+class MainRecyclerAdapter(private var itemsHolder: ArrayList<ItemsHolder>, var recyclerView: RecyclerView, var ctx: Context) : RecyclerView.Adapter<MainRecyclerAdapter.ViewHolder>() {
 
     private var deletedItem: ItemsHolder? = null
     private lateinit var preferences: SharedPreferences
-    private lateinit var undoSnackbar: Snackbar
+    private lateinit var undoSnack: Snackbar
 
 
     interface OnSnackbarDismissListener {
@@ -41,36 +41,32 @@ class MainRecyclerAdapter(var itemsHolder: ArrayList<ItemsHolder>, var recyclerV
     }
 
     override fun onBindViewHolder(holder: ViewHolder?, position: Int) {
-        val itemsHolder: ItemsHolder = itemsHolder[position]
 
-        var title = itemsHolder.title
-        var note = itemsHolder.note
-
+        var title = itemsHolder[position].title
+        var note = itemsHolder[position].note
+        var positionToDelete: Int
 
         if (title.length > 30)
             title = title.substring(0, 30) + "..."
         if (note.length > 260)
             note = note.substring(0, 260) + "..."
 
-        EditorManager.FontStyleManager.recogniseAndSetFont(itemsHolder.fontStyle, holder!!.title, holder.note)
+        EditorManager.FontStyleManager.recogniseAndSetFont(itemsHolder[position].fontStyle, holder!!.title, holder.note)
         val bg = EditorManager.ColorManager(ctx)
 
-        bg.recogniseAndSetColor(itemsHolder.bgColor, arrayListOf(holder.card), "BG") //Change note color
-        bg.recogniseAndSetColor(itemsHolder.textColor, arrayListOf(holder.title, holder.note), "FONT")
+        bg.recogniseAndSetColor(itemsHolder[position].bgColor, arrayListOf(holder.card), "BG") //Change note color
+        bg.recogniseAndSetColor(itemsHolder[position].textColor, arrayListOf(holder.title, holder.note), "FONT")
 
         holder.title?.text = title
         holder.note.text = note
 
-        var pos: Int
 
         holder.itemView?.setOnClickListener {
-            pos = recyclerView.getChildAdapterPosition(holder.itemView)
-            (ctx as MainActivity).onNoteClicked(this.itemsHolder[pos])
+            (ctx as MainActivity).onNoteClicked(this.itemsHolder[position])
         }
 
         holder.itemView?.setOnLongClickListener {
-            pos = recyclerView.getChildAdapterPosition(holder.itemView)
-
+            positionToDelete = holder.adapterPosition
             preferences = PreferenceManager.getDefaultSharedPreferences(ctx)
             val flag = preferences.getBoolean(ctx.getString(R.string.pref_key_archives), true)
 
@@ -79,19 +75,19 @@ class MainRecyclerAdapter(var itemsHolder: ArrayList<ItemsHolder>, var recyclerV
              */
 
             if (flag) {
-                undoSnackbar = Snackbar.make((ctx as MainActivity).binding.root, ctx.getString(R.string.note_archived), Snackbar.LENGTH_LONG)
-                undoSnackbar.setActionTextColor(ContextCompat.getColor(ctx, R.color.material_white))
+                undoSnack = Snackbar.make((ctx as MainActivity).binding.root, ctx.getString(R.string.note_archived), Snackbar.LENGTH_SHORT)
+                undoSnack.setActionTextColor(ContextCompat.getColor(ctx, R.color.material_white))
             } else if (!flag) {
-                undoSnackbar = Snackbar.make((ctx as MainActivity).binding.root, ctx.getString(R.string.note_deleted), Snackbar.LENGTH_LONG)
-                undoSnackbar.setActionTextColor(ContextCompat.getColor(ctx, R.color.material_red))
+                undoSnack = Snackbar.make((ctx as MainActivity).binding.root, ctx.getString(R.string.note_deleted), Snackbar.LENGTH_SHORT)
+                undoSnack.setActionTextColor(ContextCompat.getColor(ctx, R.color.material_red))
             }
 
 
             @Suppress("DEPRECATION")
-            undoSnackbar.setAction(ctx.getString(R.string.undo), {
-                this.itemsHolder.add(pos, deletedItem!!)
-                notifyItemInserted(pos)
-                recyclerView.scrollToPosition(pos)
+            undoSnack.setAction(ctx.getString(R.string.undo), {
+                this.itemsHolder.add(positionToDelete, deletedItem!!)
+                notifyItemInserted(positionToDelete)
+                recyclerView.scrollToPosition(positionToDelete)
 
                 if (flag)
                     addDeleteFlag(deletedItem!!.id, false)
@@ -108,8 +104,8 @@ class MainRecyclerAdapter(var itemsHolder: ArrayList<ItemsHolder>, var recyclerV
                 }
             }).show()
 
-            deletedItem = this.itemsHolder.removeAt(pos)
-            notifyItemRemoved(pos)
+            deletedItem = itemsHolder.removeAt(positionToDelete)
+            notifyItemRemoved(positionToDelete)
 
             if (flag)
                 addDeleteFlag(deletedItem!!.id, true)

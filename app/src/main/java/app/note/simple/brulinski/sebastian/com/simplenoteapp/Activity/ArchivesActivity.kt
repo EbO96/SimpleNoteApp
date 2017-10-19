@@ -11,6 +11,7 @@ import app.note.simple.brulinski.sebastian.com.simplenoteapp.Fragment.ArchivedNo
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.Fragment.NoArchivedNotesFragment
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.HelperClass.MyRowParserNoteProperties
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.HelperClass.MyRowParserNotes
+import app.note.simple.brulinski.sebastian.com.simplenoteapp.Model.ArchivedNotesItemsHolder
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.Model.ItemsHolder
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.Model.NotesProperties
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.R
@@ -19,7 +20,7 @@ import org.jetbrains.anko.db.select
 
 class ArchivesActivity : AppCompatActivity() {
 
-    private var archivedNotesArrayList = ArrayList<ItemsHolder>()
+    private var archivedNotesArrayList = ArrayList<ArchivedNotesItemsHolder>()
     private lateinit var binding: ActivityArchivesBinding
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -79,7 +80,7 @@ class ArchivesActivity : AppCompatActivity() {
         listenForReplaceFragmentEvent(fragment)
     }
 
-    private fun getArchivedNotes(): ArrayList<ItemsHolder> {
+    private fun getArchivedNotes(): ArrayList<ArchivedNotesItemsHolder> {
         archivedNotesArrayList = ArrayList()
 
         val propertiesArray = ArrayList<NotesProperties>()
@@ -103,7 +104,7 @@ class ArchivesActivity : AppCompatActivity() {
 
             for (x in 0 until size) {
                 val item = notes[x].get(x)
-                val noteObject = ItemsHolder(item.id!!, item.title!!, item.note!!, item.date!!, propertiesArray[x].bgColor.toString(),
+                val noteObject = ArchivedNotesItemsHolder(false, item.id!!, item.title!!, item.note!!, item.date!!, propertiesArray[x].bgColor.toString(),
                         propertiesArray[x].textColor.toString(), propertiesArray[x].fontStyle.toString(), true)
                 archivedNotesArrayList.add(noteObject)
             }
@@ -112,7 +113,7 @@ class ArchivesActivity : AppCompatActivity() {
     }
 
     override fun onOptionsItemSelected(item: MenuItem?): Boolean {
-        when(item!!.itemId){
+        when (item!!.itemId) {
             R.id.home -> {
                 NavUtils.navigateUpFromSameTask(this)
             }

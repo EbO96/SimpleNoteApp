@@ -6,6 +6,7 @@ import android.content.Context
 import android.support.v4.content.ContextCompat
 import android.support.v7.widget.CardView
 import android.support.v7.widget.RecyclerView
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -16,17 +17,12 @@ import app.note.simple.brulinski.sebastian.com.simplenoteapp.Database.LocalSQLAn
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.Database.database
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.Editor.EditorManager
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.Fragment.ArchivedNotesFragment
-import app.note.simple.brulinski.sebastian.com.simplenoteapp.Model.ItemsHolder
+import app.note.simple.brulinski.sebastian.com.simplenoteapp.Model.ArchivedNotesItemsHolder
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.R
 
-class ArchivesRecycler(private val notesArrayList: ArrayList<ItemsHolder>, private val recycler: RecyclerView, private val ctx: Context, private val fragment: ArchivedNotesFragment) : RecyclerView.Adapter<ArchivesRecycler.MyViewHolder>() {
+class ArchivesRecycler(private var notesArrayList: ArrayList<ArchivedNotesItemsHolder>, private val recycler: RecyclerView, private val ctx: Context, private val fragment: ArchivedNotesFragment) : RecyclerView.Adapter<ArchivesRecycler.MyViewHolder>() {
 
     lateinit var mSizeCallback: OnRecyclerSizeListener
-
-    companion object {
-        var selectedItemsIdArrayList = ArrayList<String>()
-        var parentSavedInstanceState: Boolean = false
-    }
 
     interface OnRecyclerSizeListener {
         fun recyclerSize(size: Int)
@@ -38,11 +34,27 @@ class ArchivesRecycler(private val notesArrayList: ArrayList<ItemsHolder>, priva
 
     override fun onBindViewHolder(holder: MyViewHolder?, position: Int) {
         val noteObject = notesArrayList[position]
+        var positionToDelete: Int
 
         val title = noteObject.title
         val note = noteObject.note
 
-        EditorManager.FontStyleManager.recogniseAndSetFont(noteObject.fontStyle, holder!!.titleTextView, holder.noteTextView)
+        val checkedObject = notesArrayList[position].isSelected
+
+        holder!!.checkBox.setOnCheckedChangeListener(null)
+
+        for (x in 0 until notesArrayList.size) {
+            Log.i("checkbox", "item position in array: $x and item isChecked = ${notesArrayList[x].isSelected}")
+        }
+        if (checkedObject) {
+            holder.checkBox.isChecked = true
+            holder.buttonsCard.visibility = View.INVISIBLE
+        } else {
+            holder.checkBox.isChecked = false
+            holder.buttonsCard.visibility = View.VISIBLE
+        }
+
+        EditorManager.FontStyleManager.recogniseAndSetFont(noteObject.fontStyle, holder.titleTextView, holder.noteTextView)
         val bg = EditorManager.ColorManager(ctx)
 
         bg.recogniseAndSetColor(noteObject.bgColor, arrayListOf(holder.card), "BG") //Change note color
@@ -51,12 +63,20 @@ class ArchivesRecycler(private val notesArrayList: ArrayList<ItemsHolder>, priva
         holder.titleTextView.text = title
         holder.noteTextView.text = note
 
-        var itemPosition = 0
+        holder.checkBox.setOnClickListener {
+            val checked = holder.checkBox.isChecked
+
+            if (checked) {
+                holder.buttonsCard.visibility = View.INVISIBLE
+            } else if (!checked) {
+                holder.buttonsCard.visibility = View.VISIBLE
+            }
+            notesArrayList[position].isSelected = checked
+            fragment.onCheckBoxesListener(notesArrayList)
+        }
 
         holder.deleteImageButton.setOnClickListener {
-
-            itemPosition = recycler.getChildAdapterPosition(holder.itemView)
-
+            positionToDelete = recycler.getChildAdapterPosition(holder.itemView)
             val alert = AlertDialog.Builder(ctx).create()
 
             alert.setIcon(ContextCompat.getDrawable(ctx, R.drawable.ic_delete_black_24dp))
@@ -68,8 +88,8 @@ class ArchivesRecycler(private val notesArrayList: ArrayList<ItemsHolder>, priva
                     delete(LocalSQLAnkoDatabase.TABLE_NOTES_PROPERTIES, "${LocalSQLAnkoDatabase.NOTE_ID}=?", arrayOf(noteObject.id))
                 }
 
-                notesArrayList.removeAt(itemPosition)
-                notifyItemRemoved(itemPosition)
+                notesArrayList.removeAt(positionToDelete)
+                notifyItemRemoved(positionToDelete)
 
                 mSizeCallback.recyclerSize(notesArrayList.size)
             })
@@ -82,8 +102,7 @@ class ArchivesRecycler(private val notesArrayList: ArrayList<ItemsHolder>, priva
         }
 
         holder.restoreImageButton.setOnClickListener {
-            itemPosition = recycler.getChildAdapterPosition(holder.itemView)
-
+            positionToDelete = recycler.getChildAdapterPosition(holder.itemView)
             val alert = AlertDialog.Builder(ctx).create()
 
             alert.setIcon(ContextCompat.getDrawable(ctx, R.drawable.ic_restore_black_24dp))
@@ -97,8 +116,8 @@ class ArchivesRecycler(private val notesArrayList: ArrayList<ItemsHolder>, priva
                     update(LocalSQLAnkoDatabase.TABLE_NOTES, isDeletedValue, "${LocalSQLAnkoDatabase.ID}=?", arrayOf(noteObject.id))
                     update(LocalSQLAnkoDatabase.TABLE_NOTES_PROPERTIES, isDeletedValue, "${LocalSQLAnkoDatabase.NOTE_ID}=?", arrayOf(noteObject.id))
                 }
-                notesArrayList.removeAt(itemPosition)
-                notifyItemRemoved(itemPosition)
+                notesArrayList.removeAt(positionToDelete)
+                notifyItemRemoved(positionToDelete)
 
                 mSizeCallback.recyclerSize(notesArrayList.size)
             })
@@ -106,31 +125,8 @@ class ArchivesRecycler(private val notesArrayList: ArrayList<ItemsHolder>, priva
             alert.setButton(AlertDialog.BUTTON_NEGATIVE, ctx.getString(R.string.no), { _, i ->
                 //Do nothing
             })
-
             alert.show()
         }
-
-        for (x in 0 until selectedItemsIdArrayList.size) {
-            if (noteObject.id.equals(selectedItemsIdArrayList[x])) {
-                holder.checkBox.isChecked = true
-                holder.buttonsCard.visibility = View.INVISIBLE
-            }
-        }
-
-        holder.checkBox.setOnCheckedChangeListener { _, checked ->
-            checkThatNoteCheckBoxIsChecked(checked, holder, noteObject)
-        }
-    }
-
-    private fun checkThatNoteCheckBoxIsChecked(checked: Boolean, holder: MyViewHolder?, noteObject: ItemsHolder) {
-        if (checked) {
-            holder!!.buttonsCard.visibility = View.INVISIBLE
-            selectedItemsIdArrayList.add(noteObject.id)
-        } else {
-            holder!!.buttonsCard.visibility = View.VISIBLE
-            selectedItemsIdArrayList.removeAt(selectedItemsIdArrayList.indexOf(noteObject.id))
-        }
-        fragment.onCheckBoxesListener(selectedItemsIdArrayList.size, selectedItemsIdArrayList)
     }
 
     override fun getItemCount(): Int {
@@ -151,5 +147,10 @@ class ArchivesRecycler(private val notesArrayList: ArrayList<ItemsHolder>, priva
         val card = itemView.findViewById<CardView>(R.id.archives_card)
         val buttonsCard = itemView.findViewById<CardView>(R.id.archived_note_card_buttons_card)
         val checkBox = itemView.findViewById<CheckBox>(R.id.archived_note_card_checkBox)
+    }
+
+    fun getArray(): ArrayList<ArchivedNotesItemsHolder> {
+
+        return notesArrayList
     }
 }

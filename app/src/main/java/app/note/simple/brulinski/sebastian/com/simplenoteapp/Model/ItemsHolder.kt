@@ -4,8 +4,8 @@ import android.os.Parcel
 import android.os.Parcelable
 
 
-class ItemsHolder(var id: String, var title: String, var note: String, var date: String?, var bgColor: String, var textColor: String,
-                  var fontStyle: String, var isDeleted: Boolean) : Parcelable {
+open class ItemsHolder(var id: String, var title: String, var note: String, var date: String?, var bgColor: String, var textColor: String,
+                       var fontStyle: String, var isDeleted: Boolean) : Parcelable {
 
     constructor(parcel: Parcel) : this(
             parcel.readString(),
