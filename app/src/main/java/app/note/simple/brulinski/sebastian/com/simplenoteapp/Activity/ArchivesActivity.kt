@@ -12,7 +12,6 @@ import app.note.simple.brulinski.sebastian.com.simplenoteapp.Fragment.NoArchived
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.HelperClass.MyRowParserNoteProperties
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.HelperClass.MyRowParserNotes
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.Model.ArchivedNotesItemsHolder
-import app.note.simple.brulinski.sebastian.com.simplenoteapp.Model.ItemsHolder
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.Model.NotesProperties
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.R
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.databinding.ActivityArchivesBinding
@@ -22,6 +21,8 @@ class ArchivesActivity : AppCompatActivity() {
 
     private var archivedNotesArrayList = ArrayList<ArchivedNotesItemsHolder>()
     private lateinit var binding: ActivityArchivesBinding
+    private val ARCHIVED_TAG = "archived"
+    private val NO_ARCHIVED_TAG = "no_archived"
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -36,13 +37,26 @@ class ArchivesActivity : AppCompatActivity() {
 
         val notes = getArchivedNotes()
         val args = Bundle()
-        args.putParcelableArrayList("archivedNoteObject", notes)
+        if (savedInstanceState == null)
+            args.putParcelableArrayList(ArchivedNotesFragment.BUNDLE_KEY, notes)
+        else {
+            args.putParcelableArrayList(ArchivedNotesFragment.BUNDLE_KEY, savedInstanceState.getParcelableArrayList<ArchivedNotesItemsHolder>(ArchivedNotesFragment.BUNDLE_KEY))
+        }
 
         if (notes.size == 0) {
             setNoArchivedNotesFragment()
         } else {
             setArchivedNotesFragment(args)
         }
+    }
+
+    override fun onSaveInstanceState(outState: Bundle?) {
+        val frag = supportFragmentManager.findFragmentById(binding.archivedNotesFragmentContainer.id)
+        if (frag is ArchivedNotesFragment) {
+            val array = frag.archivedNotesArrayList
+            outState!!.putParcelableArrayList(ArchivedNotesFragment.BUNDLE_KEY, array)
+        }
+        super.onSaveInstanceState(outState)
     }
 
     fun setToolbarTitle(title: String) {
@@ -63,7 +77,7 @@ class ArchivesActivity : AppCompatActivity() {
 
         val fragment = NoArchivedNotesFragment()
 
-        fragmentTransaction.replace(binding.archivedNotesFragmentContainer.id, fragment).commit()
+        fragmentTransaction.replace(binding.archivedNotesFragmentContainer.id, fragment, NO_ARCHIVED_TAG).commit()
         fragmentManager.executePendingTransactions()
     }
 
@@ -74,7 +88,7 @@ class ArchivesActivity : AppCompatActivity() {
         val fragment = ArchivedNotesFragment()
         fragment.arguments = notesBundle
 
-        fragmentTransaction.replace(binding.archivedNotesFragmentContainer.id, fragment).commit()
+        fragmentTransaction.replace(binding.archivedNotesFragmentContainer.id, fragment, ARCHIVED_TAG).commit()
         fragmentManager.executePendingTransactions()
 
         listenForReplaceFragmentEvent(fragment)

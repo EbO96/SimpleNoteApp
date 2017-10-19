@@ -32,6 +32,7 @@
         <activity
             android:name=".Activity.ArchivesActivity"
             android:parentActivityName=".Activity.MainActivity"
+            android:noHistory="false"
             tools:ignore="InnerclassSeparator">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"

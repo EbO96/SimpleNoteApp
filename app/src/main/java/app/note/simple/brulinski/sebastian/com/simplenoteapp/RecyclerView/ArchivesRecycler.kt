@@ -33,6 +33,7 @@ class ArchivesRecycler(private var notesArrayList: ArrayList<ArchivedNotesItemsH
     }
 
     override fun onBindViewHolder(holder: MyViewHolder?, position: Int) {
+        Log.i("checkbox", "recycler bind")
         val noteObject = notesArrayList[position]
         var positionToDelete: Int
 
@@ -46,6 +47,7 @@ class ArchivesRecycler(private var notesArrayList: ArrayList<ArchivedNotesItemsH
         for (x in 0 until notesArrayList.size) {
             Log.i("checkbox", "item position in array: $x and item isChecked = ${notesArrayList[x].isSelected}")
         }
+
         if (checkedObject) {
             holder.checkBox.isChecked = true
             holder.buttonsCard.visibility = View.INVISIBLE
@@ -153,4 +155,6 @@ class ArchivesRecycler(private var notesArrayList: ArrayList<ArchivedNotesItemsH
 
         return notesArrayList
     }
+
+
 }
