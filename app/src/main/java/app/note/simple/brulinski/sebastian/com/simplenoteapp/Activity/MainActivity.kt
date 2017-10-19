@@ -267,7 +267,11 @@ class MainActivity : AppCompatActivity(), NotesListFragment.OnListenRecyclerScro
             }
             R.id.search_main -> {
                 val intent = Intent(this, SearchActivity::class.java)
-                intent.putParcelableArrayListExtra("notesArray", NotesListFragment.itemsObjectsArray)
+                val myArray = NotesListFragment.itemsObjectsArray
+                for (x in 0 until myArray.size) {
+                    myArray[x].isDeleted = false
+                }
+                intent.putParcelableArrayListExtra("notesArray", myArray)
                 startActivity(intent)
             }
             R.id.archives -> {
