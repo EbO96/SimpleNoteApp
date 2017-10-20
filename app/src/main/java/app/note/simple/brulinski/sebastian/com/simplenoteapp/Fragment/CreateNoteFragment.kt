@@ -443,19 +443,21 @@ open class CreateNoteFragment : Fragment(), SaveNoteInterface {
 
     private fun pasteText() {
         val clipboardManager = (context.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager)
-        val pasteData = clipboardManager.primaryClip.getItemAt(0).text
+        if (clipboardManager.primaryClip != null) {
+            val pasteData = clipboardManager.primaryClip.getItemAt(0).text
 
-        val title = bindingFrag.createNoteTitleField
-        val note = bindingFrag.createNoteNoteField
+            val title = bindingFrag.createNoteTitleField
+            val note = bindingFrag.createNoteNoteField
 
-        val startIndex: Int
+            val startIndex: Int
 
-        if (title.isFocused && clipboardManager.hasPrimaryClip()) {
-            startIndex = title.selectionStart
-            title.text.insert(startIndex, pasteData)
-        } else if (note.isFocused && clipboardManager.hasPrimaryClip()) {
-            startIndex = note.selectionStart
-            note.text.insert(startIndex, pasteData)
+            if (title.isFocused && clipboardManager.hasPrimaryClip()) {
+                startIndex = title.selectionStart
+                title.text.insert(startIndex, pasteData)
+            } else if (note.isFocused && clipboardManager.hasPrimaryClip()) {
+                startIndex = note.selectionStart
+                note.text.insert(startIndex, pasteData)
+            }
         }
     }
 
