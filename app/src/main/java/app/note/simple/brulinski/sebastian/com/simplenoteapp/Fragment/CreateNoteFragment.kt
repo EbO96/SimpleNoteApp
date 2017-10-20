@@ -8,11 +8,14 @@ import android.content.DialogInterface
 import android.databinding.DataBindingUtil
 import android.graphics.Color
 import android.graphics.Typeface
+import android.os.Build
 import android.os.Bundle
 import android.support.annotation.ColorInt
+import android.support.annotation.RequiresApi
 import android.support.v4.app.Fragment
 import android.support.v4.content.ContextCompat
 import android.text.TextUtils
+import android.util.Log
 import android.view.*
 import android.view.animation.Animation
 import android.widget.FrameLayout
@@ -45,6 +48,8 @@ open class CreateNoteFragment : Fragment(), SaveNoteInterface {
     private val noteCharactersLimit = 1000
     private val titleCharactersLimit = 50
     private var actualLimit = titleCharactersLimit
+    private val STATUS_BAR_COLOR_KEY = "status_bar_color"
+    private lateinit var colorManager: EditorManager.ColorManager
 
     @ColorInt
     private val INFO_COLOR = Color.parseColor("#3F51B5")
@@ -61,9 +66,14 @@ open class CreateNoteFragment : Fragment(), SaveNoteInterface {
         var noteObject: ItemsHolder? = null
     }
 
+    @RequiresApi(Build.VERSION_CODES.LOLLIPOP)
     override fun onCreateView(inflater: LayoutInflater?, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         bindingFrag = DataBindingUtil.inflate(inflater, R.layout.create_note_fragment, container, false)
 
+        //init color manager
+        colorManager = EditorManager.ColorManager(context)
+
+        Log.i("save", savedInstanceState.toString())
         database = LocalSQLAnkoDatabase(context)
 
         val titleView = bindingFrag.createNoteTitleField
@@ -75,6 +85,7 @@ open class CreateNoteFragment : Fragment(), SaveNoteInterface {
                     EditorManager.ColorManager.BLACK, EditorManager.FontStyleManager.DEFAULT_FONT, false)
         } else {
             noteObject = savedInstanceState.getParcelable("note_object")
+            colorManager.changeStatusBarColor(activity, EditorManager.ColorManager.BLACK, savedInstanceState.getInt(STATUS_BAR_COLOR_KEY))
         }
 
         val bgColor = noteObject!!.bgColor
@@ -139,9 +150,11 @@ open class CreateNoteFragment : Fragment(), SaveNoteInterface {
 
     }
 
+    @RequiresApi(Build.VERSION_CODES.LOLLIPOP)
     override fun onSaveInstanceState(outState: Bundle?) {
         super.onSaveInstanceState(outState)
         outState!!.putParcelable("note_object", noteObject)
+        outState.putInt(STATUS_BAR_COLOR_KEY, activity.window.statusBarColor)
     }
 
     override fun onSaveNote() {
@@ -255,6 +268,7 @@ open class CreateNoteFragment : Fragment(), SaveNoteInterface {
         var currentColor = noteObject!!.bgColor
 
         BottomSheet.Builder(activity).title(sheetTitle).sheet(R.menu.color_menu).listener(object : DialogInterface.OnClickListener {
+            @RequiresApi(Build.VERSION_CODES.LOLLIPOP)
             override fun onClick(p0: DialogInterface?, p1: Int) {
                 when (p1) {
                     R.id.col_red -> {
@@ -324,6 +338,8 @@ open class CreateNoteFragment : Fragment(), SaveNoteInterface {
                         MainActivity.noteToEdit!!.textColor = currentColor
                     else noteObject!!.textColor = currentColor
                 }
+
+                colorManager.changeStatusBarColor(activity, EditorManager.ColorManager.BLACK, resColor)
             }
         }).show()
     }

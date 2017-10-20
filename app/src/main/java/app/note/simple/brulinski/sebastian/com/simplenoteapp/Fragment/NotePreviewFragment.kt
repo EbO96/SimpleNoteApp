@@ -1,7 +1,9 @@
 package app.note.simple.brulinski.sebastian.com.simplenoteapp.Fragment
 
 import android.databinding.DataBindingUtil
+import android.os.Build
 import android.os.Bundle
+import android.support.annotation.RequiresApi
 import android.support.v4.app.Fragment
 import android.support.v4.content.ContextCompat
 import android.view.*
@@ -20,6 +22,7 @@ class NotePreviewFragment : Fragment() {
     lateinit var database: LocalSQLAnkoDatabase
     lateinit var binding: PreviewCardBinding
     var noteObj: ItemsHolder? = null
+    lateinit var colorManager: EditorManager.ColorManager
 
     override fun onCreateView(inflater: LayoutInflater?, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         setHasOptionsMenu(true)
@@ -37,6 +40,7 @@ class NotePreviewFragment : Fragment() {
         }
     }
 
+    @RequiresApi(Build.VERSION_CODES.LOLLIPOP)
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
 
@@ -59,7 +63,8 @@ class NotePreviewFragment : Fragment() {
 
         EditorManager.FontStyleManager.recogniseAndSetFont(fontStyle, titleView, noteView)
 
-        val colorManager = EditorManager.ColorManager(context)
+        colorManager = EditorManager.ColorManager(context)
+        colorManager.changeStatusBarColor(activity, bgColor, null)
 
         colorManager.recogniseAndSetColor(textColor, arrayListOf(titleView, noteView), "FONT") //set font color
         colorManager.recogniseAndSetColor(bgColor, arrayListOf(cardView), "BG") //set background color
@@ -77,5 +82,11 @@ class NotePreviewFragment : Fragment() {
         menu!!.findItem(R.id.main_menu_grid).isVisible = false
         menu.findItem(R.id.main_menu_linear).isVisible = false
         super.onCreateOptionsMenu(menu, inflater)
+    }
+
+    @RequiresApi(Build.VERSION_CODES.LOLLIPOP)
+    override fun onDestroy() {
+        colorManager.changeStatusBarColor(activity, EditorManager.ColorManager.BLACK, null)
+        super.onDestroy()
     }
 }
