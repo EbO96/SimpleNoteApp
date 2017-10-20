@@ -78,7 +78,7 @@ class MainRecyclerAdapter(private var itemsHolder: ArrayList<ItemsHolder>, var r
                 undoSnack = Snackbar.make((ctx as MainActivity).binding.root, ctx.getString(R.string.note_archived), Snackbar.LENGTH_SHORT)
                 undoSnack.setActionTextColor(ContextCompat.getColor(ctx, R.color.material_white))
             } else if (!flag) {
-                undoSnack = Snackbar.make((ctx as MainActivity).binding.root, ctx.getString(R.string.note_deleted), Snackbar.LENGTH_SHORT)
+                undoSnack = Snackbar.make((ctx as MainActivity).binding.root, ctx.getString(R.string.note_deleted), Snackbar.LENGTH_LONG)
                 undoSnack.setActionTextColor(ContextCompat.getColor(ctx, R.color.material_red))
             }
 

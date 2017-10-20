@@ -54,15 +54,6 @@
                     android:src="@drawable/ic_content_paste_black_24dp" />
 
                 <ImageButton
-                    android:id="@+id/undo"
-                    android:layout_width="wrap_content"
-                    android:layout_height="?attr/actionBarSize"
-                    android:background="@android:color/transparent"
-                    android:contentDescription="@string/undo_changes"
-                    android:minWidth="70dp"
-                    android:src="@drawable/ic_undo_black_24dp" />
-
-                <ImageButton
                     android:id="@+id/font_style"
                     android:layout_width="wrap_content"
                     android:layout_height="?attr/actionBarSize"

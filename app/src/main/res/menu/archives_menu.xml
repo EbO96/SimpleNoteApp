@@ -12,4 +12,6 @@
         android:icon="@drawable/ic_restore_black_24dp"
         android:title="@string/restore_selected"
         app:showAsAction="always" />
+
+
 </menu>

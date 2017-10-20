@@ -20,7 +20,6 @@ import android.widget.Toast
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.Activity.MainActivity
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.Database.LocalSQLAnkoDatabase
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.Editor.EditorManager
-import app.note.simple.brulinski.sebastian.com.simplenoteapp.Editor.UndoRedo
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.HelperClass.CurrentFragmentState
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.HelperClass.MyRowParserNotes
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.Interfaces.SaveNoteInterface
@@ -43,7 +42,6 @@ open class CreateNoteFragment : Fragment(), SaveNoteInterface {
 
     lateinit var bindingFrag: CreateNoteFragmentBinding
     private lateinit var database: LocalSQLAnkoDatabase
-    private lateinit var undoRedo: UndoRedo
     private val noteCharactersLimit = 1000
     private val titleCharactersLimit = 50
     private var actualLimit = titleCharactersLimit
@@ -103,21 +101,27 @@ open class CreateNoteFragment : Fragment(), SaveNoteInterface {
     override fun onViewCreated(view: View?, savedInstanceState: Bundle?) {
         setHasOptionsMenu(true)
         super.onViewCreated(view, savedInstanceState)
-        undoRedo = UndoRedo(bindingFrag) //Setup UndoRedo class to handle operations at undo and redo actions
 
         listenBarOptions()
     }
 
     private fun onTitleAndNoteFieldFocusListener() {
-        bindingFrag.createNoteTitleField.setOnFocusChangeListener { p0, p1 ->
-            actualLimit = titleCharactersLimit
-            setCounterText(bindingFrag.createNoteTitleField.text.length)
+        var textLength: Int
 
+        bindingFrag.createNoteTitleField.setOnFocusChangeListener { p0, p1 ->
+            textLength = bindingFrag.createNoteTitleField.text.length
+
+            actualLimit = titleCharactersLimit
+            setCounterText(textLength)
+            changeCounterColor(textLength)
         }
 
         bindingFrag.createNoteNoteField.setOnFocusChangeListener { p0, p1 ->
+            textLength = bindingFrag.createNoteNoteField.text.length
+
             actualLimit = noteCharactersLimit
-            setCounterText(bindingFrag.createNoteNoteField.text.length)
+            setCounterText(textLength)
+            changeCounterColor(textLength)
         }
     }
 
@@ -185,11 +189,6 @@ open class CreateNoteFragment : Fragment(), SaveNoteInterface {
 
         bindingFrag.paste.setOnClickListener {
             pasteText()
-        }
-
-        bindingFrag.undo.setOnClickListener {
-            undoRedo.block(true)
-            undoRedo.getUndo()
         }
 
         bindingFrag.fontStyle.setOnClickListener {
@@ -381,7 +380,6 @@ open class CreateNoteFragment : Fragment(), SaveNoteInterface {
         val note = bindingFrag.createNoteNoteField
 
         title.textChangedListener {
-            afterTextChanged { text -> undoRedo.addUndo(text = text.toString()) }
 
             onTextChanged { p0, p1, p2, p3 ->
                 if (actualLimit == titleCharactersLimit)
@@ -395,7 +393,7 @@ open class CreateNoteFragment : Fragment(), SaveNoteInterface {
                     if (!infoToastShowedAtStart)
                         showInfoToast(R.string.max_note_size_toast.toString() + actualLimit)
                     infoToastShowedAtStart = false
-                } else undoRedo.addUndo(text = text.toString())
+                }
             }
 
             onTextChanged { p0, p1, p2, p3 ->
@@ -407,6 +405,10 @@ open class CreateNoteFragment : Fragment(), SaveNoteInterface {
 
     private fun incrementCharacterCounter(charLength: Int) {
         setCounterText(charLength)
+        changeCounterColor(charLength)
+    }
+
+    private fun changeCounterColor(charLength: Int) {
         if (charLength >= actualLimit)
             bindingFrag.charactersCounterTextView.textColor = ContextCompat.getColor(context, R.color.material_red)
         else bindingFrag.charactersCounterTextView.textColor = ContextCompat.getColor(context, R.color.material_blue_grey)
