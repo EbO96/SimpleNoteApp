@@ -328,6 +328,7 @@ open class CreateNoteFragment : Fragment(), SaveNoteInterface {
                 Change color
                  */
                 if (colorOf.equals("BG")) {
+                    colorManager.changeStatusBarColor(activity, EditorManager.ColorManager.BLACK, resColor)
                     EditorManager.ColorManager.changeBgColor(viewsArray, resColor)
                     if (editMode)
                         MainActivity.noteToEdit!!.bgColor = currentColor
@@ -338,8 +339,6 @@ open class CreateNoteFragment : Fragment(), SaveNoteInterface {
                         MainActivity.noteToEdit!!.textColor = currentColor
                     else noteObject!!.textColor = currentColor
                 }
-
-                colorManager.changeStatusBarColor(activity, EditorManager.ColorManager.BLACK, resColor)
             }
         }).show()
     }
