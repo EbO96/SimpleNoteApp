@@ -83,10 +83,4 @@ class NotePreviewFragment : Fragment() {
         menu.findItem(R.id.main_menu_linear).isVisible = false
         super.onCreateOptionsMenu(menu, inflater)
     }
-
-    @RequiresApi(Build.VERSION_CODES.LOLLIPOP)
-    override fun onDestroy() {
-        colorManager.changeStatusBarColor(activity, EditorManager.ColorManager.BLACK, null)
-        super.onDestroy()
-    }
 }
