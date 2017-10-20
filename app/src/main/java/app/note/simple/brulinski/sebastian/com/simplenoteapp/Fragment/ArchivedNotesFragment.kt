@@ -24,8 +24,10 @@ class ArchivedNotesFragment : Fragment() {
     lateinit var archivedNotesArrayList: ArrayList<ArchivedNotesItemsHolder>
     private lateinit var deleteMenuItem: MenuItem
     private lateinit var restoreMenuItem: MenuItem
+    private lateinit var selectAllMenuItem: MenuItem
     private var itemsToDeleteOrRestore = ArrayList<ArchivedNotesItemsHolder>()
-    private val CHECKED_INSTANCE_KEY = "checkedNotes"
+    private val SELECTED_ALL_KEY = "selected_all"
+    private var isSelectedAll = true
 
     companion object {
         val BUNDLE_KEY = "my_bundle_array"
@@ -131,8 +133,9 @@ class ArchivedNotesFragment : Fragment() {
         menuInflater.inflate(R.menu.archives_menu, menu)
         deleteMenuItem = menu!!.findItem(R.id.archives_delete).setVisible(false)
         restoreMenuItem = menu.findItem(R.id.archives_restore).setVisible(false)
-        Log.i("checkbox", "onCreateOptionsMenu()")
-        onCheckBoxesListener(archivedNotesArrayList!!)
+        selectAllMenuItem = menu.findItem(R.id.archives_select_all).setVisible(true)
+        onCheckBoxesListener(archivedNotesArrayList)
+
         super.onCreateOptionsMenu(menu, inflater)
     }
 
@@ -154,6 +157,17 @@ class ArchivedNotesFragment : Fragment() {
 
                 makeDeleteOrRestoreConfirmDialog(message,
                         R.drawable.ic_restore_black_24dp, false) //False means that method delete items
+            }
+
+            R.id.archives_select_all -> {
+
+                for (x in 0 until archivedNotesArrayList.size) {
+                    archivedNotesArrayList[x].isSelected = isSelectedAll
+                }
+
+                myRecycler.notifyDataSetChanged()
+                onCheckBoxesListener(archivedNotesArrayList)
+                isSelectedAll = !isSelectedAll
             }
         }
         return super.onOptionsItemSelected(item)
@@ -178,13 +192,11 @@ class ArchivedNotesFragment : Fragment() {
     }
 
     fun onCheckBoxesListener(itemsIdArrayList: ArrayList<ArchivedNotesItemsHolder>) {
-        Log.i("checkbox", "onCheckBoxesListener")
-
         itemsToDeleteOrRestore.clear()
 
         for (x in 0 until itemsIdArrayList.size) {
             if (itemsIdArrayList[x].isSelected)
-                itemsToDeleteOrRestore.add(itemsIdArrayList[x]!!)
+                itemsToDeleteOrRestore.add(itemsIdArrayList[x])
         }
 
         val arraySize = itemsToDeleteOrRestore.size

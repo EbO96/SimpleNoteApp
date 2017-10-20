@@ -44,10 +44,6 @@ class ArchivesRecycler(private var notesArrayList: ArrayList<ArchivedNotesItemsH
 
         holder!!.checkBox.setOnCheckedChangeListener(null)
 
-        for (x in 0 until notesArrayList.size) {
-            Log.i("checkbox", "item position in array: $x and item isChecked = ${notesArrayList[x].isSelected}")
-        }
-
         if (checkedObject) {
             holder.checkBox.isChecked = true
             holder.buttonsCard.visibility = View.INVISIBLE
