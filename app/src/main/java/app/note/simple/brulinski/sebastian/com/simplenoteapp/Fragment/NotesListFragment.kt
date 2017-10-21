@@ -1,6 +1,7 @@
 package app.note.simple.brulinski.sebastian.com.simplenoteapp.Fragment
 
 import android.app.Activity
+import android.content.Context
 import android.databinding.DataBindingUtil
 import android.os.Build
 import android.os.Bundle
@@ -73,7 +74,6 @@ class NotesListFragment : Fragment() {
         if (savedInstanceState == null) {
             itemsObjectsArray = arguments.getParcelableArrayList(MainActivity.DATABASE_NOTES_ARRAY)
         } else {
-            Log.i("startLog", "get notes from saved instance state")
             itemsObjectsArray = savedInstanceState.getParcelableArrayList<ItemsHolder>(NOTES_ARRAY_KEY)
         }
 
@@ -208,14 +208,18 @@ class NotesListFragment : Fragment() {
         else return MoveAnimation.create(MoveAnimation.LEFT, enter, CurrentFragmentState.FRAGMENT_ANIM_DURATION)
     }
 
+    override fun onAttach(context: Context?) {
+        try {
+            mGetNotesCallback = (context as OnGetNotesFromParentActivity)
+        } catch (e: ClassCastException) {
+            throw ClassCastException("$context must implement OnGetNotesFromParentActivity")
+        }
+        super.onAttach(context)
+    }
+
     override fun onStart() {
-//        Log.i("startLog", "onStart()")
         itemsObjectsArray = mGetNotesCallback.getNotes()
-//        Log.i("startLog", "array log")
-//
-//        for (x in 0 until itemsObjectsArray.size) {
-//            Log.i("startLog", itemsObjectsArray[x].bgColor)
-//        }
+
         initRecyclerAdapter()
         sortNotes()
         recyclerScrollingListener()

@@ -18,7 +18,7 @@ import app.note.simple.brulinski.sebastian.com.simplenoteapp.Database.LocalSQLAn
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.Database.ObjectToDatabaseOperations
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.Database.database
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.Editor.EditorManager
-import app.note.simple.brulinski.sebastian.com.simplenoteapp.Fragment.NotesListFragment
+import app.note.simple.brulinski.sebastian.com.simplenoteapp.Interfaces.MainRecyclerSizeListener
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.Model.ItemsHolder
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.R
 
@@ -28,7 +28,7 @@ class MainRecyclerAdapter(private var itemsHolderArray: ArrayList<ItemsHolder>, 
     private var deletedItem: ItemsHolder? = null
     private lateinit var preferences: SharedPreferences
     private lateinit var undoSnack: Snackbar
-
+    val sizeCallback: MainRecyclerSizeListener = (ctx as MainActivity)
 
     interface OnSnackbarDismissListener {
         fun snackState(isDismiss: Boolean)
@@ -90,6 +90,7 @@ class MainRecyclerAdapter(private var itemsHolderArray: ArrayList<ItemsHolder>, 
                 this.itemsHolderArray.add(positionToDelete, deletedItem!!)
                 notifyItemInserted(positionToDelete)
                 recyclerView.scrollToPosition(positionToDelete)
+                sizeCallback.getRecyclerAdapterSize(itemsHolderArray.size)
 
                 if (flag)
                     addDeleteFlag(deletedItem!!.id, false)
@@ -112,11 +113,14 @@ class MainRecyclerAdapter(private var itemsHolderArray: ArrayList<ItemsHolder>, 
             if (flag)
                 addDeleteFlag(deletedItem!!.id, true)
             else ObjectToDatabaseOperations.deleteNoteObject(deletedItem!!, ctx)
+
+            Log.i("recyclerSize", "recycler size is ${itemsHolderArray.size}")
+            sizeCallback.getRecyclerAdapterSize(itemsHolderArray.size)
             true
         }
     }
 
-    fun getArray(): ArrayList<ItemsHolder>{
+    fun getArray(): ArrayList<ItemsHolder> {
         return itemsHolderArray
     }
 

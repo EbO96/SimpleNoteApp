@@ -16,7 +16,6 @@ import android.support.v4.app.FragmentManager
 import android.support.v4.app.FragmentTransaction
 import android.support.v7.app.AppCompatActivity
 import android.support.v7.widget.RecyclerView
-import android.util.Log
 import android.view.Menu
 import android.view.MenuInflater
 import android.view.MenuItem
@@ -24,14 +23,12 @@ import android.widget.FrameLayout
 import android.widget.Toast
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.Database.LocalSQLAnkoDatabase
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.Database.database
-import app.note.simple.brulinski.sebastian.com.simplenoteapp.Fragment.CreateNoteFragment
-import app.note.simple.brulinski.sebastian.com.simplenoteapp.Fragment.EditNoteFragment
-import app.note.simple.brulinski.sebastian.com.simplenoteapp.Fragment.NotePreviewFragment
-import app.note.simple.brulinski.sebastian.com.simplenoteapp.Fragment.NotesListFragment
+import app.note.simple.brulinski.sebastian.com.simplenoteapp.Fragment.*
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.HelperClass.CurrentFragmentState
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.HelperClass.LayoutManagerStyle
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.HelperClass.MyRowParserNoteProperties
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.HelperClass.MyRowParserNotes
+import app.note.simple.brulinski.sebastian.com.simplenoteapp.Interfaces.MainRecyclerSizeListener
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.Interfaces.RecyclerMainInterface
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.Model.ItemsHolder
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.Model.Notes
@@ -47,8 +44,20 @@ import org.jetbrains.anko.db.select
 
 @Suppress("DEPRECATION")
 class MainActivity : AppCompatActivity(), NotesListFragment.OnListenRecyclerScroll,
-        EditNoteFragment.OnEditDestroy, RecyclerMainInterface {
+        EditNoteFragment.OnEditDestroy, RecyclerMainInterface, NotesListFragment.OnGetNotesFromParentActivity, MainRecyclerSizeListener {
 
+    override fun getRecyclerAdapterSize(recyclerAdapterSize: Int) {
+        adapterSize = recyclerAdapterSize
+        val frag = supportFragmentManager.findFragmentById(binding.mainContainer.id) is NotesListFragment
+        if (frag && recyclerAdapterSize == 0)
+            setNoNotesFragment()
+        else if (!frag && recyclerAdapterSize != 0)
+            setNotesListFragment(getNotesFromDatabase())
+    }
+
+    override fun getNotes(): ArrayList<ItemsHolder> {
+        return getNotesFromDatabase()
+    }
 
     lateinit var mSearchCallback: OnSearchResultListener
 
@@ -65,6 +74,7 @@ class MainActivity : AppCompatActivity(), NotesListFragment.OnListenRecyclerScro
     lateinit var ft: FragmentTransaction
     lateinit var noteFragment: Fragment
     lateinit var managerStyle: LayoutManagerStyle
+    private val ADAPTER_SIZE_KEY = "adapter size"
     var doubleTapToExit = false
 
     @ColorInt
@@ -76,11 +86,13 @@ class MainActivity : AppCompatActivity(), NotesListFragment.OnListenRecyclerScro
         var CREATE_NOTE_FRAGMENT_TAG: String = "CREATE" //Fragment TAG
         var EDIT_NOTE_FRAGMENT_TAG: String = "EDIT" //Fragment TAG
         var NOTE_PREVIEW_FRAGMENT_TAG: String = "PREVIEW" //Fragment TAG'
+        var NO_NOTES_FRAGMENT_TAG: String = "NO_NOTES" //Fragment TAG'
         val DATABASE_NOTES_ARRAY = "notes array"
         lateinit var menuItemGrid: MenuItem //Toolbar menu item (set recycler view layout as staggered layout)
         lateinit var menuItemLinear: MenuItem//Toolbar menu item (set recycler view layout as linear layout)
         lateinit var menuItemSearch: MenuItem //Toolbar menu item (set recycler view layout as linear layout)
         var noteToEdit: ItemsHolder? = null
+        var adapterSize = 0
     }
 
     /*
@@ -111,13 +123,16 @@ class MainActivity : AppCompatActivity(), NotesListFragment.OnListenRecyclerScro
         At the same time we getting layout manager type from SharedPreferences
          */
         if (savedInstanceState == null) {
-            setNotesListFragment(getNotesFromDatabase())
+            val array = getNotesFromDatabase()
+            if (array.size != 0)
+                setNotesListFragment(getNotesFromDatabase())
+            else setNoNotesFragment()
             val v: ItemsHolder? = intent.getParcelableExtra<ItemsHolder>("noteObject")
             if (v != null) {
                 onNoteClicked(v)
                 intent.removeExtra("noteObject")
             }
-        }
+        } else adapterSize = savedInstanceState.getInt(ADAPTER_SIZE_KEY)
 
         floatingActionButtonListener() //Listen for floating action button actions and click
 
@@ -135,16 +150,22 @@ class MainActivity : AppCompatActivity(), NotesListFragment.OnListenRecyclerScro
         )
 
         val fragment = supportFragmentManager.findFragmentById(binding.mainContainer.id)
-        if (fragment is NotesListFragment) {
-            fragment.setOnGetNotesFromParentActivity(object : NotesListFragment.OnGetNotesFromParentActivity {
-                override fun getNotes(): ArrayList<ItemsHolder> {
-                    Log.i("startLog", "returning notes")
 
-                    return getNotesFromDatabase()
-                }
-            })
-        }
+//        if (fragment is NotesListFragment) {
+//            fragment.setOnGetNotesFromParentActivity(object : NotesListFragment.OnGetNotesFromParentActivity {
+//                override fun getNotes(): ArrayList<ItemsHolder> {
+//                    Log.i("startLog", "returning notes")
+//
+//                    return getNotesFromDatabase()
+//                }
+//            })
+//        }
     } //END OF onCreate(...)
+
+    override fun onSaveInstanceState(outState: Bundle?) {
+        outState!!.putInt(ADAPTER_SIZE_KEY, adapterSize);
+        super.onSaveInstanceState(outState)
+    }
 
     private fun getNotesFromDatabase(): ArrayList<ItemsHolder> {
         val itemsObjectsArray = ArrayList<ItemsHolder>()
@@ -180,6 +201,22 @@ class MainActivity : AppCompatActivity(), NotesListFragment.OnListenRecyclerScro
     /*
     This function replace another fragment in FrameLayout container by our main Fragment (NoteListFragment.kt - display our notes)
      */
+
+    private fun setNoNotesFragment() {
+        fm = supportFragmentManager
+        ft = fm.beginTransaction()
+
+        val noNotesFragment = NoNotesFragment()
+
+        ft.replace(binding.mainContainer.id, noNotesFragment, NO_NOTES_FRAGMENT_TAG)
+
+        ft.addToBackStack(NO_NOTES_FRAGMENT_TAG)
+        ft.commit()
+
+        fm.executePendingTransactions()
+
+    }
+
     fun setNotesListFragment(array: ArrayList<ItemsHolder>) {
         fm = supportFragmentManager
         ft = fm.beginTransaction()
@@ -196,7 +233,6 @@ class MainActivity : AppCompatActivity(), NotesListFragment.OnListenRecyclerScro
         ft.addToBackStack(NOTE_LIST_FRAGMENT_TAG)
 
         ft.commit()
-        fm.executePendingTransactions()
     }
 
     /*
@@ -272,7 +308,7 @@ class MainActivity : AppCompatActivity(), NotesListFragment.OnListenRecyclerScro
         var title = resources.getString(R.string.notes)
 
 
-        if (frag is NotesListFragment) {
+        if (frag is NotesListFragment || frag is NoNotesFragment) {
             drawIcon = resources.getDrawable(R.drawable.ic_add_white_24dp)
             title = resources.getString(R.string.notes)
             //supportActionBar!!.setIcon(ContextCompat.getDrawable(this, R.mipmap.ic_launcher))
@@ -353,23 +389,27 @@ class MainActivity : AppCompatActivity(), NotesListFragment.OnListenRecyclerScro
 
     override fun onBackPressed() {
         CurrentFragmentState.backPressed = true //Set flag at true. Necessary in onDestroyView() method in CreateNoteFragment.kt
+        val frag = supportFragmentManager.findFragmentById(binding.mainContainer.id)
 
-        if (supportFragmentManager.backStackEntryCount > 1) {
-            supportFragmentManager.popBackStack()
-
-        } else if (supportFragmentManager.backStackEntryCount <= 1) {
-            if (doubleTapToExit) {
-                this.finish()
-                return
-            }
-
-            Toasty.error(this, getString(R.string.exit_toast), Toast.LENGTH_SHORT, true).show()
-            doubleTapToExit = true
-
-            Handler().postDelayed({
-                doubleTapToExit = false
-            }, 2000)
+        if (frag is NotesListFragment || frag is NoNotesFragment) {
+            doubleTapBackToExit()
+        } else {
+            if (supportFragmentManager.backStackEntryCount > 1)
+                supportFragmentManager.popBackStack()
         }
+    }
+
+    private fun doubleTapBackToExit() {
+        if (doubleTapToExit) {
+            finish()
+        }
+
+        Toasty.error(this, getString(R.string.exit_toast), Toast.LENGTH_SHORT, true).show()
+        doubleTapToExit = true
+
+        Handler().postDelayed({
+            doubleTapToExit = false
+        }, 2000)
     }
 
     /*
@@ -384,16 +424,12 @@ class MainActivity : AppCompatActivity(), NotesListFragment.OnListenRecyclerScro
              */
             val frag = supportFragmentManager.findFragmentById(binding.mainContainer.id)
 
-            if (frag is NotesListFragment) {
+            if (frag is NotesListFragment || frag is NoNotesFragment) {
                 setCreateNoteFragment()
             } else if (frag is CreateNoteFragment && frag.tag.equals(CREATE_NOTE_FRAGMENT_TAG)) {
-                try {
-                    frag.onSaveNote()
-                    Log.i("startLog", "back from backstack and save note")
-                    supportFragmentManager.popBackStack()
-                } catch (e: Exception) {
-                    e.printStackTrace()
-                }
+                frag.onSaveNote()
+                supportFragmentManager.popBackStack()
+                adapterSize = 1
             } else if (frag is EditNoteFragment) { //Update RecyclerView item and return to NoteListFragment
                 for (x in 1..2) {
                     supportFragmentManager.popBackStack()

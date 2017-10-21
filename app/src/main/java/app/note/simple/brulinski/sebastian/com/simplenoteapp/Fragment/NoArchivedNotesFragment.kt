@@ -11,7 +11,7 @@ import app.note.simple.brulinski.sebastian.com.simplenoteapp.R
 class NoArchivedNotesFragment : Fragment() {
 
     override fun onCreateView(inflater: LayoutInflater?, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        val root = layoutInflater.inflate(R.layout.no_archived_notes_fragment, container, false)
+        val root = layoutInflater.inflate(R.layout.no_notes_fragment, container, false)
 
         Log.i("fromNoArchives", "Hello NoArchives")
         return root
