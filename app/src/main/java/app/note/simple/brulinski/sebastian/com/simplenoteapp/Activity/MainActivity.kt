@@ -16,6 +16,7 @@ import android.support.v4.app.FragmentManager
 import android.support.v4.app.FragmentTransaction
 import android.support.v7.app.AppCompatActivity
 import android.support.v7.widget.RecyclerView
+import android.util.Log
 import android.view.Menu
 import android.view.MenuInflater
 import android.view.MenuItem
@@ -29,14 +30,19 @@ import app.note.simple.brulinski.sebastian.com.simplenoteapp.Fragment.NotePrevie
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.Fragment.NotesListFragment
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.HelperClass.CurrentFragmentState
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.HelperClass.LayoutManagerStyle
+import app.note.simple.brulinski.sebastian.com.simplenoteapp.HelperClass.MyRowParserNoteProperties
+import app.note.simple.brulinski.sebastian.com.simplenoteapp.HelperClass.MyRowParserNotes
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.Interfaces.RecyclerMainInterface
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.Model.ItemsHolder
+import app.note.simple.brulinski.sebastian.com.simplenoteapp.Model.Notes
+import app.note.simple.brulinski.sebastian.com.simplenoteapp.Model.NotesProperties
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.R
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.RecyclerView.MainRecyclerAdapter
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.databinding.ActivityMainBinding
 import es.dmoral.toasty.Toasty
 import net.yslibrary.android.keyboardvisibilityevent.KeyboardVisibilityEvent
 import net.yslibrary.android.keyboardvisibilityevent.KeyboardVisibilityEventListener
+import org.jetbrains.anko.db.select
 
 
 @Suppress("DEPRECATION")
@@ -64,13 +70,13 @@ class MainActivity : AppCompatActivity(), NotesListFragment.OnListenRecyclerScro
     @ColorInt
     private val ERROR_COLOR = Color.parseColor("#D50000")
     private var infoToastShowedAtStart: Boolean = false
-    private val showFabAfterTime = 2000L
 
     companion object {
         var NOTE_LIST_FRAGMENT_TAG: String = "NOTES" //Fragment TAG
         var CREATE_NOTE_FRAGMENT_TAG: String = "CREATE" //Fragment TAG
         var EDIT_NOTE_FRAGMENT_TAG: String = "EDIT" //Fragment TAG
-        var NOTE_PREVIEW_FRAGMENT_TAG: String = "PREVIEW" //Fragment TAG
+        var NOTE_PREVIEW_FRAGMENT_TAG: String = "PREVIEW" //Fragment TAG'
+        val DATABASE_NOTES_ARRAY = "notes array"
         lateinit var menuItemGrid: MenuItem //Toolbar menu item (set recycler view layout as staggered layout)
         lateinit var menuItemLinear: MenuItem//Toolbar menu item (set recycler view layout as linear layout)
         lateinit var menuItemSearch: MenuItem //Toolbar menu item (set recycler view layout as linear layout)
@@ -105,7 +111,7 @@ class MainActivity : AppCompatActivity(), NotesListFragment.OnListenRecyclerScro
         At the same time we getting layout manager type from SharedPreferences
          */
         if (savedInstanceState == null) {
-            setNotesListFragment()
+            setNotesListFragment(getNotesFromDatabase())
             val v: ItemsHolder? = intent.getParcelableExtra<ItemsHolder>("noteObject")
             if (v != null) {
                 onNoteClicked(v)
@@ -127,16 +133,62 @@ class MainActivity : AppCompatActivity(), NotesListFragment.OnListenRecyclerScro
             }
         }
         )
+
+        val fragment = supportFragmentManager.findFragmentById(binding.mainContainer.id)
+        if (fragment is NotesListFragment) {
+            fragment.setOnGetNotesFromParentActivity(object : NotesListFragment.OnGetNotesFromParentActivity {
+                override fun getNotes(): ArrayList<ItemsHolder> {
+                    Log.i("startLog", "returning notes")
+
+                    return getNotesFromDatabase()
+                }
+            })
+        }
     } //END OF onCreate(...)
+
+    private fun getNotesFromDatabase(): ArrayList<ItemsHolder> {
+        val itemsObjectsArray = ArrayList<ItemsHolder>()
+
+        val notesPropertiesArray: ArrayList<NotesProperties> = ArrayList()
+
+        database.use {
+            val properties = select(LocalSQLAnkoDatabase.TABLE_NOTES_PROPERTIES).whereSimple("${LocalSQLAnkoDatabase.IS_DELETED}=?", false.toString()).parseList(MyRowParserNoteProperties())
+            val size = properties.size - 1
+
+            for (x in 0..size) {
+                notesPropertiesArray.add(NotesProperties(properties[x].get(x).id, properties[x].get(x).bgColor,
+                        properties[x].get(x).textColor, properties[x].get(x).fontStyle))
+            }
+        }
+        var size = 0
+        var notes: List<List<Notes.Note>>? = null
+
+        database.use {
+            notes = select(LocalSQLAnkoDatabase.TABLE_NOTES).whereSimple("${LocalSQLAnkoDatabase.IS_DELETED}=?", false.toString()).parseList(MyRowParserNotes())
+            size = notes!!.size
+        }
+
+        for (x in 0 until size) {
+            itemsObjectsArray.add(ItemsHolder(notes!![x].get(x).id!!, notes!![x].get(x).title!!, notes!![x].get(x).note!!,
+                    notes!![x].get(x).date!!, notesPropertiesArray[x].bgColor!!, notesPropertiesArray[x].textColor!!,
+                    notesPropertiesArray.get(x).fontStyle!!, false))
+        }
+
+        return itemsObjectsArray
+    }
 
     /*
     This function replace another fragment in FrameLayout container by our main Fragment (NoteListFragment.kt - display our notes)
      */
-    fun setNotesListFragment() {
+    fun setNotesListFragment(array: ArrayList<ItemsHolder>) {
         fm = supportFragmentManager
         ft = fm.beginTransaction()
 
+        val args = Bundle();
+        args.putParcelableArrayList(DATABASE_NOTES_ARRAY, array)
+
         val notesListFragment = NotesListFragment()
+        notesListFragment.arguments = args
 
         noteFragment = notesListFragment
         ft.replace(binding.mainContainer.id, notesListFragment, NOTE_LIST_FRAGMENT_TAG)
@@ -337,6 +389,7 @@ class MainActivity : AppCompatActivity(), NotesListFragment.OnListenRecyclerScro
             } else if (frag is CreateNoteFragment && frag.tag.equals(CREATE_NOTE_FRAGMENT_TAG)) {
                 try {
                     frag.onSaveNote()
+                    Log.i("startLog", "back from backstack and save note")
                     supportFragmentManager.popBackStack()
                 } catch (e: Exception) {
                     e.printStackTrace()
@@ -415,13 +468,4 @@ class MainActivity : AppCompatActivity(), NotesListFragment.OnListenRecyclerScro
         noteToEdit = noteObject
         setNotePreviewFragment()
     }
-
-    override fun onResume() {
-        val frag = supportFragmentManager.findFragmentById(binding.mainContainer.id)
-        if (frag is NotesListFragment) {
-            frag.refreshAdapter()
-        }
-        super.onResume()
-    }
-
 }

@@ -33,6 +33,7 @@ import com.labo.kaji.fragmentanimations.MoveAnimation
 import jp.wasabeef.recyclerview.animators.SlideInRightAnimator
 import org.jetbrains.anko.db.select
 import java.util.*
+import kotlin.collections.ArrayList
 
 @Suppress("DEPRECATION", "OverridingDeprecatedMember")
 class NotesListFragment : Fragment() {
@@ -45,11 +46,23 @@ class NotesListFragment : Fragment() {
     lateinit var myRecycler: MainRecyclerAdapter
     lateinit var layoutStyle: LayoutManagerStyle
     var styleFlag: Boolean = true
+    private val NOTES_ARRAY_KEY = "notes"
+    private val LAYOUT_STYLE_KEY = "layout style"
 
     lateinit var mScrollCallback: OnListenRecyclerScroll
 
     interface OnListenRecyclerScroll {
         fun recyclerScrolling(dx: Int?, dy: Int?, newState: Int?)
+    }
+
+    lateinit var mGetNotesCallback: OnGetNotesFromParentActivity
+
+    interface OnGetNotesFromParentActivity {
+        fun getNotes(): ArrayList<ItemsHolder>
+    }
+
+    fun setOnGetNotesFromParentActivity(mGetNotesCallback: OnGetNotesFromParentActivity) {
+        this.mGetNotesCallback = mGetNotesCallback
     }
 
     @RequiresApi(Build.VERSION_CODES.LOLLIPOP)
@@ -58,9 +71,10 @@ class NotesListFragment : Fragment() {
 
         EditorManager.ColorManager(context).changeStatusBarColor(activity, EditorManager.ColorManager.BLACK, null)
         if (savedInstanceState == null) {
-            getNotesFromDatabase()
+            itemsObjectsArray = arguments.getParcelableArrayList(MainActivity.DATABASE_NOTES_ARRAY)
         } else {
-            itemsObjectsArray = savedInstanceState.getParcelableArrayList<ItemsHolder>("notes")
+            Log.i("startLog", "get notes from saved instance state")
+            itemsObjectsArray = savedInstanceState.getParcelableArrayList<ItemsHolder>(NOTES_ARRAY_KEY)
         }
 
         initRecyclerAdapter()
@@ -80,6 +94,17 @@ class NotesListFragment : Fragment() {
         //Listen for recycler scrolling
         recyclerScrollingListener()
         return binding.root
+    }
+
+    override fun onSaveInstanceState(outState: Bundle?) {
+        super.onSaveInstanceState(outState)
+        outState?.putBoolean(LAYOUT_STYLE_KEY, layoutStyle.flag)
+        /*
+        Save fragment state do Bundle and restore notes from it instead of
+        getting this data from database
+         */
+        itemsObjectsArray = myRecycler.getArray()
+        outState?.putParcelableArrayList(NOTES_ARRAY_KEY, itemsObjectsArray)
     }
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
@@ -154,18 +179,6 @@ class NotesListFragment : Fragment() {
         myRecycler.notifyDataSetChanged()
     }
 
-
-    override fun onSaveInstanceState(outState: Bundle?) {
-        super.onSaveInstanceState(outState)
-        outState?.putBoolean("flag", layoutStyle.flag)
-        /*
-        Save fragment state do Bundle and restore notes from it instead of
-        getting this data from database
-         */
-        outState?.putParcelableArrayList("notes", itemsObjectsArray)
-    }
-
-
     override fun onAttach(activity: Activity?) {
         super.onAttach(activity)
         try {
@@ -192,13 +205,21 @@ class NotesListFragment : Fragment() {
 
         if (CurrentFragmentState.backPressed)
             return MoveAnimation.create(MoveAnimation.RIGHT, enter, CurrentFragmentState.FRAGMENT_ANIM_DURATION)
-        else
-            return MoveAnimation.create(MoveAnimation.LEFT, enter, CurrentFragmentState.FRAGMENT_ANIM_DURATION)
+        else return MoveAnimation.create(MoveAnimation.LEFT, enter, CurrentFragmentState.FRAGMENT_ANIM_DURATION)
     }
 
-    fun refreshAdapter() {
-        getNotesFromDatabase()
+    override fun onStart() {
+//        Log.i("startLog", "onStart()")
+        itemsObjectsArray = mGetNotesCallback.getNotes()
+//        Log.i("startLog", "array log")
+//
+//        for (x in 0 until itemsObjectsArray.size) {
+//            Log.i("startLog", itemsObjectsArray[x].bgColor)
+//        }
         initRecyclerAdapter()
         sortNotes()
+        recyclerScrollingListener()
+
+        super.onStart()
     }
 }

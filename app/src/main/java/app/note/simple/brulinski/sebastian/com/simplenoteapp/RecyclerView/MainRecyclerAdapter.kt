@@ -8,6 +8,7 @@ import android.support.design.widget.Snackbar
 import android.support.v4.content.ContextCompat
 import android.support.v7.widget.CardView
 import android.support.v7.widget.RecyclerView
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -17,11 +18,12 @@ import app.note.simple.brulinski.sebastian.com.simplenoteapp.Database.LocalSQLAn
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.Database.ObjectToDatabaseOperations
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.Database.database
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.Editor.EditorManager
+import app.note.simple.brulinski.sebastian.com.simplenoteapp.Fragment.NotesListFragment
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.Model.ItemsHolder
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.R
 
 
-class MainRecyclerAdapter(private var itemsHolder: ArrayList<ItemsHolder>, var recyclerView: RecyclerView, var ctx: Context) : RecyclerView.Adapter<MainRecyclerAdapter.ViewHolder>() {
+class MainRecyclerAdapter(private var itemsHolderArray: ArrayList<ItemsHolder>, var recyclerView: RecyclerView, var ctx: Context) : RecyclerView.Adapter<MainRecyclerAdapter.ViewHolder>() {
 
     private var deletedItem: ItemsHolder? = null
     private lateinit var preferences: SharedPreferences
@@ -42,8 +44,8 @@ class MainRecyclerAdapter(private var itemsHolder: ArrayList<ItemsHolder>, var r
 
     override fun onBindViewHolder(holder: ViewHolder?, position: Int) {
 
-        var title = itemsHolder[position].title
-        var note = itemsHolder[position].note
+        var title = itemsHolderArray[position].title
+        var note = itemsHolderArray[position].note
         var positionToDelete: Int
 
         if (title.length > 30)
@@ -51,18 +53,18 @@ class MainRecyclerAdapter(private var itemsHolder: ArrayList<ItemsHolder>, var r
         if (note.length > 260)
             note = note.substring(0, 260) + "..."
 
-        EditorManager.FontStyleManager.recogniseAndSetFont(itemsHolder[position].fontStyle, holder!!.title, holder.note)
+        EditorManager.FontStyleManager.recogniseAndSetFont(itemsHolderArray[position].fontStyle, holder!!.title, holder.note)
         val bg = EditorManager.ColorManager(ctx)
 
-        bg.recogniseAndSetColor(itemsHolder[position].bgColor, arrayListOf(holder.card), "BG") //Change note color
-        bg.recogniseAndSetColor(itemsHolder[position].textColor, arrayListOf(holder.title, holder.note), "FONT")
+        bg.recogniseAndSetColor(itemsHolderArray[position].bgColor, arrayListOf(holder.card), "BG") //Change note color
+        bg.recogniseAndSetColor(itemsHolderArray[position].textColor, arrayListOf(holder.title, holder.note), "FONT")
 
         holder.title?.text = title
         holder.note.text = note
 
 
         holder.itemView?.setOnClickListener {
-            (ctx as MainActivity).onNoteClicked(this.itemsHolder[position])
+            (ctx as MainActivity).onNoteClicked(this.itemsHolderArray[position])
         }
 
         holder.itemView?.setOnLongClickListener {
@@ -85,7 +87,7 @@ class MainRecyclerAdapter(private var itemsHolder: ArrayList<ItemsHolder>, var r
 
             @Suppress("DEPRECATION")
             undoSnack.setAction(ctx.getString(R.string.undo), {
-                this.itemsHolder.add(positionToDelete, deletedItem!!)
+                this.itemsHolderArray.add(positionToDelete, deletedItem!!)
                 notifyItemInserted(positionToDelete)
                 recyclerView.scrollToPosition(positionToDelete)
 
@@ -104,7 +106,7 @@ class MainRecyclerAdapter(private var itemsHolder: ArrayList<ItemsHolder>, var r
                 }
             }).show()
 
-            deletedItem = itemsHolder.removeAt(positionToDelete)
+            deletedItem = itemsHolderArray.removeAt(positionToDelete)
             notifyItemRemoved(positionToDelete)
 
             if (flag)
@@ -112,6 +114,10 @@ class MainRecyclerAdapter(private var itemsHolder: ArrayList<ItemsHolder>, var r
             else ObjectToDatabaseOperations.deleteNoteObject(deletedItem!!, ctx)
             true
         }
+    }
+
+    fun getArray(): ArrayList<ItemsHolder>{
+        return itemsHolderArray
     }
 
     private fun addDeleteFlag(itemId: String, flag: Boolean) {
@@ -135,7 +141,7 @@ class MainRecyclerAdapter(private var itemsHolder: ArrayList<ItemsHolder>, var r
     }
 
     override fun getItemCount(): Int {
-        return itemsHolder.size
+        return itemsHolderArray.size
     }
 
     class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
