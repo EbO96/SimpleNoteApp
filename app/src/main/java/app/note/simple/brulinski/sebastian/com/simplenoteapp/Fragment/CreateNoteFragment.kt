@@ -119,7 +119,7 @@ open class CreateNoteFragment : Fragment(), SaveNoteInterface {
     private fun onTitleAndNoteFieldFocusListener() {
         var textLength: Int
 
-        bindingFrag.createNoteTitleField.setOnFocusChangeListener { p0, p1 ->
+        bindingFrag.createNoteTitleField.setOnFocusChangeListener { _, p1 ->
             textLength = bindingFrag.createNoteTitleField.text.length
 
             actualLimit = titleCharactersLimit
@@ -127,7 +127,7 @@ open class CreateNoteFragment : Fragment(), SaveNoteInterface {
             changeCounterColor(textLength)
         }
 
-        bindingFrag.createNoteNoteField.setOnFocusChangeListener { p0, p1 ->
+        bindingFrag.createNoteNoteField.setOnFocusChangeListener { _, p1 ->
             textLength = bindingFrag.createNoteNoteField.text.length
 
             actualLimit = noteCharactersLimit
