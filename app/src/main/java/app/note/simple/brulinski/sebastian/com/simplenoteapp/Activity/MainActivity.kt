@@ -58,16 +58,6 @@ class MainActivity : AppCompatActivity(), NotesListFragment.OnListenRecyclerScro
         return getNotesFromDatabase()
     }
 
-    lateinit var mSearchCallback: OnSearchResultListener
-
-    interface OnSearchResultListener {
-        fun passNewText(newText: String?)
-    }
-
-    fun setOnSearchResultListener(mSearchCallback: OnSearchResultListener) {
-        this.mSearchCallback = mSearchCallback
-    }
-
     lateinit var binding: ActivityMainBinding
     lateinit var fm: FragmentManager
     lateinit var ft: FragmentTransaction
@@ -87,25 +77,9 @@ class MainActivity : AppCompatActivity(), NotesListFragment.OnListenRecyclerScro
         var NOTE_PREVIEW_FRAGMENT_TAG: String = "PREVIEW" //Fragment TAG'
         var NO_NOTES_FRAGMENT_TAG: String = "NO_NOTES" //Fragment TAG'
         val DATABASE_NOTES_ARRAY = "notes array"
-        lateinit var menuItemGrid: MenuItem //Toolbar menu item (set recycler view layout as staggered layout)
-        lateinit var menuItemLinear: MenuItem//Toolbar menu item (set recycler view layout as linear layout)
         lateinit var menuItemSearch: MenuItem //Toolbar menu item (set recycler view layout as linear layout)
         var noteToEdit: ItemsHolder? = null
         var adapterSize = 0
-    }
-
-    /*
-    mLayoutListener - it is a interface between MainActivity and NoteListFragment. Used to
-    changeMenuItemsVisibility layout manager
-     */
-    lateinit var mLayoutListener: OnChangeLayoutListener
-
-    interface OnChangeLayoutListener {
-        fun passData(flag: Boolean)
-    }
-
-    fun setOnChangeLayoutListener(mLayoutListener: OnChangeLayoutListener) {
-        this.mLayoutListener = mLayoutListener
     }
 
     /*
@@ -147,18 +121,6 @@ class MainActivity : AppCompatActivity(), NotesListFragment.OnListenRecyclerScro
             }
         }
         )
-
-        val fragment = supportFragmentManager.findFragmentById(binding.mainContainer.id)
-
-//        if (fragment is NotesListFragment) {
-//            fragment.setOnGetNotesFromParentActivity(object : NotesListFragment.OnGetNotesFromParentActivity {
-//                override fun getNotes(): ArrayList<ItemsHolder> {
-//                    Log.i("startLog", "returning notes")
-//
-//                    return getNotesFromDatabase()
-//                }
-//            })
-//        }
     } //END OF onCreate(...)
 
     override fun onSaveInstanceState(outState: Bundle?) {
@@ -285,9 +247,7 @@ class MainActivity : AppCompatActivity(), NotesListFragment.OnListenRecyclerScro
         val menuInflater: MenuInflater = menuInflater
         menuInflater.inflate(R.menu.main_menu, menu)
 
-        menuItemGrid = menu!!.findItem(R.id.main_menu_grid)
-        menuItemLinear = menu.findItem(R.id.main_menu_linear)
-        menuItemSearch = menu.findItem(R.id.search_main)
+        menuItemSearch = menu!!.findItem(R.id.search_main)
         val menuItemArchives = menu.findItem(R.id.archives)
 
         MainRecyclerAdapter.setOnSnackbarDismissListener(object : MainRecyclerAdapter.OnSnackbarDismissListener {
@@ -339,14 +299,6 @@ class MainActivity : AppCompatActivity(), NotesListFragment.OnListenRecyclerScro
 
     override fun onOptionsItemSelected(item: MenuItem?): Boolean {
         when (item?.itemId) {
-            R.id.main_menu_grid -> {
-                saveLayoutManagerStyle(false) //Save layout manager style to SharedPreference file
-                mLayoutListener.passData(false) //Change layout style via interface between this Activity and NoteListFragment
-            }
-            R.id.main_menu_linear -> {
-                saveLayoutManagerStyle(true) //Save layout manager style to SharedPreference file
-                mLayoutListener.passData(true)
-            }
             R.id.search_main -> {
                 val intent = Intent(this, SearchActivity::class.java)
                 val myArray = NotesListFragment.itemsObjectsArray
@@ -366,19 +318,6 @@ class MainActivity : AppCompatActivity(), NotesListFragment.OnListenRecyclerScro
             }
         }
         return super.onOptionsItemSelected(item)
-    }
-
-    /*
-    Save Layout Manager style in SharedPreference file
-    true -> Linear layout
-    false -> StaggeredGridLayout
-     */
-    private fun saveLayoutManagerStyle(flag: Boolean) {
-        val sharedPref: SharedPreferences = this.getPreferences(Context.MODE_PRIVATE)
-        val editor: SharedPreferences.Editor = sharedPref.edit()
-        editor.putBoolean(getString(R.string.layout_manager_key), flag)
-        editor.apply()
-
     }
 
     override fun onBackPressed() {

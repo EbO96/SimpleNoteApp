@@ -471,12 +471,6 @@ open class CreateNoteFragment : Fragment(), SaveNoteInterface {
             return MoveAnimation.create(MoveAnimation.LEFT, enter, CurrentFragmentState.FRAGMENT_ANIM_DURATION)
         }
     }
-
-    override fun onCreateOptionsMenu(menu: Menu?, inflater: MenuInflater?) {
-        menu!!.findItem(R.id.main_menu_grid).isVisible = false
-        menu.findItem(R.id.main_menu_linear).isVisible = false
-        super.onCreateOptionsMenu(menu, inflater)
-    }
 }
 
 

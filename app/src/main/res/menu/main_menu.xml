@@ -9,18 +9,6 @@
         app:showAsAction="always" />
 
     <item
-        android:id="@+id/main_menu_grid"
-        android:icon="@drawable/ic_dashboard_black_24dp"
-        android:title="@string/grid"
-        app:showAsAction="always" />
-
-    <item
-        android:id="@+id/main_menu_linear"
-        android:icon="@drawable/ic_view_agenda_black_24dp"
-        android:title="@string/linear"
-        app:showAsAction="always" />
-
-    <item
         android:id="@+id/archives"
         android:title="@string/archives"
         app:showAsAction="never"/>
