@@ -76,7 +76,7 @@
     <string name="pref_header_general">General</string>
 
     <string name="pref_title_archives">Archive deleted notes</string>
-    <string name="pref_description_archives"></string>
+    <string name="pref_description_archives">Move deleted notes to archives section</string>
     <string name="pref_key_archives">archives</string>
 
     <string name="pref_title_display_name">Display name</string>

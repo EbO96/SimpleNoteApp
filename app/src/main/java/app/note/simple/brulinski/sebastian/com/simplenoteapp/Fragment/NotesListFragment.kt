@@ -132,37 +132,6 @@ class NotesListFragment : Fragment() {
         binding.recyclerView.adapter = myRecycler
     }
 
-
-    private fun getNotesFromDatabase() {
-        Log.d("ResumeLog", "Resume")
-        itemsObjectsArray = ArrayList()
-
-        val notesPropertiesArray: ArrayList<NotesProperties> = ArrayList()
-
-        context.database.use {
-            val properties = select(LocalSQLAnkoDatabase.TABLE_NOTES_PROPERTIES).whereSimple("${LocalSQLAnkoDatabase.IS_DELETED}=?", "false").parseList(MyRowParserNoteProperties())
-            val size = properties.size - 1
-
-            for (x in 0..size) {
-                notesPropertiesArray.add(NotesProperties(properties[x].get(x).id, properties[x].get(x).bgColor,
-                        properties[x].get(x).textColor, properties[x].get(x).fontStyle))
-            }
-        }
-        var size = 0
-        var notes: List<List<Notes.Note>>? = null
-
-        context.database.use {
-            notes = select(LocalSQLAnkoDatabase.TABLE_NOTES).whereSimple("${LocalSQLAnkoDatabase.IS_DELETED}=?", false.toString()).parseList(MyRowParserNotes())
-            size = notes!!.size
-        }
-
-        for (x in 0 until size) {
-            itemsObjectsArray.add(ItemsHolder(notes!![x].get(x).id!!, notes!![x].get(x).title!!, notes!![x].get(x).note!!,
-                    notes!![x].get(x).date!!, notesPropertiesArray[x].bgColor!!, notesPropertiesArray[x].textColor!!,
-                    notesPropertiesArray.get(x).fontStyle!!, false))
-        }
-    }
-
     private fun sortNotes() {
         try {
             Collections.sort(itemsObjectsArray, object : Comparator<ItemsHolder> {

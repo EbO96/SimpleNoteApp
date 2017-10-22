@@ -31,7 +31,6 @@ import app.note.simple.brulinski.sebastian.com.simplenoteapp.HelperClass.MyRowPa
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.Interfaces.MainRecyclerSizeListener
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.Interfaces.RecyclerMainInterface
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.Model.ItemsHolder
-import app.note.simple.brulinski.sebastian.com.simplenoteapp.Model.Notes
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.Model.NotesProperties
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.R
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.RecyclerView.MainRecyclerAdapter
@@ -174,27 +173,22 @@ class MainActivity : AppCompatActivity(), NotesListFragment.OnListenRecyclerScro
 
         database.use {
             val properties = select(LocalSQLAnkoDatabase.TABLE_NOTES_PROPERTIES).whereSimple("${LocalSQLAnkoDatabase.IS_DELETED}=?", false.toString()).parseList(MyRowParserNoteProperties())
-            val size = properties.size - 1
+            var size = properties.size - 1
 
             for (x in 0..size) {
                 notesPropertiesArray.add(NotesProperties(properties[x].get(x).id, properties[x].get(x).bgColor,
                         properties[x].get(x).textColor, properties[x].get(x).fontStyle))
             }
-        }
-        var size = 0
-        var notes: List<List<Notes.Note>>? = null
 
-        database.use {
-            notes = select(LocalSQLAnkoDatabase.TABLE_NOTES).whereSimple("${LocalSQLAnkoDatabase.IS_DELETED}=?", false.toString()).parseList(MyRowParserNotes())
-            size = notes!!.size
-        }
+            val notes = select(LocalSQLAnkoDatabase.TABLE_NOTES).whereSimple("${LocalSQLAnkoDatabase.IS_DELETED}=?", false.toString()).parseList(MyRowParserNotes())
+            size = notes.size
 
-        for (x in 0 until size) {
-            itemsObjectsArray.add(ItemsHolder(notes!![x].get(x).id!!, notes!![x].get(x).title!!, notes!![x].get(x).note!!,
-                    notes!![x].get(x).date!!, notesPropertiesArray[x].bgColor!!, notesPropertiesArray[x].textColor!!,
-                    notesPropertiesArray.get(x).fontStyle!!, false))
+            for (x in 0 until size) {
+                itemsObjectsArray.add(ItemsHolder(notes[x].get(x).id!!, notes[x].get(x).title!!, notes[x].get(x).note!!,
+                        notes[x].get(x).date!!, notesPropertiesArray[x].bgColor!!, notesPropertiesArray[x].textColor!!,
+                        notesPropertiesArray.get(x).fontStyle!!, false))
+            }
         }
-
         return itemsObjectsArray
     }
 
