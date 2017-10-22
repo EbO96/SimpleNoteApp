@@ -13,40 +13,44 @@
         <activity
             android:name=".Activity.MainActivity"
             tools:ignore="InnerclassSeparator">
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
+            <!--<intent-filter>-->
+                <!--<action android:name="android.intent.action.MAIN" />-->
 
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
+                <!--<category android:name="android.intent.category.LAUNCHER" />-->
+            <!--</intent-filter>-->
         </activity>
         <activity
             android:name=".Activity.SearchActivity"
             android:parentActivityName=".Activity.MainActivity"
             tools:ignore="InnerclassSeparator">
-
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value=".Activity.MainActivity" />
         </activity>
-
         <activity
             android:name=".Activity.ArchivesActivity"
-            android:parentActivityName=".Activity.MainActivity"
             android:noHistory="false"
+            android:parentActivityName=".Activity.MainActivity"
             tools:ignore="InnerclassSeparator">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value=".Activity.MainActivity" />
         </activity>
-
         <activity
             android:name=".Activity.SettingsActivity"
             android:label="@string/title_activity_settings"
             android:parentActivityName=".Activity.MainActivity">
-
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value=".Activity.MainActivity" />
+        </activity>
+        <activity android:name=".Activity.StartSplashActivity"
+            android:theme="@style/SplashTheme">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
         </activity>
     </application>
 
