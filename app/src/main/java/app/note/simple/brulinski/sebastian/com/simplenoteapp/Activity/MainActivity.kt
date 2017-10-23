@@ -1,9 +1,7 @@
 package app.note.simple.brulinski.sebastian.com.simplenoteapp.Activity
 
 import android.content.ContentValues
-import android.content.Context
 import android.content.Intent
-import android.content.SharedPreferences
 import android.databinding.DataBindingUtil
 import android.graphics.Color
 import android.graphics.drawable.Drawable
@@ -301,7 +299,8 @@ class MainActivity : AppCompatActivity(), NotesListFragment.OnListenRecyclerScro
         when (item?.itemId) {
             R.id.search_main -> {
                 val intent = Intent(this, SearchActivity::class.java)
-                val myArray = NotesListFragment.itemsObjectsArray
+                val myArray = getNotesFromDatabase()
+
                 for (x in 0 until myArray.size) {
                     myArray[x].isDeleted = false
                 }
