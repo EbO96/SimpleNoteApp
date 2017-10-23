@@ -26,7 +26,9 @@ import app.note.simple.brulinski.sebastian.com.simplenoteapp.HelperClass.Current
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.HelperClass.LayoutManagerStyle
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.HelperClass.MyRowParserNoteProperties
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.HelperClass.MyRowParserNotes
+import app.note.simple.brulinski.sebastian.com.simplenoteapp.Interfaces.ChangeColorInterface
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.Interfaces.MainRecyclerSizeListener
+import app.note.simple.brulinski.sebastian.com.simplenoteapp.Interfaces.OnColorClickListener
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.Interfaces.RecyclerMainInterface
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.Model.ItemsHolder
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.Model.NotesProperties
@@ -41,26 +43,15 @@ import org.jetbrains.anko.db.select
 
 @Suppress("DEPRECATION")
 class MainActivity : AppCompatActivity(), NotesListFragment.OnListenRecyclerScroll,
-        EditNoteFragment.OnEditDestroy, RecyclerMainInterface, NotesListFragment.OnGetNotesFromParentActivity, MainRecyclerSizeListener {
-
-    override fun getRecyclerAdapterSize(recyclerAdapterSize: Int) {
-        adapterSize = recyclerAdapterSize
-        val frag = supportFragmentManager.findFragmentById(binding.mainContainer.id) is NotesListFragment
-        if (frag && recyclerAdapterSize == 0)
-            setNoNotesFragment()
-        else if (!frag && recyclerAdapterSize != 0)
-            setNotesListFragment(getNotesFromDatabase())
-    }
-
-    override fun getNotes(): ArrayList<ItemsHolder> {
-        return getNotesFromDatabase()
-    }
+        EditNoteFragment.OnEditDestroy, RecyclerMainInterface, NotesListFragment.OnGetNotesFromParentActivity, MainRecyclerSizeListener,
+        OnColorClickListener {
 
     lateinit var binding: ActivityMainBinding
     lateinit var fm: FragmentManager
     lateinit var ft: FragmentTransaction
     lateinit var noteFragment: Fragment
     lateinit var managerStyle: LayoutManagerStyle
+    lateinit var mChangeColorCallback: ChangeColorInterface
     private val ADAPTER_SIZE_KEY = "adapter size"
     var doubleTapToExit = false
 
@@ -429,6 +420,30 @@ class MainActivity : AppCompatActivity(), NotesListFragment.OnListenRecyclerScro
                     LocalSQLAnkoDatabase.TABLE_NOTES_PROPERTIES, valuesProperties, whereClause, arrayOf(id)
             )
         }
+    }
+
+    override fun colorClick(color: String, colorOfWhat: String) {
+        val frag = supportFragmentManager.findFragmentById(binding.mainContainer.id)
+
+        if (frag is CreateNoteFragment)
+            mChangeColorCallback = frag
+        else if (frag is EditNoteFragment)
+            mChangeColorCallback = frag
+
+        mChangeColorCallback.changeNoteColors(colorOfWhat, color)
+    }
+
+    override fun getRecyclerAdapterSize(recyclerAdapterSize: Int) {
+        adapterSize = recyclerAdapterSize
+        val frag = supportFragmentManager.findFragmentById(binding.mainContainer.id) is NotesListFragment
+        if (frag && recyclerAdapterSize == 0)
+            setNoNotesFragment()
+        else if (!frag && recyclerAdapterSize != 0)
+            setNotesListFragment(getNotesFromDatabase())
+    }
+
+    override fun getNotes(): ArrayList<ItemsHolder> {
+        return getNotesFromDatabase()
     }
 
     override fun onNoteClicked(noteObject: ItemsHolder) {

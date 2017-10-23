@@ -2,7 +2,6 @@ package app.note.simple.brulinski.sebastian.com.simplenoteapp.Fragment
 
 import android.content.Context
 import android.os.Bundle
-import android.util.Log
 import android.view.animation.Animation
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.Activity.MainActivity
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.Editor.EditorManager
@@ -29,9 +28,9 @@ class EditNoteFragment : CreateNoteFragment() {
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         listenBarOptions()
 
-        val titleView = bindingFrag.createNoteTitleField
-        val noteView = bindingFrag.createNoteNoteField
-        val cardView = bindingFrag.createNoteParentCard
+        val titleView = binding.createNoteTitleField
+        val noteView = binding.createNoteNoteField
+        val cardView = binding.createNoteParentCard
 
         noteObject = MainActivity.noteToEdit
 
@@ -65,8 +64,8 @@ class EditNoteFragment : CreateNoteFragment() {
     When this fragment is destroying then user note is updating or deleting from local SQL database
      */
     override fun onDestroyView() {
-        val title = bindingFrag.createNoteTitleField.text.toString()
-        val note = bindingFrag.createNoteNoteField.text.toString()
+        val title = binding.createNoteTitleField.text.toString()
+        val note = binding.createNoteNoteField.text.toString()
         val date = getCurrentDateAndTime()
         val fontStyle = MainActivity.noteToEdit!!.fontStyle
         val textColor = MainActivity.noteToEdit!!.textColor

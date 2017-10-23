@@ -1,152 +1,156 @@
 <?xml version="1.0" encoding="utf-8"?>
-<layout
-    android:id="@+id/create_note_fragment_root_view"
-    xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto">
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/create_note_fragment_root_view">
 
-
-    <LinearLayout
+    <android.support.design.widget.CoordinatorLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:orientation="vertical"
-        android:background="@color/cardview_light_background">
+        android:layout_height="match_parent">
 
-        <HorizontalScrollView
-            android:id="@+id/edit_mode_bar_hor_scroll_view"
-            android:layout_width="wrap_content"
-            android:layout_height="?attr/actionBarSize"
-            android:background="@color/cardview_light_background"
-            android:scrollbars="none">
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="?attr/actionBarSize"
-                android:orientation="horizontal">
-
-                <ImageButton
-                    android:id="@+id/select_all"
-
-                    android:layout_width="wrap_content"
-                    android:layout_height="?attr/actionBarSize"
-                    android:background="@android:color/transparent"
-                    android:clickable="true"
-                    android:contentDescription="@string/select_all_text"
-                    android:focusable="true"
-                    android:minWidth="70dp"
-                    android:src="@drawable/ic_select_all_black_24dp" />
-
-                <ImageButton
-                    android:id="@+id/copy_all"
-                    android:layout_width="wrap_content"
-                    android:layout_height="?attr/actionBarSize"
-                    android:background="@android:color/transparent"
-                    android:contentDescription="@string/copy_all_text"
-                    android:minWidth="70dp"
-                    android:src="@drawable/ic_content_copy_black_24dp" />
-
-                <ImageButton
-                    android:id="@+id/paste"
-                    android:layout_width="wrap_content"
-                    android:layout_height="?attr/actionBarSize"
-                    android:background="@android:color/transparent"
-                    android:contentDescription="@string/paste_copied_text"
-                    android:minWidth="70dp"
-                    android:src="@drawable/ic_content_paste_black_24dp" />
-
-                <ImageButton
-                    android:id="@+id/font_style"
-                    android:layout_width="wrap_content"
-                    android:layout_height="?attr/actionBarSize"
-                    android:background="@android:color/transparent"
-                    android:contentDescription="@string/change_font_style"
-                    android:minWidth="70dp"
-                    android:src="@drawable/ic_font_download_black_24dp" />
-
-                <ImageButton
-                    android:id="@+id/text_color"
-                    android:layout_width="wrap_content"
-                    android:layout_height="?attr/actionBarSize"
-                    android:background="@android:color/transparent"
-                    android:contentDescription="@string/change_text_color"
-                    android:minWidth="70dp"
-                    android:src="@drawable/ic_format_color_text_black_24dp" />
-
-                <ImageButton
-                    android:id="@+id/note_color"
-                    android:layout_width="wrap_content"
-                    android:layout_height="?attr/actionBarSize"
-                    android:background="@android:color/transparent"
-                    android:contentDescription="@string/change_note_color"
-                    android:minWidth="70dp"
-                    android:src="@drawable/ic_color_lens_black_24dp" />
-
-            </LinearLayout>
-
-        </HorizontalScrollView>
-
-        <TextView
-            android:id="@+id/characters_counter_text_view"
-            android:hint="0/..."
-            android:textColor="@color/material_blue_grey"
-            android:layout_gravity="center"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content" />
-
-        <android.support.v7.widget.CardView
-            android:id="@+id/create_note_parent_card"
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:layout_margin="4dp"
-            app:cardCornerRadius="10dp"
-            app:cardElevation="0dp">
+            android:background="@color/cardview_light_background"
+            android:orientation="vertical">
 
+            <HorizontalScrollView
+                android:id="@+id/edit_mode_bar_hor_scroll_view"
+                android:layout_width="wrap_content"
+                android:layout_height="?attr/actionBarSize"
+                android:background="@color/cardview_light_background"
+                android:scrollbars="none">
 
-            <LinearLayout
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="?attr/actionBarSize"
+                    android:orientation="horizontal">
+
+                    <ImageButton
+                        android:id="@+id/select_all"
+
+                        android:layout_width="wrap_content"
+                        android:layout_height="?attr/actionBarSize"
+                        android:background="@android:color/transparent"
+                        android:clickable="true"
+                        android:contentDescription="@string/select_all_text"
+                        android:focusable="true"
+                        android:minWidth="70dp"
+                        android:src="@drawable/ic_select_all_black_24dp" />
+
+                    <ImageButton
+                        android:id="@+id/copy_all"
+                        android:layout_width="wrap_content"
+                        android:layout_height="?attr/actionBarSize"
+                        android:background="@android:color/transparent"
+                        android:contentDescription="@string/copy_all_text"
+                        android:minWidth="70dp"
+                        android:src="@drawable/ic_content_copy_black_24dp" />
+
+                    <ImageButton
+                        android:id="@+id/paste"
+                        android:layout_width="wrap_content"
+                        android:layout_height="?attr/actionBarSize"
+                        android:background="@android:color/transparent"
+                        android:contentDescription="@string/paste_copied_text"
+                        android:minWidth="70dp"
+                        android:src="@drawable/ic_content_paste_black_24dp" />
+
+                    <ImageButton
+                        android:id="@+id/font_style"
+                        android:layout_width="wrap_content"
+                        android:layout_height="?attr/actionBarSize"
+                        android:background="@android:color/transparent"
+                        android:contentDescription="@string/change_font_style"
+                        android:minWidth="70dp"
+                        android:src="@drawable/ic_font_download_black_24dp" />
+
+                    <ImageButton
+                        android:id="@+id/text_color"
+                        android:layout_width="wrap_content"
+                        android:layout_height="?attr/actionBarSize"
+                        android:background="@android:color/transparent"
+                        android:contentDescription="@string/change_text_color"
+                        android:minWidth="70dp"
+                        android:src="@drawable/ic_format_color_text_black_24dp" />
+
+                    <ImageButton
+                        android:id="@+id/note_color"
+                        android:layout_width="wrap_content"
+                        android:layout_height="?attr/actionBarSize"
+                        android:background="@android:color/transparent"
+                        android:contentDescription="@string/change_note_color"
+                        android:minWidth="70dp"
+                        android:src="@drawable/ic_color_lens_black_24dp" />
+
+                </LinearLayout>
+
+            </HorizontalScrollView>
+
+            <TextView
+                android:id="@+id/characters_counter_text_view"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:hint="0/..."
+                android:textColor="@color/material_blue_grey" />
+
+            <android.support.v7.widget.CardView
+                android:id="@+id/create_note_parent_card"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:orientation="vertical">
+                android:layout_margin="4dp"
+                app:cardCornerRadius="10dp"
+                app:cardElevation="0dp">
 
 
-                <ScrollView
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content">
-
-                    <EditText
-                        android:id="@+id/create_note_title_field"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:background="@android:color/transparent"
-                        android:hint="@string/title"
-                        android:inputType="textShortMessage"
-                        android:maxLines="1"
-                        android:maxLength="50"
-                        android:padding="8dp"
-                        android:textSize="24sp"
-                        android:textStyle="bold" />
-                </ScrollView>
-
-                <ScrollView
-                    android:id="@+id/create_note_note_scroll_view"
+                <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    android:paddingTop="8dp">
+                    android:orientation="vertical">
 
-                    <EditText
-                        android:id="@+id/create_note_note_field"
+
+                    <ScrollView
                         android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:gravity="top|start"
-                        android:hint="@string/note"
-                        android:padding="6dp"
-                        android:maxLength="1000"
-                        android:textAlignment="gravity"
-                        android:textSize="18sp"
-                        app:met_maxCharacters="1000"/>
-                </ScrollView>
+                        android:layout_height="wrap_content">
 
-            </LinearLayout>
-        </android.support.v7.widget.CardView>
+                        <EditText
+                            android:id="@+id/create_note_title_field"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:background="@android:color/transparent"
+                            android:hint="@string/title"
+                            android:inputType="textShortMessage"
+                            android:maxLength="50"
+                            android:maxLines="1"
+                            android:padding="8dp"
+                            android:textSize="24sp"
+                            android:textStyle="bold" />
+                    </ScrollView>
 
-    </LinearLayout>
+                    <ScrollView
+                        android:id="@+id/create_note_note_scroll_view"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:paddingTop="8dp">
+
+                        <EditText
+                            android:id="@+id/create_note_note_field"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:gravity="top|start"
+                            android:hint="@string/note"
+                            android:maxLength="1000"
+                            android:padding="6dp"
+                            android:textAlignment="gravity"
+                            android:textSize="18sp"
+                            app:met_maxCharacters="1000" />
+                    </ScrollView>
+
+                </LinearLayout>
+            </android.support.v7.widget.CardView>
+
+        </LinearLayout>
+
+    </android.support.design.widget.CoordinatorLayout>
 
 </layout>
