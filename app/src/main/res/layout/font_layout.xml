@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <android.support.constraint.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        tools:layout_editor_absoluteY="25dp">
+
+        <TextView
+            android:id="@+id/textView2"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:padding="4dp"
+            android:text="@string/fonts"
+            android:textAppearance="@style/Base.TextAppearance.AppCompat.Medium"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <TextView
+            android:id="@+id/font_default"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="50dp"
+            android:fontFamily="@string/default_font"
+            android:padding="4dp"
+            android:text="@string/default_font"
+            android:textAppearance="@style/Base.TextAppearance.AppCompat.Large"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <TextView
+            android:id="@+id/font_italic"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:fontFamily="@string/italic"
+            android:padding="4dp"
+            android:text="@string/italic"
+            android:textAppearance="@style/Base.TextAppearance.AppCompat.Large"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/font_default" />
+
+        <TextView
+            android:id="@+id/font_bold_italic"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:fontFamily="@string/bold_italic"
+            android:padding="4dp"
+            android:text="@string/bold_italic"
+            android:textAppearance="@style/Base.TextAppearance.AppCompat.Large"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/font_italic" />
+
+        <TextView
+            android:id="@+id/font_serif"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:fontFamily="@string/serif"
+            android:padding="4dp"
+            android:text="@string/serif"
+            android:textAppearance="@style/Base.TextAppearance.AppCompat.Large"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/font_bold_italic" />
+
+        <TextView
+            android:id="@+id/font_sans_serif"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:fontFamily="@string/sans_serif"
+            android:padding="4dp"
+            android:text="@string/sans_serif"
+            android:textAppearance="@style/Base.TextAppearance.AppCompat.Large"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/font_serif" />
+
+        <TextView
+            android:id="@+id/font_monospace"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:fontFamily="@string/monospace"
+            android:padding="4dp"
+            android:text="@string/monospace"
+            android:textAppearance="@style/Base.TextAppearance.AppCompat.Large"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/font_sans_serif" />
+
+    </android.support.constraint.ConstraintLayout>
+</layout>

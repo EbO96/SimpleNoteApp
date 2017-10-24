@@ -26,9 +26,9 @@ import app.note.simple.brulinski.sebastian.com.simplenoteapp.HelperClass.Current
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.HelperClass.LayoutManagerStyle
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.HelperClass.MyRowParserNoteProperties
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.HelperClass.MyRowParserNotes
-import app.note.simple.brulinski.sebastian.com.simplenoteapp.Interfaces.ChangeColorInterface
+import app.note.simple.brulinski.sebastian.com.simplenoteapp.Interfaces.ChangeNoteLookInterface
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.Interfaces.MainRecyclerSizeListener
-import app.note.simple.brulinski.sebastian.com.simplenoteapp.Interfaces.OnColorClickListener
+import app.note.simple.brulinski.sebastian.com.simplenoteapp.Interfaces.OnNotePropertiesClickListener
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.Interfaces.RecyclerMainInterface
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.Model.ItemsHolder
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.Model.NotesProperties
@@ -44,14 +44,14 @@ import org.jetbrains.anko.db.select
 @Suppress("DEPRECATION")
 class MainActivity : AppCompatActivity(), NotesListFragment.OnListenRecyclerScroll,
         EditNoteFragment.OnEditDestroy, RecyclerMainInterface, NotesListFragment.OnGetNotesFromParentActivity, MainRecyclerSizeListener,
-        OnColorClickListener {
+        OnNotePropertiesClickListener {
 
     lateinit var binding: ActivityMainBinding
     lateinit var fm: FragmentManager
     lateinit var ft: FragmentTransaction
     lateinit var noteFragment: Fragment
     lateinit var managerStyle: LayoutManagerStyle
-    lateinit var mChangeColorCallback: ChangeColorInterface
+    lateinit var mChangeNoteLookCallback: ChangeNoteLookInterface
     private val ADAPTER_SIZE_KEY = "adapter size"
     var doubleTapToExit = false
 
@@ -422,15 +422,29 @@ class MainActivity : AppCompatActivity(), NotesListFragment.OnListenRecyclerScro
         }
     }
 
-    override fun colorClick(color: String, colorOfWhat: String) {
+    /*
+    Methods below are called in Editor in Create or Edit Mode when user want to change color of note and etc.
+     */
+    override fun inEditorColorClick(color: String, colorOfWhat: String) {
         val frag = supportFragmentManager.findFragmentById(binding.mainContainer.id)
 
         if (frag is CreateNoteFragment)
-            mChangeColorCallback = frag
+            mChangeNoteLookCallback = frag
         else if (frag is EditNoteFragment)
-            mChangeColorCallback = frag
+            mChangeNoteLookCallback = frag
 
-        mChangeColorCallback.changeNoteColors(colorOfWhat, color)
+        mChangeNoteLookCallback.changeNoteOrFontColors(colorOfWhat, color)
+    }
+
+    override fun inEditorFontClick(whichFont: String) {
+        val frag = supportFragmentManager.findFragmentById(binding.mainContainer.id)
+
+        if (frag is CreateNoteFragment)
+            mChangeNoteLookCallback = frag
+        else if (frag is EditNoteFragment)
+            mChangeNoteLookCallback = frag
+
+        mChangeNoteLookCallback.changeFontStyle(whichFont)
     }
 
     override fun getRecyclerAdapterSize(recyclerAdapterSize: Int) {

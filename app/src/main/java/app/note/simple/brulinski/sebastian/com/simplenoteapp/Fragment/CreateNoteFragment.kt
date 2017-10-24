@@ -4,7 +4,6 @@ import android.annotation.SuppressLint
 import android.content.ClipData
 import android.content.ClipboardManager
 import android.content.Context
-import android.content.DialogInterface
 import android.databinding.DataBindingUtil
 import android.graphics.Color
 import android.graphics.Typeface
@@ -27,15 +26,15 @@ import app.note.simple.brulinski.sebastian.com.simplenoteapp.Activity.MainActivi
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.Database.LocalSQLAnkoDatabase
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.Editor.EditorManager
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.Fragment.BottomSheetFragments.BottomSheetColorFragment
+import app.note.simple.brulinski.sebastian.com.simplenoteapp.Fragment.BottomSheetFragments.BottomSheetFontFragment
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.HelperClass.CurrentFragmentState
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.HelperClass.MyRowParserNotes
-import app.note.simple.brulinski.sebastian.com.simplenoteapp.Interfaces.ChangeColorInterface
+import app.note.simple.brulinski.sebastian.com.simplenoteapp.Interfaces.ChangeNoteLookInterface
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.Interfaces.SaveNoteInterface
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.Model.ItemsHolder
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.Model.Notes
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.R
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.databinding.CreateNoteFragmentBinding
-import com.cocosw.bottomsheet.BottomSheet
 import com.labo.kaji.fragmentanimations.MoveAnimation
 import es.dmoral.toasty.Toasty
 import org.jetbrains.anko.db.insert
@@ -46,14 +45,18 @@ import java.text.SimpleDateFormat
 import java.util.*
 
 
-open class CreateNoteFragment : Fragment(), SaveNoteInterface, ChangeColorInterface {
+open class CreateNoteFragment : Fragment(), SaveNoteInterface, ChangeNoteLookInterface {
+
+    override fun changeFontStyle(whichFont: String) {
+        applyFont(whichFont)
+    }
 
     @RequiresApi(Build.VERSION_CODES.LOLLIPOP)
-    override fun changeNoteColors(colorOfWhat: String, color: String) {
+    override fun changeNoteOrFontColors(colorOfWhat: String, color: String) {
         if (colorOfWhat.equals(EditorManager.ColorManager.COLOR_OF_TEXT)) {
-            changeColorOf(arrayListOf(binding.createNoteTitleField, binding.createNoteNoteField), colorOfWhat, color)
+            applyColor(arrayListOf(binding.createNoteTitleField, binding.createNoteNoteField), colorOfWhat, color)
         } else {
-            changeColorOf(arrayListOf(binding.createNoteParentCard), colorOfWhat, color)
+            applyColor(arrayListOf(binding.createNoteParentCard), colorOfWhat, color)
         }
     }
 
@@ -207,7 +210,8 @@ open class CreateNoteFragment : Fragment(), SaveNoteInterface, ChangeColorInterf
 
     @RequiresApi(Build.VERSION_CODES.LOLLIPOP)
     fun listenBarOptions() {
-        val bottomSheet: BottomSheetDialogFragment = BottomSheetColorFragment()
+        val bottomSheetColors: BottomSheetDialogFragment = BottomSheetColorFragment()
+        val bottomSheetFonts: BottomSheetDialogFragment = BottomSheetFontFragment()
 
         binding.selectAll.setOnClickListener {
             selectAllText()
@@ -222,22 +226,22 @@ open class CreateNoteFragment : Fragment(), SaveNoteInterface, ChangeColorInterf
         }
 
         binding.fontStyle.setOnClickListener {
-            showFontMenu()
+            bottomSheetFonts.show(activity.supportFragmentManager, bottomSheetFonts.tag)
         }
 
         binding.textColor.setOnClickListener {
             val args = Bundle()
             args.putString(EditorManager.ColorManager.COLOR_OF_KEY, EditorManager.ColorManager.COLOR_OF_TEXT)
-            bottomSheet.arguments = args
-            bottomSheet.show(activity.supportFragmentManager, bottomSheet.tag)
+            bottomSheetColors.arguments = args
+            bottomSheetColors.show(activity.supportFragmentManager, bottomSheetColors.tag)
 
         }
 
         binding.noteColor.setOnClickListener {
             val args = Bundle()
             args.putString(EditorManager.ColorManager.COLOR_OF_KEY, EditorManager.ColorManager.COLOR_OF_NOTE)
-            bottomSheet.arguments = args
-            bottomSheet.show(activity.supportFragmentManager, bottomSheet.tag)
+            bottomSheetColors.arguments = args
+            bottomSheetColors.show(activity.supportFragmentManager, bottomSheetColors.tag)
         }
 
     }
@@ -246,49 +250,46 @@ open class CreateNoteFragment : Fragment(), SaveNoteInterface, ChangeColorInterf
     /*
     Options bar
      */
-    private fun showFontMenu() {
+    private fun applyFont(whichFont: String) {
         var fontStyle = ""
+        val editor = EditorManager.FontStyleManager
 
-        BottomSheet.Builder(activity).title(getString(R.string.fonts)).sheet(R.menu.font_menu).listener(object : DialogInterface.OnClickListener {
-            override fun onClick(p0: DialogInterface?, p1: Int) {
-                when (p1) {
-                    R.id.default_font -> {
-                        EditorManager.FontStyleManager.setUpFontStyle(Typeface.DEFAULT, binding.createNoteNoteField, binding.createNoteTitleField)
-                        fontStyle = EditorManager.FontStyleManager.DEFAULT_FONT
-                    }
-                    R.id.italic_font -> {
-                        EditorManager.FontStyleManager.setUpFontStyle(Typeface.ITALIC, binding.createNoteNoteField, binding.createNoteTitleField)
-                        fontStyle = EditorManager.FontStyleManager.ITALIC_FONT
-                    }
-                    R.id.bold_italic_font -> {
-                        EditorManager.FontStyleManager.setUpFontStyle(Typeface.BOLD_ITALIC, binding.createNoteNoteField, binding.createNoteTitleField)
-                        fontStyle = EditorManager.FontStyleManager.BOLD_ITALIC_FONT
-                    }
-                    R.id.serif_font -> {
-                        EditorManager.FontStyleManager.setUpFontStyle(Typeface.SERIF, binding.createNoteNoteField, binding.createNoteTitleField)
-                        fontStyle = EditorManager.FontStyleManager.SERIF_FONT
-                    }
-                    R.id.sans_serif_font -> {
-                        EditorManager.FontStyleManager.setUpFontStyle(Typeface.SANS_SERIF, binding.createNoteNoteField, binding.createNoteTitleField)
-                        fontStyle = EditorManager.FontStyleManager.SANS_SERIF_FONT
-                    }
-                    R.id.monospace_font -> {
-                        EditorManager.FontStyleManager.setUpFontStyle(Typeface.MONOSPACE, binding.createNoteNoteField, binding.createNoteTitleField)
-                        fontStyle = EditorManager.FontStyleManager.MONOSPACE_FONT
-                    }
-                }
-                val frag = activity.supportFragmentManager.findFragmentById(activity.findViewById<FrameLayout>(R.id.main_container).id)
-                val editMode = frag != null && frag.isVisible && frag.tag.equals(MainActivity.EDIT_NOTE_FRAGMENT_TAG)
-
-                if (editMode)
-                    MainActivity.noteToEdit!!.fontStyle = fontStyle
-                else noteObject!!.fontStyle = fontStyle
+        when (whichFont) {
+            editor.DEFAULT_FONT -> {
+                EditorManager.FontStyleManager.setUpFontStyle(Typeface.DEFAULT, binding.createNoteNoteField, binding.createNoteTitleField)
+                fontStyle = EditorManager.FontStyleManager.DEFAULT_FONT
             }
-        }).show()
+            editor.ITALIC_FONT -> {
+                EditorManager.FontStyleManager.setUpFontStyle(Typeface.ITALIC, binding.createNoteNoteField, binding.createNoteTitleField)
+                fontStyle = EditorManager.FontStyleManager.ITALIC_FONT
+            }
+            editor.BOLD_ITALIC_FONT -> {
+                EditorManager.FontStyleManager.setUpFontStyle(Typeface.BOLD_ITALIC, binding.createNoteNoteField, binding.createNoteTitleField)
+                fontStyle = EditorManager.FontStyleManager.BOLD_ITALIC_FONT
+            }
+            editor.SERIF_FONT -> {
+                EditorManager.FontStyleManager.setUpFontStyle(Typeface.SERIF, binding.createNoteNoteField, binding.createNoteTitleField)
+                fontStyle = EditorManager.FontStyleManager.SERIF_FONT
+            }
+            editor.SANS_SERIF_FONT -> {
+                EditorManager.FontStyleManager.setUpFontStyle(Typeface.SANS_SERIF, binding.createNoteNoteField, binding.createNoteTitleField)
+                fontStyle = EditorManager.FontStyleManager.SANS_SERIF_FONT
+            }
+            editor.MONOSPACE_FONT -> {
+                EditorManager.FontStyleManager.setUpFontStyle(Typeface.MONOSPACE, binding.createNoteNoteField, binding.createNoteTitleField)
+                fontStyle = EditorManager.FontStyleManager.MONOSPACE_FONT
+            }
+        }
+        val frag = activity.supportFragmentManager.findFragmentById(activity.findViewById<FrameLayout>(R.id.main_container).id)
+        val editMode = frag != null && frag.isVisible && frag.tag.equals(MainActivity.EDIT_NOTE_FRAGMENT_TAG)
+
+        if (editMode)
+            MainActivity.noteToEdit!!.fontStyle = fontStyle
+        else noteObject!!.fontStyle = fontStyle
     }
 
     @RequiresApi(Build.VERSION_CODES.LOLLIPOP)
-    fun changeColorOf(viewsArray: ArrayList<Any>, colorOf: String, color: String) { //Change color of background
+    fun applyColor(viewsArray: ArrayList<Any>, colorOf: String, color: String) { //Change color of background
         var resColor = ContextCompat.getColor(context, R.color.material_white)
         var currentColor = noteObject!!.bgColor
 

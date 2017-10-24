@@ -12,7 +12,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.Editor.EditorManager
-import app.note.simple.brulinski.sebastian.com.simplenoteapp.Interfaces.OnColorClickListener
+import app.note.simple.brulinski.sebastian.com.simplenoteapp.Interfaces.OnNotePropertiesClickListener
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.R
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.databinding.ColorsLayoutBinding
 
@@ -22,7 +22,7 @@ import app.note.simple.brulinski.sebastian.com.simplenoteapp.databinding.ColorsL
  */
 class BottomSheetColorFragment : BottomSheetDialogFragment() {
     private lateinit var binding: ColorsLayoutBinding
-    private lateinit var mColorClickListener: OnColorClickListener
+    private lateinit var mNotePropertiesClickListener: OnNotePropertiesClickListener
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -38,51 +38,51 @@ class BottomSheetColorFragment : BottomSheetDialogFragment() {
         else binding.textView.text = getString(R.string.font_color)
 
         binding.colorRedImage.setOnClickListener {
-            mColorClickListener.colorClick(EditorManager.ColorManager.RED, TAG)
+            mNotePropertiesClickListener.inEditorColorClick(EditorManager.ColorManager.RED, TAG)
             dismiss()
         }
         binding.colorPinkImage.setOnClickListener {
-            mColorClickListener.colorClick(EditorManager.ColorManager.PINK, TAG)
+            mNotePropertiesClickListener.inEditorColorClick(EditorManager.ColorManager.PINK, TAG)
             dismiss()
         }
         binding.colorPurpleImage.setOnClickListener {
-            mColorClickListener.colorClick(EditorManager.ColorManager.PURPLE, TAG)
+            mNotePropertiesClickListener.inEditorColorClick(EditorManager.ColorManager.PURPLE, TAG)
             dismiss()
         }
         binding.colorBlueImage.setOnClickListener {
-            mColorClickListener.colorClick(EditorManager.ColorManager.BLUE, TAG)
+            mNotePropertiesClickListener.inEditorColorClick(EditorManager.ColorManager.BLUE, TAG)
             dismiss()
         }
         binding.colorIndigoImage.setOnClickListener {
-            mColorClickListener.colorClick(EditorManager.ColorManager.INDIGO, TAG)
+            mNotePropertiesClickListener.inEditorColorClick(EditorManager.ColorManager.INDIGO, TAG)
             dismiss()
         }
         binding.colorGreenImage.setOnClickListener {
-            mColorClickListener.colorClick(EditorManager.ColorManager.GREEN, TAG)
+            mNotePropertiesClickListener.inEditorColorClick(EditorManager.ColorManager.GREEN, TAG)
             dismiss()
         }
         binding.colorTealImage.setOnClickListener {
-            mColorClickListener.colorClick(EditorManager.ColorManager.TEAL, TAG)
+            mNotePropertiesClickListener.inEditorColorClick(EditorManager.ColorManager.TEAL, TAG)
             dismiss()
         }
         binding.colorYellowImage.setOnClickListener {
-            mColorClickListener.colorClick(EditorManager.ColorManager.YELLOW, TAG)
+            mNotePropertiesClickListener.inEditorColorClick(EditorManager.ColorManager.YELLOW, TAG)
             dismiss()
         }
         binding.colorWhiteImage.setOnClickListener {
-            mColorClickListener.colorClick(EditorManager.ColorManager.WHITE, TAG)
+            mNotePropertiesClickListener.inEditorColorClick(EditorManager.ColorManager.WHITE, TAG)
             dismiss()
         }
         binding.colorBlueGreyImage.setOnClickListener {
-            mColorClickListener.colorClick(EditorManager.ColorManager.BLUE_GRAY, TAG)
+            mNotePropertiesClickListener.inEditorColorClick(EditorManager.ColorManager.BLUE_GRAY, TAG)
             dismiss()
         }
         binding.colorBlackImage.setOnClickListener {
-            mColorClickListener.colorClick(EditorManager.ColorManager.BLACK, TAG)
+            mNotePropertiesClickListener.inEditorColorClick(EditorManager.ColorManager.BLACK, TAG)
             dismiss()
         }
         binding.colorBrownImage.setOnClickListener {
-            mColorClickListener.colorClick(EditorManager.ColorManager.BROWN, TAG)
+            mNotePropertiesClickListener.inEditorColorClick(EditorManager.ColorManager.BROWN, TAG)
             dismiss()
         }
 
@@ -91,9 +91,9 @@ class BottomSheetColorFragment : BottomSheetDialogFragment() {
 
     override fun onAttach(context: Context?) {
         try {
-            mColorClickListener = (context as OnColorClickListener)
+            mNotePropertiesClickListener = (context as OnNotePropertiesClickListener)
         } catch (e: ClassCastException) {
-            throw ClassCastException(context.toString() + "must implement OnColorClickListener")
+            throw ClassCastException(context.toString() + "must implement OnNotePropertiesClickListener")
         }
         super.onAttach(context)
     }
