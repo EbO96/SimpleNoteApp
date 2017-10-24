@@ -226,14 +226,18 @@ open class CreateNoteFragment : Fragment(), SaveNoteInterface, ChangeNoteLookInt
         }
 
         binding.fontStyle.setOnClickListener {
-            bottomSheetFonts.show(activity.supportFragmentManager, bottomSheetFonts.tag)
+            if (!bottomSheetFonts.isAdded) {
+                bottomSheetFonts.show(activity.supportFragmentManager, bottomSheetFonts.tag)
+            }
         }
 
         binding.textColor.setOnClickListener {
             val args = Bundle()
             args.putString(EditorManager.ColorManager.COLOR_OF_KEY, EditorManager.ColorManager.COLOR_OF_TEXT)
             bottomSheetColors.arguments = args
-            bottomSheetColors.show(activity.supportFragmentManager, bottomSheetColors.tag)
+            if (!bottomSheetColors.isAdded) {
+                bottomSheetColors.show(activity.supportFragmentManager, bottomSheetColors.tag)
+            }
 
         }
 
@@ -241,7 +245,9 @@ open class CreateNoteFragment : Fragment(), SaveNoteInterface, ChangeNoteLookInt
             val args = Bundle()
             args.putString(EditorManager.ColorManager.COLOR_OF_KEY, EditorManager.ColorManager.COLOR_OF_NOTE)
             bottomSheetColors.arguments = args
-            bottomSheetColors.show(activity.supportFragmentManager, bottomSheetColors.tag)
+            if (!bottomSheetColors.isAdded) {
+                bottomSheetColors.show(activity.supportFragmentManager, bottomSheetColors.tag)
+            }
         }
 
     }
