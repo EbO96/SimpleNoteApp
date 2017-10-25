@@ -24,6 +24,7 @@ import android.widget.FrameLayout
 import android.widget.Toast
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.Activity.MainActivity
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.Database.LocalSQLAnkoDatabase
+import app.note.simple.brulinski.sebastian.com.simplenoteapp.Editor.ColorCreator
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.Editor.EditorManager
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.Fragment.BottomSheetFragments.BottomSheetColorFragment
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.Fragment.BottomSheetFragments.BottomSheetFontFragment
@@ -247,6 +248,8 @@ open class CreateNoteFragment : Fragment(), SaveNoteInterface, ChangeNoteLookInt
             bottomSheetColors.arguments = args
             if (!bottomSheetColors.isAdded) {
                 bottomSheetColors.show(activity.supportFragmentManager, bottomSheetColors.tag)
+//                val color = ColorCreator(156, 111, 97)
+//                binding.createNoteTitleField.setBackgroundColor(color.getColor())
             }
         }
 

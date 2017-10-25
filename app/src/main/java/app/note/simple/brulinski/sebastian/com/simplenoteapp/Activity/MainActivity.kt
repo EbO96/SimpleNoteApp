@@ -55,6 +55,9 @@ class MainActivity : AppCompatActivity(), NotesListFragment.OnListenRecyclerScro
     private val ADAPTER_SIZE_KEY = "adapter size"
     var doubleTapToExit = false
 
+    /*
+    Toasty Toasts colors
+     */
     @ColorInt
     private val ERROR_COLOR = Color.parseColor("#D50000")
     private var infoToastShowedAtStart: Boolean = false
@@ -445,6 +448,11 @@ class MainActivity : AppCompatActivity(), NotesListFragment.OnListenRecyclerScro
             mChangeNoteLookCallback = frag
 
         mChangeNoteLookCallback.changeFontStyle(whichFont)
+    }
+
+    override fun inEditorColorPickerClick() {
+        val intent = Intent(this, OwnColorCreatorActivity::class.java)
+        startActivity(intent)
     }
 
     override fun getRecyclerAdapterSize(recyclerAdapterSize: Int) {

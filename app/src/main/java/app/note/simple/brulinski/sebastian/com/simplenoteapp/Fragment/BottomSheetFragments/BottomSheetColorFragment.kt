@@ -86,6 +86,11 @@ class BottomSheetColorFragment : BottomSheetDialogFragment() {
             dismiss()
         }
 
+        binding.colorPickerImage.setOnClickListener {
+            mNotePropertiesClickListener.inEditorColorPickerClick()
+            dismiss()
+        }
+
         return binding.root
     }
 

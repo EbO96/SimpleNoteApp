@@ -80,7 +80,7 @@
                         android:background="@android:color/transparent"
                         android:contentDescription="@string/change_note_color"
                         android:minWidth="70dp"
-                        android:src="@drawable/ic_color_lens_black_24dp" />
+                        android:src="@drawable/ic_brush_black_24dp" />
 
                 </LinearLayout>
 

@@ -6,4 +6,5 @@ package app.note.simple.brulinski.sebastian.com.simplenoteapp.Interfaces
 interface OnNotePropertiesClickListener {
     fun inEditorColorClick(color: String, colorOfWhat: String)
     fun inEditorFontClick(whichFont: String)
+    fun inEditorColorPickerClick()
 }
