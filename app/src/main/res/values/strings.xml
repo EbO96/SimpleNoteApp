@@ -143,5 +143,6 @@
     <string name="select_all">Select all</string>
     <string name="create_a_color_label">Create a color</string>
     <string name="add_color">Add color</string>
+    <string name="apply_color">Apply color</string>
     <!--END-->
 </resources>

@@ -7,9 +7,9 @@
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:background="@color/material_white"
         tools:context="app.note.simple.brulinski.sebastian.com.simplenoteapp.Activity.OwnColorCreatorActivity"
-        tools:layout_editor_absoluteY="25dp"
-        android:background="@color/material_white">
+        tools:layout_editor_absoluteY="25dp">
 
         <android.support.v7.widget.Toolbar
             android:id="@+id/own_color_creator_toolbar"
@@ -25,7 +25,8 @@
             android:layout_below="@id/own_color_creator_toolbar"
             android:layout_centerHorizontal="true"
             android:layout_marginTop="16dp"
-            app:cardElevation="1dp" />
+            app:cardCornerRadius="60dp"
+            app:cardBackgroundColor="@color/material_black"/>
 
         <TextView
             android:id="@+id/hex_value_preview"
@@ -34,7 +35,7 @@
             android:layout_below="@id/color_preview"
             android:layout_centerHorizontal="true"
             android:layout_marginTop="4dp"
-            android:hint="#"
+            android:hint="#000000"
             android:textAlignment="center"
             android:textAppearance="@style/Base.TextAppearance.AppCompat.Medium" />
 
@@ -47,7 +48,8 @@
             android:layout_centerHorizontal="true"
             android:layout_marginTop="30dp"
             android:max="255"
-            android:progress="1" />
+            android:progress="1"
+            android:theme="@style/SeekBarRed" />
 
         <SeekBar
             android:id="@+id/seekBar_green_value"
@@ -58,7 +60,8 @@
             android:layout_centerHorizontal="true"
             android:layout_marginTop="25dp"
             android:max="255"
-            android:progress="1" />
+            android:progress="1"
+            android:theme="@style/SeekBarGreen" />
 
         <SeekBar
             android:id="@+id/seekBar_blue_value"
@@ -69,7 +72,8 @@
             android:layout_centerHorizontal="true"
             android:layout_marginTop="25dp"
             android:max="255"
-            android:progress="1" />
+            android:progress="1"
+            android:theme="@style/SeekBarBlue" />
 
         <EditText
             android:id="@+id/red_value_edit"
@@ -80,6 +84,7 @@
             android:layout_marginTop="20dp"
             android:layout_toLeftOf="@id/green_value_edit"
             android:hint="R"
+            android:inputType="number"
             android:maxLength="3"
             android:textAlignment="center"
             android:textAppearance="@style/Base.TextAppearance.AppCompat.Small" />
@@ -92,6 +97,7 @@
             android:layout_centerHorizontal="true"
             android:layout_marginTop="20dp"
             android:hint="G"
+            android:inputType="number"
             android:maxLength="3"
             android:textAlignment="center"
             android:textAppearance="@style/Base.TextAppearance.AppCompat.Small" />
@@ -105,6 +111,7 @@
             android:layout_marginTop="20dp"
             android:layout_toRightOf="@id/green_value_edit"
             android:hint="B"
+            android:inputType="number"
             android:maxLength="3"
             android:textAlignment="center"
             android:textAppearance="@style/Base.TextAppearance.AppCompat.Small" />

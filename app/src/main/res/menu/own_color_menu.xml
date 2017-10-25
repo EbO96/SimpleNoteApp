@@ -8,7 +8,7 @@
         android:icon="@drawable/ic_add_black_24dp"/>
 
     <item android:id="@+id/apply"
-        android:title="@string/add_color"
+        android:title="@string/apply_color"
         app:showAsAction="always"
         android:icon="@drawable/ic_done_black_24dp"/>
 </menu>
