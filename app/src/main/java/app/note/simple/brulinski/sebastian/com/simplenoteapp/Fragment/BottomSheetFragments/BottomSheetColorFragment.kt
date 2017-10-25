@@ -91,6 +91,10 @@ class BottomSheetColorFragment : BottomSheetDialogFragment() {
             dismiss()
         }
 
+        binding.customColorCard.setOnClickListener{
+
+        }
+
         return binding.root
     }
 
