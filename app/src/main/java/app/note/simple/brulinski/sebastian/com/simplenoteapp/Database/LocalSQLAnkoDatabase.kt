@@ -9,7 +9,6 @@ class LocalSQLAnkoDatabase(ctx: Context) : ManagedSQLiteOpenHelper(ctx, "user_no
     companion object {
         private var instance: LocalSQLAnkoDatabase? = null
         val TABLE_NOTES: String = "notes"
-        val TABLE_NOTES_PROPERTIES: String = "notes_properties"
 
         /*
         Column names notes table
@@ -22,12 +21,15 @@ class LocalSQLAnkoDatabase(ctx: Context) : ManagedSQLiteOpenHelper(ctx, "user_no
         val IS_DELETED = "is_deleted"
 
         /*
-        Column names note_properties table
+        Column names to properties of note
          */
 
-        val NOTE_ID = "note_id"
-        val BG_COLOR = "bg_color"
-        val TEXT_COLOR = "text_color"
+        val R_BG_COLOR = "r_bg_color"
+        val G_BG_COLOR = "g_bg_color"
+        val B_BG_COLOR = "b_bg_color"
+        val R_TXT_COLOR = "r_txt_color"
+        val G_TXT_COLOR = "g_txt_color"
+        val B_TXT_COLOR = "b_txt_color"
         val FONT_STYLE = "font_style"
 
         @Synchronized
@@ -40,15 +42,12 @@ class LocalSQLAnkoDatabase(ctx: Context) : ManagedSQLiteOpenHelper(ctx, "user_no
     }
 
     override fun onCreate(p0: SQLiteDatabase) {
-        p0.createTable(TABLE_NOTES, true, ID to INTEGER + PRIMARY_KEY, TITLE to TEXT, NOTE to TEXT,
-                DATE to TEXT, IS_DELETED to TEXT)
-        p0.createTable(TABLE_NOTES_PROPERTIES, true, ID to INTEGER + PRIMARY_KEY, NOTE_ID to TEXT,
-                BG_COLOR to TEXT, TEXT_COLOR to TEXT, FONT_STYLE to TEXT, IS_DELETED to TEXT)
+        p0.createTable(TABLE_NOTES, true, ID to INTEGER + PRIMARY_KEY, TITLE to TEXT, NOTE to TEXT, DATE to TEXT, R_BG_COLOR to INTEGER, B_BG_COLOR to INTEGER,
+                G_BG_COLOR to INTEGER, R_TXT_COLOR to INTEGER, B_TXT_COLOR to INTEGER, G_TXT_COLOR to INTEGER, FONT_STYLE to TEXT, IS_DELETED to TEXT)
     }
 
     override fun onUpgrade(p0: SQLiteDatabase, p1: Int, p2: Int) {
         p0.dropTable(TABLE_NOTES, true)
-        p0.dropTable(TABLE_NOTES_PROPERTIES, true)
     }
 }
 

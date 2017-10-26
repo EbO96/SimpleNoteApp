@@ -1,6 +1,5 @@
 package app.note.simple.brulinski.sebastian.com.simplenoteapp.Activity
 
-import android.content.ContentValues
 import android.content.Intent
 import android.databinding.DataBindingUtil
 import android.graphics.Color
@@ -19,26 +18,20 @@ import android.view.MenuInflater
 import android.view.MenuItem
 import android.widget.FrameLayout
 import android.widget.Toast
-import app.note.simple.brulinski.sebastian.com.simplenoteapp.Database.LocalSQLAnkoDatabase
-import app.note.simple.brulinski.sebastian.com.simplenoteapp.Database.database
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.Fragment.*
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.HelperClass.CurrentFragmentState
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.HelperClass.LayoutManagerStyle
-import app.note.simple.brulinski.sebastian.com.simplenoteapp.HelperClass.MyRowParserNoteProperties
-import app.note.simple.brulinski.sebastian.com.simplenoteapp.HelperClass.MyRowParserNotes
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.Interfaces.ChangeNoteLookInterface
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.Interfaces.MainRecyclerSizeListener
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.Interfaces.OnNotePropertiesClickListener
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.Interfaces.RecyclerMainInterface
-import app.note.simple.brulinski.sebastian.com.simplenoteapp.Model.ItemsHolder
-import app.note.simple.brulinski.sebastian.com.simplenoteapp.Model.NotesProperties
+import app.note.simple.brulinski.sebastian.com.simplenoteapp.Model.NoteItem
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.R
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.RecyclerView.MainRecyclerAdapter
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.databinding.ActivityMainBinding
 import es.dmoral.toasty.Toasty
 import net.yslibrary.android.keyboardvisibilityevent.KeyboardVisibilityEvent
 import net.yslibrary.android.keyboardvisibilityevent.KeyboardVisibilityEventListener
-import org.jetbrains.anko.db.select
 
 
 @Suppress("DEPRECATION")
@@ -70,7 +63,7 @@ class MainActivity : AppCompatActivity(), NotesListFragment.OnListenRecyclerScro
         var NO_NOTES_FRAGMENT_TAG: String = "NO_NOTES" //Fragment TAG'
         val DATABASE_NOTES_ARRAY = "notes array"
         lateinit var menuItemSearch: MenuItem //Toolbar menu item (set recycler view layout as linear layout)
-        var noteToEdit: ItemsHolder? = null
+        var noteToEdit: NoteItem? = null
         var adapterSize = 0
     }
 
@@ -82,7 +75,6 @@ class MainActivity : AppCompatActivity(), NotesListFragment.OnListenRecyclerScro
         binding = DataBindingUtil.setContentView(this, R.layout.activity_main)
         setSupportActionBar(binding.toolbar)
         managerStyle = LayoutManagerStyle(this)
-
         /*
         Set main fragment  (NoteListFragment.kt) manually  only once when saveInstanceState is null
         At the same time we getting layout manager type from SharedPreferences
@@ -92,7 +84,7 @@ class MainActivity : AppCompatActivity(), NotesListFragment.OnListenRecyclerScro
             if (array.size != 0)
                 setNotesListFragment(getNotesFromDatabase())
             else setNoNotesFragment()
-            val v: ItemsHolder? = intent.getParcelableExtra<ItemsHolder>("noteObject")
+            val v: NoteItem? = intent.getParcelableExtra<NoteItem>("noteObject")
             if (v != null) {
                 onNoteClicked(v)
                 intent.removeExtra("noteObject")
@@ -120,29 +112,29 @@ class MainActivity : AppCompatActivity(), NotesListFragment.OnListenRecyclerScro
         super.onSaveInstanceState(outState)
     }
 
-    private fun getNotesFromDatabase(): ArrayList<ItemsHolder> {
-        val itemsObjectsArray = ArrayList<ItemsHolder>()
-
-        val notesPropertiesArray: ArrayList<NotesProperties> = ArrayList()
-
-        database.use {
-            val properties = select(LocalSQLAnkoDatabase.TABLE_NOTES_PROPERTIES).whereSimple("${LocalSQLAnkoDatabase.IS_DELETED}=?", false.toString()).parseList(MyRowParserNoteProperties())
-            var size = properties.size - 1
-
-            for (x in 0..size) {
-                notesPropertiesArray.add(NotesProperties(properties[x].get(x).id, properties[x].get(x).bgColor,
-                        properties[x].get(x).textColor, properties[x].get(x).fontStyle))
-            }
-
-            val notes = select(LocalSQLAnkoDatabase.TABLE_NOTES).whereSimple("${LocalSQLAnkoDatabase.IS_DELETED}=?", false.toString()).parseList(MyRowParserNotes())
-            size = notes.size
-
-            for (x in 0 until size) {
-                itemsObjectsArray.add(ItemsHolder(notes[x].get(x).id!!, notes[x].get(x).title!!, notes[x].get(x).note!!,
-                        notes[x].get(x).date!!, notesPropertiesArray[x].bgColor!!, notesPropertiesArray[x].textColor!!,
-                        notesPropertiesArray.get(x).fontStyle!!, false))
-            }
-        }
+    private fun getNotesFromDatabase(): ArrayList<NoteItem> {
+        val itemsObjectsArray = ArrayList<NoteItem>()
+        //TODO new implementation of code below
+//        val notesPropertiesArray: ArrayList<NotesProperties> = ArrayList()
+//
+//        database.use {
+//            val properties = select(LocalSQLAnkoDatabase.TABLE_NOTES_PROPERTIES).whereSimple("${LocalSQLAnkoDatabase.IS_DELETED}=?", false.toString()).parseList(MyRowParserNoteProperties())
+//            var size = properties.size - 1
+//
+//            for (x in 0..size) {
+//                notesPropertiesArray.add(NotesProperties(properties[x].get(x).id, properties[x].get(x).bgColor,
+//                        properties[x].get(x).textColor, properties[x].get(x).fontStyle))
+//            }
+//
+//            val notes = select(LocalSQLAnkoDatabase.TABLE_NOTES).whereSimple("${LocalSQLAnkoDatabase.IS_DELETED}=?", false.toString()).parseList(MyRowParserNotes())
+//            size = notes.size
+//
+//            for (x in 0 until size) {
+//                itemsObjectsArray.add(NoteItem(notes[x].get(x).id!!, notes[x].get(x).title!!, notes[x].get(x).note!!,
+//                        notes[x].get(x).date!!, notesPropertiesArray[x].bgColor!!, notesPropertiesArray[x].textColor!!,
+//                        notesPropertiesArray.get(x).fontStyle!!, false))
+//            }
+//        }
         return itemsObjectsArray
     }
 
@@ -165,7 +157,7 @@ class MainActivity : AppCompatActivity(), NotesListFragment.OnListenRecyclerScro
 
     }
 
-    fun setNotesListFragment(array: ArrayList<ItemsHolder>) {
+    fun setNotesListFragment(array: ArrayList<NoteItem>) {
         fm = supportFragmentManager
         ft = fm.beginTransaction()
 
@@ -385,50 +377,51 @@ class MainActivity : AppCompatActivity(), NotesListFragment.OnListenRecyclerScro
     Listen form fragmnt destroyed
      */
 
-    override fun editDestroy(noteObject: ItemsHolder?) {
-        noteToEdit = noteObject
-
-        val id = noteObject!!.id
-        val whereClause = "_id=?"
-
-        val title = noteObject.title
-        val note = noteObject.note
-        val date = noteObject.date
-
-        val bgColor = noteObject.bgColor
-        val textColor = noteObject.textColor
-        val fontStyle = noteObject.fontStyle
-
-        val valuesNote = ContentValues()
-        val valuesProperties = ContentValues()
-
-        valuesNote.put(LocalSQLAnkoDatabase.TITLE, title)
-        valuesNote.put(LocalSQLAnkoDatabase.NOTE, note)
-        valuesNote.put(LocalSQLAnkoDatabase.DATE, date)
-
-        database.use {
-            //Update notes database
-            update(
-                    LocalSQLAnkoDatabase.TABLE_NOTES, valuesNote, whereClause, arrayOf(id)
-            )
-        }
-
-        valuesProperties.put(LocalSQLAnkoDatabase.BG_COLOR, bgColor)
-        valuesProperties.put(LocalSQLAnkoDatabase.TEXT_COLOR, textColor)
-        valuesProperties.put(LocalSQLAnkoDatabase.FONT_STYLE, fontStyle)
-
-        database.use {
-            //Update notes properties database
-            update(
-                    LocalSQLAnkoDatabase.TABLE_NOTES_PROPERTIES, valuesProperties, whereClause, arrayOf(id)
-            )
-        }
+    override fun editDestroy(noteObject: NoteItem?) {
+        //TODO new implementation of code below
+//        noteToEdit = noteObject
+//
+//        val id = noteObject!!.id
+//        val whereClause = "_id=?"
+//
+//        val title = noteObject.title
+//        val note = noteObject.note
+//        val date = noteObject.date
+//
+//        val bgColor = noteObject.bgColor
+//        val textColor = noteObject.textColor
+//        val fontStyle = noteObject.fontStyle
+//
+//        val valuesNote = ContentValues()
+//        val valuesProperties = ContentValues()
+//
+//        valuesNote.put(LocalSQLAnkoDatabase.TITLE, title)
+//        valuesNote.put(LocalSQLAnkoDatabase.NOTE, note)
+//        valuesNote.put(LocalSQLAnkoDatabase.DATE, date)
+//
+//        database.use {
+//            //Update notes database
+//            update(
+//                    LocalSQLAnkoDatabase.TABLE_NOTES, valuesNote, whereClause, arrayOf(id)
+//            )
+//        }
+//
+//        //valuesProperties.put(LocalSQLAnkoDatabase.BG_COLOR, bgColor)
+//        //valuesProperties.put(LocalSQLAnkoDatabase.TEXT_COLOR, textColor)
+//        valuesProperties.put(LocalSQLAnkoDatabase.FONT_STYLE, fontStyle)
+//
+//        database.use {
+//            //Update notes properties database
+//            update(
+//                    LocalSQLAnkoDatabase.TABLE_NOTES_PROPERTIES, valuesProperties, whereClause, arrayOf(id)
+//            )
+//        }
     }
 
     /*
     Methods below are called in Editor in Create or Edit Mode when user want to change color of note and etc.
      */
-    override fun inEditorColorClick(color: String, colorOfWhat: String) {
+    override fun inEditorColorClick(color: Int, colorOfWhat: String) {
         val frag = supportFragmentManager.findFragmentById(binding.mainContainer.id)
 
         if (frag is CreateNoteFragment)
@@ -464,11 +457,11 @@ class MainActivity : AppCompatActivity(), NotesListFragment.OnListenRecyclerScro
             setNotesListFragment(getNotesFromDatabase())
     }
 
-    override fun getNotes(): ArrayList<ItemsHolder> {
+    override fun getNotes(): ArrayList<NoteItem> {
         return getNotesFromDatabase()
     }
 
-    override fun onNoteClicked(noteObject: ItemsHolder) {
+    override fun onNoteClicked(noteObject: NoteItem) {
         CurrentFragmentState.backPressed = false
         noteToEdit = noteObject
         setNotePreviewFragment()

@@ -5,21 +5,15 @@ import android.os.Bundle
 import android.support.v4.app.NavUtils
 import android.support.v7.app.AppCompatActivity
 import android.view.MenuItem
-import app.note.simple.brulinski.sebastian.com.simplenoteapp.Database.LocalSQLAnkoDatabase
-import app.note.simple.brulinski.sebastian.com.simplenoteapp.Database.database
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.Fragment.ArchivedNotesFragment
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.Fragment.NoArchivedNotesFragment
-import app.note.simple.brulinski.sebastian.com.simplenoteapp.HelperClass.MyRowParserNoteProperties
-import app.note.simple.brulinski.sebastian.com.simplenoteapp.HelperClass.MyRowParserNotes
-import app.note.simple.brulinski.sebastian.com.simplenoteapp.Model.ArchivedNotesItemsHolder
-import app.note.simple.brulinski.sebastian.com.simplenoteapp.Model.NotesProperties
+import app.note.simple.brulinski.sebastian.com.simplenoteapp.Model.ArchivedNotesNoteItem
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.R
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.databinding.ActivityArchivesBinding
-import org.jetbrains.anko.db.select
 
 class ArchivesActivity : AppCompatActivity() {
 
-    private var archivedNotesArrayList = ArrayList<ArchivedNotesItemsHolder>()
+    private var archivedNotesArrayList = ArrayList<ArchivedNotesNoteItem>()
     private lateinit var binding: ActivityArchivesBinding
     private val ARCHIVED_TAG = "archived"
     private val NO_ARCHIVED_TAG = "no_archived"
@@ -40,7 +34,7 @@ class ArchivesActivity : AppCompatActivity() {
         if (savedInstanceState == null)
             args.putParcelableArrayList(ArchivedNotesFragment.BUNDLE_KEY, notes)
         else {
-            args.putParcelableArrayList(ArchivedNotesFragment.BUNDLE_KEY, savedInstanceState.getParcelableArrayList<ArchivedNotesItemsHolder>(ArchivedNotesFragment.BUNDLE_KEY))
+            args.putParcelableArrayList(ArchivedNotesFragment.BUNDLE_KEY, savedInstanceState.getParcelableArrayList<ArchivedNotesNoteItem>(ArchivedNotesFragment.BUNDLE_KEY))
         }
 
         if (notes.size == 0) {
@@ -94,35 +88,35 @@ class ArchivesActivity : AppCompatActivity() {
         listenForReplaceFragmentEvent(fragment)
     }
 
-    private fun getArchivedNotes(): ArrayList<ArchivedNotesItemsHolder> {
+    private fun getArchivedNotes(): ArrayList<ArchivedNotesNoteItem> {
         archivedNotesArrayList = ArrayList()
-
-        val propertiesArray = ArrayList<NotesProperties>()
-
-        database.use {
-            val properties = select(LocalSQLAnkoDatabase.TABLE_NOTES_PROPERTIES).whereSimple("${LocalSQLAnkoDatabase.IS_DELETED}=?", "true").
-                    parseList(MyRowParserNoteProperties())
-
-            val size = properties.size
-
-            for (x in 0 until size) {
-                val item = properties[x].get(x)
-                propertiesArray.add(NotesProperties(item.id, item.bgColor, item.textColor, item.fontStyle))
-            }
-        }
-
-        database.use {
-            val notes = select(LocalSQLAnkoDatabase.TABLE_NOTES).whereSimple("${LocalSQLAnkoDatabase.IS_DELETED}=?", "true").
-                    parseList(MyRowParserNotes())
-            val size = notes.size
-
-            for (x in 0 until size) {
-                val item = notes[x].get(x)
-                val noteObject = ArchivedNotesItemsHolder(false, item.id!!, item.title!!, item.note!!, item.date!!, propertiesArray[x].bgColor.toString(),
-                        propertiesArray[x].textColor.toString(), propertiesArray[x].fontStyle.toString(), true)
-                archivedNotesArrayList.add(noteObject)
-            }
-        }
+        //TODO new implementation of code below
+//        val propertiesArray = ArrayList<NotesProperties>()
+//
+//        database.use {
+//            val properties = select(LocalSQLAnkoDatabase.TABLE_NOTES_PROPERTIES).whereSimple("${LocalSQLAnkoDatabase.IS_DELETED}=?", "true").
+//                    parseList(MyRowParserNoteProperties())
+//
+//            val size = properties.size
+//
+//            for (x in 0 until size) {
+//                val item = properties[x].get(x)
+//                propertiesArray.add(NotesProperties(item.id, item.bgColor, item.textColor, item.fontStyle))
+//            }
+//        }
+//
+//        database.use {
+//            val notes = select(LocalSQLAnkoDatabase.TABLE_NOTES).whereSimple("${LocalSQLAnkoDatabase.IS_DELETED}=?", "true").
+//                    parseList(MyRowParserNotes())
+//            val size = notes.size
+//
+//            for (x in 0 until size) {
+//                val item = notes[x].get(x)
+//                val noteObject = ArchivedNotesNoteItem(false, item.id!!, item.title!!, item.note!!, item.date!!, propertiesArray[x].bgColor.toString(),
+//                        propertiesArray[x].textColor.toString(), propertiesArray[x].fontStyle.toString(), true)
+//                archivedNotesArrayList.add(noteObject)
+//            }
+//        }
         return archivedNotesArrayList
     }
 

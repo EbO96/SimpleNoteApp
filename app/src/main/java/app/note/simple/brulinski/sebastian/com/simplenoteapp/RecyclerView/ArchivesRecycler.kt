@@ -15,12 +15,11 @@ import android.widget.ImageButton
 import android.widget.TextView
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.Database.LocalSQLAnkoDatabase
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.Database.database
-import app.note.simple.brulinski.sebastian.com.simplenoteapp.Editor.EditorManager
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.Fragment.ArchivedNotesFragment
-import app.note.simple.brulinski.sebastian.com.simplenoteapp.Model.ArchivedNotesItemsHolder
+import app.note.simple.brulinski.sebastian.com.simplenoteapp.Model.ArchivedNotesNoteItem
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.R
 
-class ArchivesRecycler(private var notesArrayList: ArrayList<ArchivedNotesItemsHolder>, private val recycler: RecyclerView, private val ctx: Context, private val fragment: ArchivedNotesFragment) : RecyclerView.Adapter<ArchivesRecycler.MyViewHolder>() {
+class ArchivesRecycler(private var notesArrayList: ArrayList<ArchivedNotesNoteItem>, private val recycler: RecyclerView, private val ctx: Context, private val fragment: ArchivedNotesFragment) : RecyclerView.Adapter<ArchivesRecycler.MyViewHolder>() {
 
     lateinit var mSizeCallback: OnRecyclerSizeListener
 
@@ -52,11 +51,6 @@ class ArchivesRecycler(private var notesArrayList: ArrayList<ArchivedNotesItemsH
             holder.buttonsCard.visibility = View.VISIBLE
         }
 
-        EditorManager.FontStyleManager.recogniseAndSetFont(noteObject.fontStyle, holder.titleTextView, holder.noteTextView)
-        val bg = EditorManager.ColorManager(ctx)
-
-        bg.recogniseAndSetColor(noteObject.bgColor, arrayListOf(holder.card), "BG") //Change note color
-        bg.recogniseAndSetColor(noteObject.textColor, arrayListOf(holder.titleTextView, holder.noteTextView), "FONT")
 
         holder.titleTextView.text = title
         holder.noteTextView.text = note
@@ -73,58 +67,59 @@ class ArchivesRecycler(private var notesArrayList: ArrayList<ArchivedNotesItemsH
             fragment.onCheckBoxesListener(notesArrayList)
         }
 
-        holder.deleteImageButton.setOnClickListener {
-            positionToDelete = recycler.getChildAdapterPosition(holder.itemView)
-            val alert = AlertDialog.Builder(ctx).create()
-
-            alert.setIcon(ContextCompat.getDrawable(ctx, R.drawable.ic_delete_black_24dp))
-            alert.setTitle(ctx.getString(R.string.delete_this_note))
-
-            alert.setButton(AlertDialog.BUTTON_POSITIVE, ctx.getString(R.string.yes), { _, i ->
-                ctx.database.use {
-                    delete(LocalSQLAnkoDatabase.TABLE_NOTES, "${LocalSQLAnkoDatabase.ID}=?", arrayOf(noteObject.id))
-                    delete(LocalSQLAnkoDatabase.TABLE_NOTES_PROPERTIES, "${LocalSQLAnkoDatabase.NOTE_ID}=?", arrayOf(noteObject.id))
-                }
-
-                notesArrayList.removeAt(positionToDelete)
-                notifyItemRemoved(positionToDelete)
-
-                mSizeCallback.recyclerSize(notesArrayList.size)
-            })
-
-            alert.setButton(AlertDialog.BUTTON_NEGATIVE, ctx.getString(R.string.no), { _, i ->
-                //Do nothing
-            })
-
-            alert.show()
-        }
-
-        holder.restoreImageButton.setOnClickListener {
-            positionToDelete = recycler.getChildAdapterPosition(holder.itemView)
-            val alert = AlertDialog.Builder(ctx).create()
-
-            alert.setIcon(ContextCompat.getDrawable(ctx, R.drawable.ic_restore_black_24dp))
-            alert.setTitle(ctx.getString(R.string.restore_this_note))
-
-            alert.setButton(AlertDialog.BUTTON_POSITIVE, ctx.getString(R.string.yes), { _, i ->
-                val isDeletedValue = ContentValues()
-                isDeletedValue.put(LocalSQLAnkoDatabase.IS_DELETED, false.toString())
-
-                ctx.database.use {
-                    update(LocalSQLAnkoDatabase.TABLE_NOTES, isDeletedValue, "${LocalSQLAnkoDatabase.ID}=?", arrayOf(noteObject.id))
-                    update(LocalSQLAnkoDatabase.TABLE_NOTES_PROPERTIES, isDeletedValue, "${LocalSQLAnkoDatabase.NOTE_ID}=?", arrayOf(noteObject.id))
-                }
-                notesArrayList.removeAt(positionToDelete)
-                notifyItemRemoved(positionToDelete)
-
-                mSizeCallback.recyclerSize(notesArrayList.size)
-            })
-
-            alert.setButton(AlertDialog.BUTTON_NEGATIVE, ctx.getString(R.string.no), { _, i ->
-                //Do nothing
-            })
-            alert.show()
-        }
+        //TODO new implementation of buttons (code below)
+//        holder.deleteImageButton.setOnClickListener {
+//            positionToDelete = recycler.getChildAdapterPosition(holder.itemView)
+//            val alert = AlertDialog.Builder(ctx).create()
+//
+//            alert.setIcon(ContextCompat.getDrawable(ctx, R.drawable.ic_delete_black_24dp))
+//            alert.setTitle(ctx.getString(R.string.delete_this_note))
+//
+//            alert.setButton(AlertDialog.BUTTON_POSITIVE, ctx.getString(R.string.yes), { _, i ->
+//                ctx.database.use {
+//                    delete(LocalSQLAnkoDatabase.TABLE_NOTES, "${LocalSQLAnkoDatabase.ID}=?", arrayOf(noteObject.id))
+//                    delete(LocalSQLAnkoDatabase.TABLE_NOTES_PROPERTIES, "${LocalSQLAnkoDatabase.NOTE_ID}=?", arrayOf(noteObject.id))
+//                }
+//
+//                notesArrayList.removeAt(positionToDelete)
+//                notifyItemRemoved(positionToDelete)
+//
+//                mSizeCallback.recyclerSize(notesArrayList.size)
+//            })
+//
+//            alert.setButton(AlertDialog.BUTTON_NEGATIVE, ctx.getString(R.string.no), { _, i ->
+//                //Do nothing
+//            })
+//
+//            alert.show()
+//        }
+//
+//        holder.restoreImageButton.setOnClickListener {
+//            positionToDelete = recycler.getChildAdapterPosition(holder.itemView)
+//            val alert = AlertDialog.Builder(ctx).create()
+//
+//            alert.setIcon(ContextCompat.getDrawable(ctx, R.drawable.ic_restore_black_24dp))
+//            alert.setTitle(ctx.getString(R.string.restore_this_note))
+//
+//            alert.setButton(AlertDialog.BUTTON_POSITIVE, ctx.getString(R.string.yes), { _, i ->
+//                val isDeletedValue = ContentValues()
+//                isDeletedValue.put(LocalSQLAnkoDatabase.IS_DELETED, false.toString())
+//
+//                ctx.database.use {
+//                    update(LocalSQLAnkoDatabase.TABLE_NOTES, isDeletedValue, "${LocalSQLAnkoDatabase.ID}=?", arrayOf(noteObject.id))
+//                    update(LocalSQLAnkoDatabase.TABLE_NOTES_PROPERTIES, isDeletedValue, "${LocalSQLAnkoDatabase.NOTE_ID}=?", arrayOf(noteObject.id))
+//                }
+//                notesArrayList.removeAt(positionToDelete)
+//                notifyItemRemoved(positionToDelete)
+//
+//                mSizeCallback.recyclerSize(notesArrayList.size)
+//            })
+//
+//            alert.setButton(AlertDialog.BUTTON_NEGATIVE, ctx.getString(R.string.no), { _, i ->
+//                //Do nothing
+//            })
+//            alert.show()
+//        }
     }
 
     override fun getItemCount(): Int {
@@ -147,7 +142,7 @@ class ArchivesRecycler(private var notesArrayList: ArrayList<ArchivedNotesItemsH
         val checkBox = itemView.findViewById<CheckBox>(R.id.archived_note_card_checkBox)
     }
 
-    fun getArray(): ArrayList<ArchivedNotesItemsHolder> {
+    fun getArray(): ArrayList<ArchivedNotesNoteItem> {
 
         return notesArrayList
     }

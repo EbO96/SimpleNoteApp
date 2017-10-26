@@ -29,17 +29,13 @@ import app.note.simple.brulinski.sebastian.com.simplenoteapp.Editor.EditorManage
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.Fragment.BottomSheetFragments.BottomSheetColorFragment
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.Fragment.BottomSheetFragments.BottomSheetFontFragment
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.HelperClass.CurrentFragmentState
-import app.note.simple.brulinski.sebastian.com.simplenoteapp.HelperClass.MyRowParserNotes
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.Interfaces.ChangeNoteLookInterface
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.Interfaces.SaveNoteInterface
-import app.note.simple.brulinski.sebastian.com.simplenoteapp.Model.ItemsHolder
-import app.note.simple.brulinski.sebastian.com.simplenoteapp.Model.Notes
+import app.note.simple.brulinski.sebastian.com.simplenoteapp.Model.NoteItem
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.R
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.databinding.CreateNoteFragmentBinding
 import com.labo.kaji.fragmentanimations.MoveAnimation
 import es.dmoral.toasty.Toasty
-import org.jetbrains.anko.db.insert
-import org.jetbrains.anko.db.select
 import org.jetbrains.anko.sdk25.coroutines.textChangedListener
 import org.jetbrains.anko.textColor
 import java.text.SimpleDateFormat
@@ -53,8 +49,8 @@ open class CreateNoteFragment : Fragment(), SaveNoteInterface, ChangeNoteLookInt
     }
 
     @RequiresApi(Build.VERSION_CODES.LOLLIPOP)
-    override fun changeNoteOrFontColors(colorOfWhat: String, color: String) {
-        if (colorOfWhat.equals(EditorManager.ColorManager.COLOR_OF_TEXT)) {
+    override fun changeNoteOrFontColors(colorOfWhat: String, color: Int) {
+        if (colorOfWhat == (EditorManager.ColorManager.COLOR_OF_TEXT)) {
             applyColor(arrayListOf(binding.createNoteTitleField, binding.createNoteNoteField), colorOfWhat, color)
         } else {
             applyColor(arrayListOf(binding.createNoteParentCard), colorOfWhat, color)
@@ -81,14 +77,14 @@ open class CreateNoteFragment : Fragment(), SaveNoteInterface, ChangeNoteLookInt
             return SimpleDateFormat("yyyy-MM-dd 'at' HH:mm:ss a").format(calendar.time)
         }
 
-        var noteObject: ItemsHolder? = null
+        var noteObject: NoteItem? = null
     }
 
     @RequiresApi(Build.VERSION_CODES.LOLLIPOP)
     override fun onCreateView(inflater: LayoutInflater?, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         binding = DataBindingUtil.inflate(inflater, R.layout.create_note_fragment, container, false)
         //init color manager
-        colorManager = EditorManager.ColorManager(context)
+        colorManager = EditorManager.ColorManager(activity)
 
         Log.i("save", savedInstanceState.toString())
         database = LocalSQLAnkoDatabase(context)
@@ -96,25 +92,21 @@ open class CreateNoteFragment : Fragment(), SaveNoteInterface, ChangeNoteLookInt
         val titleView = binding.createNoteTitleField
         val noteView = binding.createNoteNoteField
         val cardView = binding.createNoteParentCard
+        val actionBar = EditorManager.ColorManager.ACTION_BAR_COLOR
 
+        val noteStyleEditor = EditorManager.ColorManager(activity)
+
+        //Create empty note object
         if (savedInstanceState == null) {
-            noteObject = ItemsHolder("", "", "", "", EditorManager.ColorManager.WHITE,
-                    EditorManager.ColorManager.BLACK, EditorManager.FontStyleManager.DEFAULT_FONT, false)
+            noteObject = NoteItem("", "", "", "", 255, 255, 255, 0, 0, 0, EditorManager.FontStyleManager.DEFAULT_FONT, false)
         } else {
             noteObject = savedInstanceState.getParcelable("note_object")
-            colorManager.changeStatusBarColor(activity, EditorManager.ColorManager.BLACK, savedInstanceState.getInt(STATUS_BAR_COLOR_KEY))
+            noteStyleEditor.changeColor(arrayListOf(EditorManager.ColorManager.ACTION_BAR_COLOR), Color.parseColor("#000000"))
         }
 
-        val bgColor = noteObject!!.bgColor
-        val fontStyle = noteObject!!.fontStyle
-        val fontColor = noteObject!!.textColor
-
-        EditorManager.FontStyleManager.recogniseAndSetFont(fontStyle, titleView, noteView)
-        val bg = EditorManager.ColorManager(context)
-
-        bg.recogniseAndSetColor(bgColor, arrayListOf(cardView), "BG") //Change note color
-
-        bg.recogniseAndSetColor(fontColor, arrayListOf(titleView, noteView), "FONT") //Change text color
+        //TODO change card color's
+        noteStyleEditor.changeColor(arrayListOf(cardView, actionBar), ColorCreator(noteObject!!.rBGColor, noteObject!!.gBGColor, noteObject!!.bBGColor, activity).getColor())
+        noteStyleEditor.changeColor(arrayListOf(titleView, noteView), ColorCreator(noteObject!!.rTXTColor, noteObject!!.gTXTColor, noteObject!!.bTXTColor, activity).getColor())
 
         editListener()
 
@@ -125,6 +117,14 @@ open class CreateNoteFragment : Fragment(), SaveNoteInterface, ChangeNoteLookInt
         onTitleAndNoteFieldFocusListener()
 
         return binding.root
+    }
+
+    override fun onSaveInstanceState(outState: Bundle?) {
+        super.onSaveInstanceState(outState)
+        outState!!.putParcelable("note_object", noteObject)
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            outState.putInt(STATUS_BAR_COLOR_KEY, activity.window.statusBarColor)
+        }
     }
 
     @RequiresApi(Build.VERSION_CODES.LOLLIPOP)
@@ -169,44 +169,38 @@ open class CreateNoteFragment : Fragment(), SaveNoteInterface, ChangeNoteLookInt
 
     }
 
-    @RequiresApi(Build.VERSION_CODES.LOLLIPOP)
-    override fun onSaveInstanceState(outState: Bundle?) {
-        super.onSaveInstanceState(outState)
-        outState!!.putParcelable("note_object", noteObject)
-        outState.putInt(STATUS_BAR_COLOR_KEY, activity.window.statusBarColor)
-    }
-
     override fun onSaveNote() {
-        try {
-            val titleCol = Pair<String, String>(LocalSQLAnkoDatabase.TITLE, binding.createNoteTitleField.text.toString().trim())
-            val noteCol = Pair<String, String>(LocalSQLAnkoDatabase.NOTE, binding.createNoteNoteField.text.toString().trim())
-            val dateCol = Pair<String, String>(LocalSQLAnkoDatabase.DATE, getCurrentDateAndTime())
-            val isDeletedCol = Pair<String, String>(LocalSQLAnkoDatabase.IS_DELETED, false.toString())
-            var idList: List<List<Notes.Note>>? = null
-            var size = 0
-
-            database.use {
-                insert(LocalSQLAnkoDatabase.TABLE_NOTES, titleCol, noteCol, dateCol, isDeletedCol)
-                select(LocalSQLAnkoDatabase.TABLE_NOTES)
-            }
-
-            database.use {
-                idList = select(LocalSQLAnkoDatabase.TABLE_NOTES).whereArgs(LocalSQLAnkoDatabase.ID, titleCol, noteCol).
-                        parseList(MyRowParserNotes())
-                size = idList!!.size
-            }
-
-            val noteIdCol = Pair<String, String>(LocalSQLAnkoDatabase.NOTE_ID, idList!!.get(size - 1).get(size - 1).id!!)
-            val bgColorCol = Pair<String, String>(LocalSQLAnkoDatabase.BG_COLOR, noteObject!!.bgColor)
-            val textColorCol = Pair<String, String>(LocalSQLAnkoDatabase.TEXT_COLOR, noteObject!!.textColor)
-            val fontStyleCol = Pair<String, String>(LocalSQLAnkoDatabase.FONT_STYLE, noteObject!!.fontStyle)
-
-            database.use {
-                insert(LocalSQLAnkoDatabase.TABLE_NOTES_PROPERTIES, noteIdCol, bgColorCol, textColorCol, fontStyleCol, isDeletedCol)
-            }
-        } catch (e: Exception) {
-            e.printStackTrace()
-        }
+        //TODO new implementation of code below
+//        try {
+//            val titleCol = Pair<String, String>(LocalSQLAnkoDatabase.TITLE, binding.createNoteTitleField.text.toString().trim())
+//            val noteCol = Pair<String, String>(LocalSQLAnkoDatabase.NOTE, binding.createNoteNoteField.text.toString().trim())
+//            val dateCol = Pair<String, String>(LocalSQLAnkoDatabase.DATE, getCurrentDateAndTime())
+//            val isDeletedCol = Pair<String, String>(LocalSQLAnkoDatabase.IS_DELETED, false.toString())
+//            var idList: List<List<Notes.Note>>? = null
+//            var size = 0
+//
+//            database.use {
+//                insert(LocalSQLAnkoDatabase.TABLE_NOTES, titleCol, noteCol, dateCol, isDeletedCol)
+//                select(LocalSQLAnkoDatabase.TABLE_NOTES)
+//            }
+//
+//            database.use {
+//                idList = select(LocalSQLAnkoDatabase.TABLE_NOTES).whereArgs(LocalSQLAnkoDatabase.ID, titleCol, noteCol).
+//                        parseList(MyRowParserNotes())
+//                size = idList!!.size
+//            }
+//
+//            val noteIdCol = Pair<String, String>(LocalSQLAnkoDatabase.NOTE_ID, idList!!.get(size - 1).get(size - 1).id!!)
+//            // val bgColorCol = Pair<String, String>(LocalSQLAnkoDatabase.BG_COLOR, noteObject!!.bgColor)
+//            // val textColorCol = Pair<String, String>(LocalSQLAnkoDatabase.TEXT_COLOR, noteObject!!.textColor)
+//            val fontStyleCol = Pair<String, String>(LocalSQLAnkoDatabase.FONT_STYLE, noteObject!!.fontStyle)
+//
+//            database.use {
+//                //insert(LocalSQLAnkoDatabase.TABLE_NOTES_PROPERTIES, noteIdCol, bgColorCol, textColorCol, fontStyleCol, isDeletedCol)
+//            }
+//        } catch (e: Exception) {
+//            e.printStackTrace()
+//        }
     }
 
     @RequiresApi(Build.VERSION_CODES.LOLLIPOP)
@@ -248,8 +242,6 @@ open class CreateNoteFragment : Fragment(), SaveNoteInterface, ChangeNoteLookInt
             bottomSheetColors.arguments = args
             if (!bottomSheetColors.isAdded) {
                 bottomSheetColors.show(activity.supportFragmentManager, bottomSheetColors.tag)
-//                val color = ColorCreator(156, 111, 97)
-//                binding.createNoteTitleField.setBackgroundColor(color.getColor())
             }
         }
 
@@ -298,80 +290,83 @@ open class CreateNoteFragment : Fragment(), SaveNoteInterface, ChangeNoteLookInt
     }
 
     @RequiresApi(Build.VERSION_CODES.LOLLIPOP)
-    fun applyColor(viewsArray: ArrayList<Any>, colorOf: String, color: String) { //Change color of background
-        var resColor = ContextCompat.getColor(context, R.color.material_white)
-        var currentColor = noteObject!!.bgColor
-
-
-        when (color) {
-            EditorManager.ColorManager.RED -> {
-                resColor = ContextCompat.getColor(context, R.color.material_red)
-                currentColor = EditorManager.ColorManager.RED
-            }
-            EditorManager.ColorManager.PINK -> {
-                resColor = ContextCompat.getColor(context, R.color.material_pink)
-                currentColor = EditorManager.ColorManager.PINK
-            }
-            EditorManager.ColorManager.PURPLE -> {
-                resColor = ContextCompat.getColor(context, R.color.material_purple)
-                currentColor = EditorManager.ColorManager.PURPLE
-            }
-            EditorManager.ColorManager.BLUE -> {
-                resColor = ContextCompat.getColor(context, R.color.material_blue)
-                currentColor = EditorManager.ColorManager.BLUE
-            }
-            EditorManager.ColorManager.INDIGO -> {
-                resColor = ContextCompat.getColor(context, R.color.material_indigo)
-                currentColor = EditorManager.ColorManager.INDIGO
-            }
-            EditorManager.ColorManager.GREEN -> {
-                resColor = ContextCompat.getColor(context, R.color.material_green)
-                currentColor = EditorManager.ColorManager.GREEN
-            }
-            EditorManager.ColorManager.TEAL -> {
-                resColor = ContextCompat.getColor(context, R.color.material_teal)
-                currentColor = EditorManager.ColorManager.TEAL
-            }
-            EditorManager.ColorManager.YELLOW -> {
-                resColor = ContextCompat.getColor(context, R.color.material_yellow)
-                currentColor = EditorManager.ColorManager.YELLOW
-            }
-            EditorManager.ColorManager.WHITE -> {
-                resColor = ContextCompat.getColor(context, R.color.material_white)
-                currentColor = EditorManager.ColorManager.WHITE
-            }
-            EditorManager.ColorManager.BLUE_GRAY -> {
-                resColor = ContextCompat.getColor(context, R.color.material_blue_grey)
-                currentColor = EditorManager.ColorManager.BLUE_GRAY
-            }
-            EditorManager.ColorManager.BLACK -> {
-                resColor = ContextCompat.getColor(context, R.color.material_black)
-                currentColor = EditorManager.ColorManager.BLACK
-            }
-            EditorManager.ColorManager.BROWN -> {
-                resColor = ContextCompat.getColor(context, R.color.material_brown)
-                currentColor = EditorManager.ColorManager.BROWN
-            }
-        }
-
-
+    fun applyColor(viewsArray: ArrayList<Any>, colorOf: String, color: Int) { //Change color of background
+        //TODO new implementation of code below
+//        var resColor = ContextCompat.getColor(context, R.color.material_white)
+//        var currentColor = noteObject!!.bgColor
+//
+//
+//        when (color) {
+//            EditorManager.ColorManager.RED -> {
+//                resColor = ContextCompat.getColor(context, R.color.material_red)
+//                currentColor = EditorManager.ColorManager.RED
+//            }
+//            EditorManager.ColorManager.PINK -> {
+//                resColor = ContextCompat.getColor(context, R.color.material_pink)
+//                currentColor = EditorManager.ColorManager.PINK
+//            }
+//            EditorManager.ColorManager.PURPLE -> {
+//                resColor = ContextCompat.getColor(context, R.color.material_purple)
+//                currentColor = EditorManager.ColorManager.PURPLE
+//            }
+//            EditorManager.ColorManager.BLUE -> {
+//                resColor = ContextCompat.getColor(context, R.color.material_blue)
+//                currentColor = EditorManager.ColorManager.BLUE
+//            }
+//            EditorManager.ColorManager.INDIGO -> {
+//                resColor = ContextCompat.getColor(context, R.color.material_indigo)
+//                currentColor = EditorManager.ColorManager.INDIGO
+//            }
+//            EditorManager.ColorManager.GREEN -> {
+//                resColor = ContextCompat.getColor(context, R.color.material_green)
+//                currentColor = EditorManager.ColorManager.GREEN
+//            }
+//            EditorManager.ColorManager.TEAL -> {
+//                resColor = ContextCompat.getColor(context, R.color.material_teal)
+//                currentColor = EditorManager.ColorManager.TEAL
+//            }
+//            EditorManager.ColorManager.YELLOW -> {
+//                resColor = ContextCompat.getColor(context, R.color.material_yellow)
+//                currentColor = EditorManager.ColorManager.YELLOW
+//            }
+//            EditorManager.ColorManager.WHITE -> {
+//                resColor = ContextCompat.getColor(context, R.color.material_white)
+//                currentColor = EditorManager.ColorManager.WHITE
+//            }
+//            EditorManager.ColorManager.BLUE_GRAY -> {
+//                resColor = ContextCompat.getColor(context, R.color.material_blue_grey)
+//                currentColor = EditorManager.ColorManager.BLUE_GRAY
+//            }
+//            EditorManager.ColorManager.BLACK -> {
+//                resColor = ContextCompat.getColor(context, R.color.material_black)
+//                currentColor = EditorManager.ColorManager.BLACK
+//            }
+//            EditorManager.ColorManager.BROWN -> {
+//                resColor = ContextCompat.getColor(context, R.color.material_brown)
+//                currentColor = EditorManager.ColorManager.BROWN
+//            }
+//        }
+//
+//
         val frag = activity.supportFragmentManager.findFragmentById(activity.findViewById<FrameLayout>(R.id.main_container).id)
         val editMode = frag != null && frag.isVisible && frag.tag.equals(MainActivity.EDIT_NOTE_FRAGMENT_TAG)
-
+//
         /*
         Change color
          */
-        if (colorOf.equals(EditorManager.ColorManager.COLOR_OF_NOTE)) {
-            colorManager.changeStatusBarColor(activity, EditorManager.ColorManager.BLACK, resColor)
-            EditorManager.ColorManager.changeBgColor(viewsArray, resColor)
-            if (editMode)
-                MainActivity.noteToEdit!!.bgColor = currentColor
-            else noteObject!!.bgColor = currentColor
-        } else if (colorOf.equals(EditorManager.ColorManager.COLOR_OF_TEXT)) {
-            EditorManager.ColorManager.changeFontColor(viewsArray, resColor)
-            if (editMode)
-                MainActivity.noteToEdit!!.textColor = currentColor
-            else noteObject!!.textColor = currentColor
+        if (colorOf == (EditorManager.ColorManager.COLOR_OF_NOTE)) {
+            val colorMng = EditorManager.ColorManager(activity)
+            colorMng.changeColor(viewsArray, color)
+            colorMng.changeColor(arrayListOf(EditorManager.ColorManager.ACTION_BAR_COLOR), color)
+            //TODO  if (editMode)
+            //TODO  MainActivity.noteToEdit!!.bgColor = currentColor
+            //TODO else noteObject!!.bgColor = currentColor
+        } else if (colorOf == (EditorManager.ColorManager.COLOR_OF_TEXT)) {
+            EditorManager.ColorManager(activity).changeColor(viewsArray, color)
+            Log.i("abcd", "$color")
+            //TODO if (editMode)
+            //TODO  MainActivity.noteToEdit!!.textColor = currentColor
+            //TODO else noteObject!!.textColor = currentColor
         }
     }
 

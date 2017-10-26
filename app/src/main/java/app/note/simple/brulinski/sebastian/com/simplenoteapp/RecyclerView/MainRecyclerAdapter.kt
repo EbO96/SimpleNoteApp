@@ -15,17 +15,15 @@ import android.view.ViewGroup
 import android.widget.TextView
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.Activity.MainActivity
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.Database.LocalSQLAnkoDatabase
-import app.note.simple.brulinski.sebastian.com.simplenoteapp.Database.ObjectToDatabaseOperations
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.Database.database
-import app.note.simple.brulinski.sebastian.com.simplenoteapp.Editor.EditorManager
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.Interfaces.MainRecyclerSizeListener
-import app.note.simple.brulinski.sebastian.com.simplenoteapp.Model.ItemsHolder
+import app.note.simple.brulinski.sebastian.com.simplenoteapp.Model.NoteItem
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.R
 
 
-class MainRecyclerAdapter(private var itemsHolderArray: ArrayList<ItemsHolder>, var recyclerView: RecyclerView, var ctx: Context) : RecyclerView.Adapter<MainRecyclerAdapter.ViewHolder>() {
+class MainRecyclerAdapter(private var noteItemArray: ArrayList<NoteItem>, var recyclerView: RecyclerView, var ctx: Context) : RecyclerView.Adapter<MainRecyclerAdapter.ViewHolder>() {
 
-    private var deletedItem: ItemsHolder? = null
+    private var deletedItem: NoteItem? = null
     private lateinit var preferences: SharedPreferences
     private lateinit var undoSnack: Snackbar
     val sizeCallback: MainRecyclerSizeListener = (ctx as MainActivity)
@@ -44,8 +42,8 @@ class MainRecyclerAdapter(private var itemsHolderArray: ArrayList<ItemsHolder>, 
 
     override fun onBindViewHolder(holder: ViewHolder?, position: Int) {
 
-        var title = itemsHolderArray[position].title
-        var note = itemsHolderArray[position].note
+        var title = noteItemArray[position].title
+        var note = noteItemArray[position].note
         var positionToDelete: Int
 
         if (title.length > 30)
@@ -53,18 +51,13 @@ class MainRecyclerAdapter(private var itemsHolderArray: ArrayList<ItemsHolder>, 
         if (note.length > 260)
             note = note.substring(0, 260) + "..."
 
-        EditorManager.FontStyleManager.recogniseAndSetFont(itemsHolderArray[position].fontStyle, holder!!.title, holder.note)
-        val bg = EditorManager.ColorManager(ctx)
-
-        bg.recogniseAndSetColor(itemsHolderArray[position].bgColor, arrayListOf(holder.card), "BG") //Change note color
-        bg.recogniseAndSetColor(itemsHolderArray[position].textColor, arrayListOf(holder.title, holder.note), "FONT")
-
-        holder.title?.text = title
+        //TODO change card color's
+        holder!!.title?.text = title
         holder.note.text = note
 
 
         holder.itemView?.setOnClickListener {
-            (ctx as MainActivity).onNoteClicked(this.itemsHolderArray[position])
+            (ctx as MainActivity).onNoteClicked(this.noteItemArray[position])
         }
 
         holder.itemView?.setOnLongClickListener {
@@ -87,14 +80,14 @@ class MainRecyclerAdapter(private var itemsHolderArray: ArrayList<ItemsHolder>, 
 
             @Suppress("DEPRECATION")
             undoSnack.setAction(ctx.getString(R.string.undo), {
-                this.itemsHolderArray.add(positionToDelete, deletedItem!!)
+                this.noteItemArray.add(positionToDelete, deletedItem!!)
                 notifyItemInserted(positionToDelete)
                 recyclerView.scrollToPosition(positionToDelete)
-                sizeCallback.getRecyclerAdapterSize(itemsHolderArray.size)
+                sizeCallback.getRecyclerAdapterSize(noteItemArray.size)
 
                 if (flag)
                     addDeleteFlag(deletedItem!!.id, false)
-                else ObjectToDatabaseOperations.insertNoteObject(deletedItem!!, ctx)
+               // else ObjectToDatabaseOperations.insertNoteObject(deletedItem!!, ctx) //TODO delete note from database
 
             }).setCallback(object : Snackbar.Callback() {
                 override fun onDismissed(transientBottomBar: Snackbar?, event: Int) {
@@ -107,36 +100,37 @@ class MainRecyclerAdapter(private var itemsHolderArray: ArrayList<ItemsHolder>, 
                 }
             }).show()
 
-            deletedItem = itemsHolderArray.removeAt(positionToDelete)
+            deletedItem = noteItemArray.removeAt(positionToDelete)
             notifyItemRemoved(positionToDelete)
 
             if (flag)
                 addDeleteFlag(deletedItem!!.id, true)
-            else ObjectToDatabaseOperations.deleteNoteObject(deletedItem!!, ctx)
+            //else ObjectToDatabaseOperations.deleteNoteObject(deletedItem!!, ctx) //TODO delete note from database
 
-            Log.i("recyclerSize", "recycler size is ${itemsHolderArray.size}")
-            sizeCallback.getRecyclerAdapterSize(itemsHolderArray.size)
+            Log.i("recyclerSize", "recycler size is ${noteItemArray.size}")
+            sizeCallback.getRecyclerAdapterSize(noteItemArray.size)
             true
         }
     }
 
-    fun getArray(): ArrayList<ItemsHolder> {
-        return itemsHolderArray
+    fun getArray(): ArrayList<NoteItem> {
+        return noteItemArray
     }
 
     private fun addDeleteFlag(itemId: String, flag: Boolean) {
-        val isDeletedValue = ContentValues()
-        isDeletedValue.put(LocalSQLAnkoDatabase.IS_DELETED, flag.toString())
-
-        ctx.database.use {
-            //Delete from database
-            update(
-                    LocalSQLAnkoDatabase.TABLE_NOTES, isDeletedValue, "${LocalSQLAnkoDatabase.ID}=?", arrayOf(itemId)
-            )
-            update(
-                    LocalSQLAnkoDatabase.TABLE_NOTES_PROPERTIES, isDeletedValue, "${LocalSQLAnkoDatabase.ID}=?", arrayOf(itemId)
-            )
-        }
+        //TODO new implementation of code below
+//        val isDeletedValue = ContentValues()
+//        isDeletedValue.put(LocalSQLAnkoDatabase.IS_DELETED, flag.toString())
+//
+//        ctx.database.use {
+//            //Delete from database
+//            update(
+//                    LocalSQLAnkoDatabase.TABLE_NOTES, isDeletedValue, "${LocalSQLAnkoDatabase.ID}=?", arrayOf(itemId)
+//            )
+//            update(
+//                    LocalSQLAnkoDatabase.TABLE_NOTES_PROPERTIES, isDeletedValue, "${LocalSQLAnkoDatabase.ID}=?", arrayOf(itemId)
+//            )
+//        }
     }
 
     override fun onCreateViewHolder(parent: ViewGroup?, viewType: Int): ViewHolder {
@@ -145,7 +139,7 @@ class MainRecyclerAdapter(private var itemsHolderArray: ArrayList<ItemsHolder>, 
     }
 
     override fun getItemCount(): Int {
-        return itemsHolderArray.size
+        return noteItemArray.size
     }
 
     class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {

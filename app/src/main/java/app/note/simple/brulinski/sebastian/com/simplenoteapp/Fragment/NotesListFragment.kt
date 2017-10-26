@@ -15,10 +15,9 @@ import android.support.v7.widget.StaggeredGridLayoutManager
 import android.view.*
 import android.view.animation.Animation
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.Activity.MainActivity
-import app.note.simple.brulinski.sebastian.com.simplenoteapp.Editor.EditorManager
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.HelperClass.CurrentFragmentState
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.HelperClass.LayoutManagerStyle
-import app.note.simple.brulinski.sebastian.com.simplenoteapp.Model.ItemsHolder
+import app.note.simple.brulinski.sebastian.com.simplenoteapp.Model.NoteItem
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.R
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.RecyclerView.MainRecyclerAdapter
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.databinding.NotesListFragmentBinding
@@ -30,7 +29,7 @@ import java.util.*
 class NotesListFragment : Fragment() {
 
     companion object {
-        lateinit var itemsObjectsArray: ArrayList<ItemsHolder>
+        lateinit var itemsObjectsArray: ArrayList<NoteItem>
     }
 
     lateinit var binding: NotesListFragmentBinding
@@ -49,7 +48,7 @@ class NotesListFragment : Fragment() {
     lateinit var mGetNotesCallback: OnGetNotesFromParentActivity
 
     interface OnGetNotesFromParentActivity {
-        fun getNotes(): ArrayList<ItemsHolder>
+        fun getNotes(): ArrayList<NoteItem>
     }
 
     fun setOnGetNotesFromParentActivity(mGetNotesCallback: OnGetNotesFromParentActivity) {
@@ -60,11 +59,11 @@ class NotesListFragment : Fragment() {
     override fun onCreateView(inflater: LayoutInflater?, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         binding = DataBindingUtil.inflate(inflater, R.layout.notes_list_fragment, container, false)
         setHasOptionsMenu(true)
-        EditorManager.ColorManager(context).changeStatusBarColor(activity, EditorManager.ColorManager.BLACK, null)
+        //TODO change status bar color
         if (savedInstanceState == null) {
             itemsObjectsArray = arguments.getParcelableArrayList(MainActivity.DATABASE_NOTES_ARRAY)
         } else {
-            itemsObjectsArray = savedInstanceState.getParcelableArrayList<ItemsHolder>(NOTES_ARRAY_KEY)
+            itemsObjectsArray = savedInstanceState.getParcelableArrayList<NoteItem>(NOTES_ARRAY_KEY)
         }
 
         initRecyclerAdapter()
@@ -131,8 +130,8 @@ class NotesListFragment : Fragment() {
 
     private fun sortNotes() {
         try {
-            Collections.sort(itemsObjectsArray, object : Comparator<ItemsHolder> {
-                override fun compare(o1: ItemsHolder, o2: ItemsHolder): Int {
+            Collections.sort(itemsObjectsArray, object : Comparator<NoteItem> {
+                override fun compare(o1: NoteItem, o2: NoteItem): Int {
                     if (o1.date == null || o2.date == null) {
                         return 0
                     }

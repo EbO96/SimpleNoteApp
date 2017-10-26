@@ -3,6 +3,7 @@ package app.note.simple.brulinski.sebastian.com.simplenoteapp.Fragment.BottomShe
 import android.annotation.SuppressLint
 import android.app.Dialog
 import android.content.Context
+import android.content.res.ColorStateList
 import android.databinding.DataBindingUtil
 import android.os.Bundle
 import android.support.design.widget.BottomSheetBehavior
@@ -11,10 +12,12 @@ import android.support.design.widget.CoordinatorLayout
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import app.note.simple.brulinski.sebastian.com.simplenoteapp.Editor.ColorCreator
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.Editor.EditorManager
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.Interfaces.OnNotePropertiesClickListener
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.R
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.databinding.ColorsLayoutBinding
+import org.jetbrains.anko.backgroundColor
 
 
 /**
@@ -37,52 +40,56 @@ class BottomSheetColorFragment : BottomSheetDialogFragment() {
             binding.textView.text = getString(R.string.note_color)
         else binding.textView.text = getString(R.string.font_color)
 
+        val col = ColorCreator
+
+        binding.customColorCard.cardBackgroundColor= ColorStateList.valueOf(col.getColorFromSharedPreferences(activity))
+
         binding.colorRedImage.setOnClickListener {
-            mNotePropertiesClickListener.inEditorColorClick(EditorManager.ColorManager.RED, TAG)
+            mNotePropertiesClickListener.inEditorColorClick(col.getColorFromCard(activity, binding.colorRedImage), TAG)
             dismiss()
         }
         binding.colorPinkImage.setOnClickListener {
-            mNotePropertiesClickListener.inEditorColorClick(EditorManager.ColorManager.PINK, TAG)
+            mNotePropertiesClickListener.inEditorColorClick(col.getColorFromCard(activity, binding.colorPinkImage), TAG)
             dismiss()
         }
         binding.colorPurpleImage.setOnClickListener {
-            mNotePropertiesClickListener.inEditorColorClick(EditorManager.ColorManager.PURPLE, TAG)
+            mNotePropertiesClickListener.inEditorColorClick(col.getColorFromCard(activity, binding.colorPurpleImage), TAG)
             dismiss()
         }
         binding.colorBlueImage.setOnClickListener {
-            mNotePropertiesClickListener.inEditorColorClick(EditorManager.ColorManager.BLUE, TAG)
+            mNotePropertiesClickListener.inEditorColorClick(col.getColorFromCard(activity, binding.colorBlueImage), TAG)
             dismiss()
         }
         binding.colorIndigoImage.setOnClickListener {
-            mNotePropertiesClickListener.inEditorColorClick(EditorManager.ColorManager.INDIGO, TAG)
+            mNotePropertiesClickListener.inEditorColorClick(col.getColorFromCard(activity, binding.colorIndigoImage), TAG)
             dismiss()
         }
         binding.colorGreenImage.setOnClickListener {
-            mNotePropertiesClickListener.inEditorColorClick(EditorManager.ColorManager.GREEN, TAG)
+            mNotePropertiesClickListener.inEditorColorClick(col.getColorFromCard(activity, binding.colorGreenImage), TAG)
             dismiss()
         }
         binding.colorTealImage.setOnClickListener {
-            mNotePropertiesClickListener.inEditorColorClick(EditorManager.ColorManager.TEAL, TAG)
+            mNotePropertiesClickListener.inEditorColorClick(col.getColorFromCard(activity, binding.colorTealImage), TAG)
             dismiss()
         }
         binding.colorYellowImage.setOnClickListener {
-            mNotePropertiesClickListener.inEditorColorClick(EditorManager.ColorManager.YELLOW, TAG)
+            mNotePropertiesClickListener.inEditorColorClick(col.getColorFromCard(activity, binding.colorYellowImage), TAG)
             dismiss()
         }
         binding.colorWhiteImage.setOnClickListener {
-            mNotePropertiesClickListener.inEditorColorClick(EditorManager.ColorManager.WHITE, TAG)
+            mNotePropertiesClickListener.inEditorColorClick(col.getColorFromCard(activity, binding.colorWhiteImage), TAG)
             dismiss()
         }
         binding.colorBlueGreyImage.setOnClickListener {
-            mNotePropertiesClickListener.inEditorColorClick(EditorManager.ColorManager.BLUE_GRAY, TAG)
+            mNotePropertiesClickListener.inEditorColorClick(col.getColorFromCard(activity, binding.colorBlueGreyImage), TAG)
             dismiss()
         }
         binding.colorBlackImage.setOnClickListener {
-            mNotePropertiesClickListener.inEditorColorClick(EditorManager.ColorManager.BLACK, TAG)
+            mNotePropertiesClickListener.inEditorColorClick(col.getColorFromCard(activity, binding.colorBlackImage), TAG)
             dismiss()
         }
         binding.colorBrownImage.setOnClickListener {
-            mNotePropertiesClickListener.inEditorColorClick(EditorManager.ColorManager.BROWN, TAG)
+            mNotePropertiesClickListener.inEditorColorClick(col.getColorFromCard(activity, binding.colorBrownImage), TAG)
             dismiss()
         }
 
@@ -91,8 +98,9 @@ class BottomSheetColorFragment : BottomSheetDialogFragment() {
             dismiss()
         }
 
-        binding.customColorCard.setOnClickListener{
-
+        binding.customColorCard.setOnClickListener {
+            mNotePropertiesClickListener.inEditorColorClick(col.getColorFromCard(activity, binding.customColorCard), TAG)
+            dismiss()
         }
 
         return binding.root

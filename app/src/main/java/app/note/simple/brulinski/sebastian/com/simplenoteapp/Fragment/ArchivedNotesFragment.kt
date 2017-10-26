@@ -7,12 +7,11 @@ import android.os.Bundle
 import android.support.v4.app.Fragment
 import android.support.v4.content.ContextCompat
 import android.support.v7.widget.LinearLayoutManager
-import android.util.Log
 import android.view.*
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.Activity.ArchivesActivity
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.Database.LocalSQLAnkoDatabase
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.Database.database
-import app.note.simple.brulinski.sebastian.com.simplenoteapp.Model.ArchivedNotesItemsHolder
+import app.note.simple.brulinski.sebastian.com.simplenoteapp.Model.ArchivedNotesNoteItem
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.R
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.RecyclerView.ArchivesRecycler
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.databinding.ArchivedNotesFragmentBinding
@@ -21,11 +20,11 @@ import jp.wasabeef.recyclerview.animators.SlideInRightAnimator
 class ArchivedNotesFragment : Fragment() {
 
     lateinit var mChangeScreenCallback: OnChangeScreenListener
-    lateinit var archivedNotesArrayList: ArrayList<ArchivedNotesItemsHolder>
+    lateinit var archivedNotesArrayList: ArrayList<ArchivedNotesNoteItem>
     private lateinit var deleteMenuItem: MenuItem
     private lateinit var restoreMenuItem: MenuItem
     private lateinit var selectAllMenuItem: MenuItem
-    private var itemsToDeleteOrRestore = ArrayList<ArchivedNotesItemsHolder>()
+    private var itemsToDeleteOrRestore = ArrayList<ArchivedNotesNoteItem>()
     private val SELECTED_ALL_KEY = "selected_all"
     private var isSelectedAll = true
 
@@ -48,7 +47,7 @@ class ArchivedNotesFragment : Fragment() {
         binding = DataBindingUtil.inflate(inflater, R.layout.archived_notes_fragment, container, false)
         setHasOptionsMenu(true)
 
-        val bundleData = arguments.getParcelableArrayList<ArchivedNotesItemsHolder>(BUNDLE_KEY)
+        val bundleData = arguments.getParcelableArrayList<ArchivedNotesNoteItem>(BUNDLE_KEY)
         archivedNotesArrayList = bundleData
 
 
@@ -58,7 +57,7 @@ class ArchivedNotesFragment : Fragment() {
         return binding.root
     }
 
-    private fun initRecycler(itemsHolderArrayList: ArrayList<ArchivedNotesItemsHolder>) {
+    private fun initRecycler(itemsHolderArrayList: ArrayList<ArchivedNotesNoteItem>) {
         val recycler = binding.archivesRecycler
         recycler.itemAnimator = SlideInRightAnimator()
         recycler.layoutManager = LinearLayoutManager(context)
@@ -77,36 +76,37 @@ class ArchivedNotesFragment : Fragment() {
         })
     }
 
-    private fun deleteSelectedItems(itemsArrayList: ArrayList<ArchivedNotesItemsHolder>) {
-        context.database.use {
-            for (x in 0 until itemsArrayList.size) {
-                delete(
-                        LocalSQLAnkoDatabase.TABLE_NOTES, "${LocalSQLAnkoDatabase.ID}=?", arrayOf(itemsArrayList[x].id)
-                )
-                delete(
-                        LocalSQLAnkoDatabase.TABLE_NOTES_PROPERTIES, "${LocalSQLAnkoDatabase.NOTE_ID}=?", arrayOf(itemsArrayList[x].id)
-                )
-            }
-        }
-        removeSelectedItems()
-        resetInterfaceAndValuesAfterMultipleDelete()
+    private fun deleteSelectedItems(itemsArrayList: ArrayList<ArchivedNotesNoteItem>) {
+        //TODO new implementation of code below
+//        context.database.use {
+//            for (x in 0 until itemsArrayList.size) {
+//                delete(
+//                        LocalSQLAnkoDatabase.TABLE_NOTES, "${LocalSQLAnkoDatabase.ID}=?", arrayOf(itemsArrayList[x].id)
+//                )
+//                delete(
+//                        LocalSQLAnkoDatabase.TABLE_NOTES_PROPERTIES, "${LocalSQLAnkoDatabase.NOTE_ID}=?", arrayOf(itemsArrayList[x].id)
+//                )
+//            }
+//        }
+//        removeSelectedItems()
+//        resetInterfaceAndValuesAfterMultipleDelete()
     }
 
-    private fun restoreSelectedItems(itemsToRestore: ArrayList<ArchivedNotesItemsHolder>) {
-
-        val isDeletedValue = ContentValues()
-        isDeletedValue.put(LocalSQLAnkoDatabase.IS_DELETED, false.toString())
-
-        context.database.use {
-
-            for (x in 0 until itemsToRestore.size) {
-                update(LocalSQLAnkoDatabase.TABLE_NOTES, isDeletedValue, "${LocalSQLAnkoDatabase.ID}=?", arrayOf(itemsToRestore[x].id))
-                update(LocalSQLAnkoDatabase.TABLE_NOTES_PROPERTIES, isDeletedValue, "${LocalSQLAnkoDatabase.NOTE_ID}=?", arrayOf(itemsToRestore[x].id))
-
-            }
-            removeSelectedItems()
-            resetInterfaceAndValuesAfterMultipleDelete()
-        }
+    private fun restoreSelectedItems(itemsToRestore: ArrayList<ArchivedNotesNoteItem>) {
+        //TODO new implementation of code below
+//        val isDeletedValue = ContentValues()
+//        isDeletedValue.put(LocalSQLAnkoDatabase.IS_DELETED, false.toString())
+//
+//        context.database.use {
+//
+//            for (x in 0 until itemsToRestore.size) {
+//                update(LocalSQLAnkoDatabase.TABLE_NOTES, isDeletedValue, "${LocalSQLAnkoDatabase.ID}=?", arrayOf(itemsToRestore[x].id))
+//                update(LocalSQLAnkoDatabase.TABLE_NOTES_PROPERTIES, isDeletedValue, "${LocalSQLAnkoDatabase.NOTE_ID}=?", arrayOf(itemsToRestore[x].id))
+//
+//            }
+//            removeSelectedItems()
+//            resetInterfaceAndValuesAfterMultipleDelete()
+//        }
     }
 
     private fun removeSelectedItems() {
@@ -191,7 +191,7 @@ class ArchivedNotesFragment : Fragment() {
         alert.show()
     }
 
-    fun onCheckBoxesListener(itemsIdArrayList: ArrayList<ArchivedNotesItemsHolder>) {
+    fun onCheckBoxesListener(itemsIdArrayList: ArrayList<ArchivedNotesNoteItem>) {
         itemsToDeleteOrRestore.clear()
 
         for (x in 0 until itemsIdArrayList.size) {

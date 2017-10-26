@@ -4,9 +4,8 @@ import android.content.Context
 import android.os.Bundle
 import android.view.animation.Animation
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.Activity.MainActivity
-import app.note.simple.brulinski.sebastian.com.simplenoteapp.Editor.EditorManager
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.HelperClass.CurrentFragmentState
-import app.note.simple.brulinski.sebastian.com.simplenoteapp.Model.ItemsHolder
+import app.note.simple.brulinski.sebastian.com.simplenoteapp.Model.NoteItem
 import com.labo.kaji.fragmentanimations.MoveAnimation
 
 @Suppress("DEPRECATION", "OverridingDeprecatedMember")
@@ -18,37 +17,32 @@ class EditNoteFragment : CreateNoteFragment() {
     lateinit var mEditDestroyCallback: OnEditDestroy
 
     interface OnEditDestroy {
-        fun editDestroy(noteObject: ItemsHolder?)
+        fun editDestroy(noteObject: NoteItem?)
     }
 
     companion object {
-        var noteObject: ItemsHolder? = null
+        var noteObject: NoteItem? = null
     }
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
-        listenBarOptions()
-
-        val titleView = binding.createNoteTitleField
-        val noteView = binding.createNoteNoteField
-        val cardView = binding.createNoteParentCard
-
-        noteObject = MainActivity.noteToEdit
-
-        val title = noteObject!!.title
-        val note = noteObject!!.note
-        val bgColor = noteObject!!.bgColor
-        val fontStyle = noteObject!!.fontStyle
-        val textColor = noteObject!!.textColor
-
-        EditorManager.FontStyleManager.recogniseAndSetFont(fontStyle, titleView, noteView)
-
-        val colorManager = EditorManager.ColorManager(context)
-
-        colorManager.recogniseAndSetColor(bgColor, arrayListOf(cardView), "BG")
-        colorManager.recogniseAndSetColor(textColor, arrayListOf(titleView, noteView), "FONT")
-
-        titleView.setText(title)
-        noteView.setText(note)
+        //TODO new implementation of code below
+//        listenBarOptions()
+//
+//        val titleView = binding.createNoteTitleField
+//        val noteView = binding.createNoteNoteField
+//        val cardView = binding.createNoteParentCard
+//
+//        noteObject = MainActivity.noteToEdit
+//
+//        val title = noteObject!!.title
+//        val note = noteObject!!.note
+//        val bgColor = noteObject!!.bgColor
+//        val fontStyle = noteObject!!.fontStyle
+//        val textColor = noteObject!!.textColor
+//        //TODO change card color's
+//
+//        titleView.setText(title)
+//        noteView.setText(note)
 
         super.onActivityCreated(savedInstanceState)
     }
@@ -64,21 +58,22 @@ class EditNoteFragment : CreateNoteFragment() {
     When this fragment is destroying then user note is updating or deleting from local SQL database
      */
     override fun onDestroyView() {
-        val title = binding.createNoteTitleField.text.toString()
-        val note = binding.createNoteNoteField.text.toString()
-        val date = getCurrentDateAndTime()
-        val fontStyle = MainActivity.noteToEdit!!.fontStyle
-        val textColor = MainActivity.noteToEdit!!.textColor
-        val bgColor = MainActivity.noteToEdit!!.bgColor
-
-        noteObject!!.title = title
-        noteObject!!.note = note
-        noteObject!!.date = date
-        noteObject!!.fontStyle = fontStyle
-        noteObject!!.textColor = textColor
-        noteObject!!.bgColor = bgColor
-
-        mEditDestroyCallback.editDestroy(noteObject)
+        //TODO new implementation of code below
+//        val title = binding.createNoteTitleField.text.toString()
+//        val note = binding.createNoteNoteField.text.toString()
+//        val date = getCurrentDateAndTime()
+//        val fontStyle = MainActivity.noteToEdit!!.fontStyle
+//        val textColor = MainActivity.noteToEdit!!.textColor
+//        val bgColor = MainActivity.noteToEdit!!.bgColor
+//
+//        noteObject!!.title = title
+//        noteObject!!.note = note
+//        noteObject!!.date = date
+//        noteObject!!.fontStyle = fontStyle
+//        noteObject!!.textColor = textColor
+//        noteObject!!.bgColor = bgColor
+//
+//        mEditDestroyCallback.editDestroy(noteObject)
         super.onDestroyView()
     }
 
