@@ -80,6 +80,4 @@ class ColorCreator(private val R: Int, private val G: Int, private val B: Int, p
             return cardView.cardBackgroundColor.getColorForState(states, defaultColor)
         }
     }
-
-
 }
