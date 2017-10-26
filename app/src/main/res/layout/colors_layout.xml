@@ -27,7 +27,7 @@
             android:layout_height="24dp"
             android:layout_margin="8dp"
             android:layout_toLeftOf="@id/color_picker_image"
-            app:cardBackgroundColor="@color/material_black"
+            app:cardBackgroundColor="@color/material_pink"
             app:cardCornerRadius="12dp" />
 
         <ImageView

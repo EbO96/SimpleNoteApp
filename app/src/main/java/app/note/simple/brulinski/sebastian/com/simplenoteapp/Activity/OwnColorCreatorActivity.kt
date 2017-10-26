@@ -59,6 +59,8 @@ class OwnColorCreatorActivity : AppCompatActivity() {
         val B = binding.seekBarBlueValue.progress
 
         val color = ColorCreator(R, G, B, this)
+        color.saveToSharedPref()
+
         binding.hexValuePreview.text = color.hexColorValue
         binding.colorPreview.cardBackgroundColor = ColorStateList.valueOf(color.getColor())
     }

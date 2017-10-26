@@ -5,6 +5,7 @@ import android.app.Dialog
 import android.content.Context
 import android.content.res.ColorStateList
 import android.databinding.DataBindingUtil
+import android.graphics.Color.rgb
 import android.os.Bundle
 import android.support.design.widget.BottomSheetBehavior
 import android.support.design.widget.BottomSheetDialogFragment
@@ -12,17 +13,14 @@ import android.support.design.widget.CoordinatorLayout
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import app.note.simple.brulinski.sebastian.com.simplenoteapp.Activity.OwnColorCreatorActivity
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.Editor.ColorCreator
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.Editor.EditorManager
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.Interfaces.OnNotePropertiesClickListener
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.R
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.databinding.ColorsLayoutBinding
-import org.jetbrains.anko.backgroundColor
 
 
-/**
- * Created by sebas on 10/23/2017.
- */
 class BottomSheetColorFragment : BottomSheetDialogFragment() {
     private lateinit var binding: ColorsLayoutBinding
     private lateinit var mNotePropertiesClickListener: OnNotePropertiesClickListener
@@ -41,8 +39,6 @@ class BottomSheetColorFragment : BottomSheetDialogFragment() {
         else binding.textView.text = getString(R.string.font_color)
 
         val col = ColorCreator
-
-        binding.customColorCard.cardBackgroundColor= ColorStateList.valueOf(col.getColorFromSharedPreferences(activity))
 
         binding.colorRedImage.setOnClickListener {
             mNotePropertiesClickListener.inEditorColorClick(col.getColorFromCard(activity, binding.colorRedImage), TAG)
@@ -103,6 +99,11 @@ class BottomSheetColorFragment : BottomSheetDialogFragment() {
             dismiss()
         }
 
+        val color = ColorCreator.getColorFromSharedPreferences(activity)
+
+
+        binding.customColorCard.cardBackgroundColor = ColorStateList.valueOf(color)
+
         return binding.root
     }
 
@@ -118,9 +119,8 @@ class BottomSheetColorFragment : BottomSheetDialogFragment() {
     private val mBottomSheetBehaviorCallback = object : BottomSheetBehavior.BottomSheetCallback() {
 
         override fun onStateChanged(bottomSheet: View, newState: Int) {
-            if (newState == BottomSheetBehavior.STATE_HIDDEN) {
+            if (newState == BottomSheetBehavior.STATE_HIDDEN)
                 dismiss()
-            }
         }
 
         override fun onSlide(bottomSheet: View, slideOffset: Float) {}
@@ -138,6 +138,5 @@ class BottomSheetColorFragment : BottomSheetDialogFragment() {
         if (behavior is BottomSheetBehavior) {
             behavior.setBottomSheetCallback(mBottomSheetBehaviorCallback)
         }
-
     }
 }

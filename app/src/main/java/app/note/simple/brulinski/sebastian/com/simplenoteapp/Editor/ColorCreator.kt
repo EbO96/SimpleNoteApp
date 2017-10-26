@@ -16,7 +16,6 @@ class ColorCreator(private val R: Int, private val G: Int, private val B: Int, p
 
     init {
         hexColorValue = makeHexColorValue()
-        saveToSharedPref()
     }
 
     private fun makeHexColorValue(): String {
@@ -27,8 +26,8 @@ class ColorCreator(private val R: Int, private val G: Int, private val B: Int, p
         return rgb(R, G, B)
     }
 
-    private fun saveToSharedPref() {
-        val preferences: SharedPreferences = activity.getPreferences(0)
+    fun saveToSharedPref() {
+        val preferences: SharedPreferences = activity.getSharedPreferences(COLOR_PREFERENCES_NAME, 0)
         val editor = preferences.edit()
         editor.putInt(RED_KEY, R)
         editor.putInt(GREEN_KEY, G)
@@ -44,8 +43,10 @@ class ColorCreator(private val R: Int, private val G: Int, private val B: Int, p
         val GREEN_KEY = "green_key"
         val BLUE_KEY = "blue_key"
 
+        private val COLOR_PREFERENCES_NAME = "color_pref"
+
         fun getRGBFromSharedPreferences(activity: Activity): Array<HashMap<String, Int>> {
-            val preferences: SharedPreferences = activity.getPreferences(0)
+            val preferences: SharedPreferences = activity.getSharedPreferences(COLOR_PREFERENCES_NAME, 0)
 
             val rShared = preferences.getInt(RED_KEY, 0)
             val gShared = preferences.getInt(GREEN_KEY, 0)
@@ -63,7 +64,7 @@ class ColorCreator(private val R: Int, private val G: Int, private val B: Int, p
         }
 
         fun getColorFromSharedPreferences(activity: Activity): Int {
-            val preferences: SharedPreferences = activity.getPreferences(0)
+            val preferences: SharedPreferences = activity.getSharedPreferences(COLOR_PREFERENCES_NAME, 0)
 
             val rShared = preferences.getInt(RED_KEY, 0)
             val gShared = preferences.getInt(GREEN_KEY, 0)

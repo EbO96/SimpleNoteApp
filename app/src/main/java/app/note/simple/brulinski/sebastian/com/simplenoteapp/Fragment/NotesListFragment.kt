@@ -4,9 +4,8 @@ import android.app.Activity
 import android.content.Context
 import android.content.SharedPreferences
 import android.databinding.DataBindingUtil
-import android.os.Build
+import android.graphics.Color
 import android.os.Bundle
-import android.support.annotation.RequiresApi
 import android.support.v4.app.Fragment
 import android.support.v4.content.ContextCompat
 import android.support.v7.widget.LinearLayoutManager
@@ -15,6 +14,7 @@ import android.support.v7.widget.StaggeredGridLayoutManager
 import android.view.*
 import android.view.animation.Animation
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.Activity.MainActivity
+import app.note.simple.brulinski.sebastian.com.simplenoteapp.Editor.EditorManager
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.HelperClass.CurrentFragmentState
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.HelperClass.LayoutManagerStyle
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.Model.NoteItem
@@ -55,11 +55,16 @@ class NotesListFragment : Fragment() {
         this.mGetNotesCallback = mGetNotesCallback
     }
 
-    @RequiresApi(Build.VERSION_CODES.LOLLIPOP)
     override fun onCreateView(inflater: LayoutInflater?, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         binding = DataBindingUtil.inflate(inflater, R.layout.notes_list_fragment, container, false)
         setHasOptionsMenu(true)
-        //TODO change status bar color
+
+        /*
+        Change color of status bar
+         */
+        val colorMng = EditorManager.ColorManager(activity)
+        colorMng.changeColor(arrayListOf(EditorManager.ColorManager.ACTION_BAR_COLOR), Color.BLACK)
+
         if (savedInstanceState == null) {
             itemsObjectsArray = arguments.getParcelableArrayList(MainActivity.DATABASE_NOTES_ARRAY)
         } else {
