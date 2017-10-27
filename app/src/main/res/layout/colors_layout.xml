@@ -27,7 +27,7 @@
             android:layout_height="24dp"
             android:layout_margin="8dp"
             android:layout_toLeftOf="@id/color_picker_image"
-            app:cardBackgroundColor="@color/material_pink"
+            app:cardBackgroundColor="@color/material_black"
             app:cardCornerRadius="12dp" />
 
         <ImageView
@@ -47,7 +47,7 @@
             android:layout_below="@id/textView"
             android:layout_margin="8dp"
             android:layout_toLeftOf="@id/color_pink_image"
-            app:cardBackgroundColor="@color/material_red"
+            app:cardBackgroundColor="@color/material_black"
             app:cardCornerRadius="23dp"
             app:cardElevation="1dp" />
 
@@ -58,7 +58,7 @@
             android:layout_below="@id/textView"
             android:layout_margin="8dp"
             android:layout_toLeftOf="@id/color_purple_image"
-            app:cardBackgroundColor="@color/material_pink"
+            app:cardBackgroundColor="@color/material_white"
             app:cardCornerRadius="23dp"
             app:cardElevation="1dp" />
 
@@ -91,7 +91,7 @@
             android:layout_below="@id/textView"
             android:layout_margin="8dp"
             android:layout_toRightOf="@id/color_blue_image"
-            app:cardBackgroundColor="@color/material_pink"
+            app:cardBackgroundColor="@color/material_indigo"
             app:cardCornerRadius="23dp"
             app:cardElevation="1dp" />
 
@@ -135,7 +135,7 @@
             android:layout_below="@id/color_blue_image"
             android:layout_margin="8dp"
             android:layout_toRightOf="@id/color_yellow_image"
-            app:cardBackgroundColor="@color/material_white"
+            app:cardBackgroundColor="@color/material_pink"
             app:cardCornerRadius="23dp"
             app:cardElevation="1dp" />
 
@@ -157,7 +157,7 @@
             android:layout_below="@id/color_green_image"
             android:layout_margin="8dp"
             android:layout_toLeftOf="@id/color_teal_image"
-            app:cardBackgroundColor="@color/material_black"
+            app:cardBackgroundColor="@color/material_red"
             app:cardCornerRadius="23dp"
             app:cardElevation="1dp" />
 
