@@ -40,6 +40,13 @@ class EditNoteFragment : CreateNoteFragment() {
 
         noteObject = arguments.getParcelable(MainActivity.NOTE_TO_EDIT_EXTRA_KEY)
 
+        if (savedInstanceState != null) {
+            noteObject = CreateNoteFragment.noteObject
+
+        } else {
+            CreateNoteFragment.noteObject = noteObject
+        }
+
         val title = noteObject!!.title
         val note = noteObject!!.note
 
