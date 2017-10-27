@@ -129,7 +129,7 @@ class NotesListFragment : Fragment() {
 
         binding.recyclerView.itemAnimator = SlideInRightAnimator()
 
-        myRecycler = MainRecyclerAdapter(itemsObjectsArray, binding.recyclerView, context)
+        myRecycler = MainRecyclerAdapter(itemsObjectsArray, binding.recyclerView, activity)
         binding.recyclerView.adapter = myRecycler
     }
 

@@ -10,7 +10,6 @@ import org.jetbrains.anko.db.select
 
 class ObjectToDatabaseOperations {
 
-    //TODO new database operations
     companion object {
         fun insertObject(context: Context, noteObject: NoteItem?) {
 
@@ -82,7 +81,6 @@ class ObjectToDatabaseOperations {
             return array
         }
 
-        //TODO implement method below
         fun updateObject(context: Context, noteObjects: ArrayList<NoteItem?>?) {
             val contentValues = ContentValues()
             val db = LocalSQLAnkoDatabase

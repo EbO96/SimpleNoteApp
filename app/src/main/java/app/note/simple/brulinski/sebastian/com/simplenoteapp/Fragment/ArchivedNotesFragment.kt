@@ -81,7 +81,6 @@ class ArchivedNotesFragment : Fragment() {
     }
 
     private fun restoreSelectedItems(itemsToRestore: ArrayList<NoteItem>) {
-        //TODO new implementation of code below
         ObjectToDatabaseOperations.addDeleteFlag(context, itemsToRestore, false)
             removeSelectedItems()
             resetInterfaceAndValuesAfterMultipleDelete()

@@ -99,7 +99,7 @@ open class CreateNoteFragment : Fragment(), SaveNoteInterface, ChangeNoteLookInt
 
         //Create empty note object
         if (savedInstanceState == null) {
-            noteObject = NoteItem(null, "", "", "", 0, 0, EditorManager.FontStyleManager.DEFAULT_FONT, false, false)
+            noteObject = NoteItem(null, "", "", "", ContextCompat.getColor(context, R.color.material_white), ContextCompat.getColor(context, R.color.material_black), EditorManager.FontStyleManager.DEFAULT_FONT, false, false)
         } else {
             noteObject = savedInstanceState.getParcelable("note_object")
             noteStyleEditor.changeColor(arrayListOf(EditorManager.ColorManager.ACTION_BAR_COLOR), Color.parseColor("#000000"))
@@ -171,8 +171,6 @@ open class CreateNoteFragment : Fragment(), SaveNoteInterface, ChangeNoteLookInt
     }
 
     override fun onSaveNote() {
-        //TODO new implementation of code below
-
         noteObject!!.date = getCurrentDateAndTime()
 
         ObjectToDatabaseOperations.insertObject(context, noteObject)

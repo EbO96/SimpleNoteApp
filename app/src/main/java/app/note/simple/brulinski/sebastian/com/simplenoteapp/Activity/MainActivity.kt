@@ -357,7 +357,6 @@ class MainActivity : AppCompatActivity(), NotesListFragment.OnListenRecyclerScro
      */
 
     override fun editDestroy(noteObject: NoteItem?) { //Update object in database after edit
-        //TODO new implementation of code below
         noteToEdit = noteObject
         ObjectToDatabaseOperations.updateObject(context = this, noteObjects = arrayListOf(noteObject))
     }

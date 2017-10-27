@@ -117,7 +117,7 @@ class OwnColorCreatorActivity : AppCompatActivity() {
 
         binding.redValueEdit.addTextChangedListener(object : TextWatcher {
             override fun beforeTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {
-                //TODO
+
             }
 
             override fun onTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {
@@ -140,13 +140,13 @@ class OwnColorCreatorActivity : AppCompatActivity() {
             }
 
             override fun afterTextChanged(p0: Editable?) {
-                //TODO
+
             }
         })
 
         binding.greenValueEdit.addTextChangedListener(object : TextWatcher {
             override fun beforeTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {
-                //TODO
+
             }
 
             override fun onTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {
@@ -168,13 +168,13 @@ class OwnColorCreatorActivity : AppCompatActivity() {
             }
 
             override fun afterTextChanged(p0: Editable?) {
-                //TODO
+
             }
         })
 
         binding.blueValueEdit.addTextChangedListener(object : TextWatcher {
             override fun beforeTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {
-                //TODO
+
             }
 
             override fun onTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {
@@ -197,7 +197,7 @@ class OwnColorCreatorActivity : AppCompatActivity() {
             }
 
             override fun afterTextChanged(p0: Editable?) {
-                //TODO
+                
             }
         })
     }
