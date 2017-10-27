@@ -6,10 +6,11 @@ import android.os.Bundle
 import android.support.annotation.RequiresApi
 import android.support.v4.app.Fragment
 import android.support.v4.content.ContextCompat
-import android.view.*
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
 import android.view.animation.Animation
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.Activity.MainActivity
-import app.note.simple.brulinski.sebastian.com.simplenoteapp.Database.LocalSQLAnkoDatabase
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.Editor.EditorManager
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.HelperClass.CurrentFragmentState
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.Model.NoteItem
@@ -19,10 +20,7 @@ import com.labo.kaji.fragmentanimations.MoveAnimation
 
 class NotePreviewFragment : Fragment() {
 
-    lateinit var database: LocalSQLAnkoDatabase
     lateinit var binding: PreviewCardBinding
-    var noteObj: NoteItem? = null
-    lateinit var colorManager: EditorManager.ColorManager
 
     override fun onCreateView(inflater: LayoutInflater?, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         setHasOptionsMenu(true)
@@ -31,47 +29,33 @@ class NotePreviewFragment : Fragment() {
         return binding.root
     }
 
-    override fun onCreateAnimation(transit: Int, enter: Boolean, nextAnim: Int): Animation {
-        if (CurrentFragmentState.backPressed) {
-            return MoveAnimation.create(MoveAnimation.RIGHT, enter, CurrentFragmentState.FRAGMENT_ANIM_DURATION)
-
-        } else {
-            return MoveAnimation.create(MoveAnimation.LEFT, enter, CurrentFragmentState.FRAGMENT_ANIM_DURATION)
-        }
-    }
-
     @RequiresApi(Build.VERSION_CODES.LOLLIPOP)
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
-            //TODO new implementation of code below
-//        (activity as MainActivity).setTitleAndFab(ContextCompat.getDrawable(context, R.drawable.ic_mode_edit_white_24dp),
-//                resources.getString(R.string.preview))
-//
-//        database = LocalSQLAnkoDatabase(context)
-//        noteObj = MainActivity.noteToEdit
-//
-//        val titleView = binding.previewTitleField
-//        val noteView = binding.previewNoteField
-//        val cardView = binding.previewCardParentCard
-//
-//        val title = noteObj!!.title
-//        val note = noteObj!!.note
-//
-//        val fontStyle = noteObj!!.fontStyle
-//        val textColor = noteObj!!.textColor
-//        val bgColor = noteObj!!.bgColor
-//
-//        EditorManager.FontStyleManager.recogniseAndSetFont(fontStyle, titleView, noteView)
-//
-//        colorManager = EditorManager.ColorManager(context)
-//        //TODO change card color's
-//
-//        titleView.text = title
-//        noteView.text = note
+        (activity as MainActivity).setTitleAndFab(ContextCompat.getDrawable(context, R.drawable.ic_mode_edit_white_24dp),
+                resources.getString(R.string.preview))
+
+        val noteObj: NoteItem = arguments.getParcelable(MainActivity.NOTE_TO_EDIT_EXTRA_KEY)
+
+        val titleView = binding.previewTitleField
+        val noteView = binding.previewNoteField
+        val cardView = binding.previewCardParentCard
+
+        val title = noteObj.title
+        val note = noteObj.note
+
+        EditorManager.ColorManager(activity).applyNoteTheme(arrayListOf(titleView, noteView, cardView), arrayListOf(noteObj))
+
+        titleView.text = title
+        noteView.text = note
     }
 
-    override fun onDestroyView() {
-        MainActivity.noteToEdit
-        super.onDestroyView()
+    override fun onCreateAnimation(transit: Int, enter: Boolean, nextAnim: Int): Animation {
+        return if (CurrentFragmentState.backPressed) {
+            MoveAnimation.create(MoveAnimation.RIGHT, enter, CurrentFragmentState.FRAGMENT_ANIM_DURATION)
+
+        } else {
+            MoveAnimation.create(MoveAnimation.LEFT, enter, CurrentFragmentState.FRAGMENT_ANIM_DURATION)
+        }
     }
 }

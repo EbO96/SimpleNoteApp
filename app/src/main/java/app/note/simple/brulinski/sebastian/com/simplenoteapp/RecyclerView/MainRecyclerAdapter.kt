@@ -50,11 +50,7 @@ class MainRecyclerAdapter(private var noteItemArray: ArrayList<NoteItem>, var re
         if (note!!.length > 260)
             note = note.substring(0, 260) + "..."
 
-        //TODO change card color's
-        val colorManager = EditorManager.ColorManager(activity)
-
-        colorManager.changeColor(arrayListOf(holder!!.title, holder.note), noteItemArray[position].TXTColor!!)
-        colorManager.changeColor(arrayListOf(holder.card), noteItemArray[position].BGColor!!)
+        EditorManager.ColorManager(activity).applyNoteTheme(arrayListOf(holder!!.title, holder.note, holder.card), arrayListOf(noteItemArray[position]))
 
         holder.title?.text = title
         holder.note.text = note

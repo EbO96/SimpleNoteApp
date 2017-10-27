@@ -254,12 +254,6 @@ open class CreateNoteFragment : Fragment(), SaveNoteInterface, ChangeNoteLookInt
                 fontStyle = EditorManager.FontStyleManager.MONOSPACE_FONT
             }
         }
-        val frag = activity.supportFragmentManager.findFragmentById(activity.findViewById<FrameLayout>(R.id.main_container).id)
-        val editMode = frag != null && frag.isVisible && frag.tag.equals(MainActivity.EDIT_NOTE_FRAGMENT_TAG)
-
-        if (editMode)
-            MainActivity.noteToEdit!!.fontStyle = fontStyle
-        else noteObject!!.fontStyle = fontStyle
     }
 
     @RequiresApi(Build.VERSION_CODES.LOLLIPOP)
@@ -276,15 +270,9 @@ open class CreateNoteFragment : Fragment(), SaveNoteInterface, ChangeNoteLookInt
             val colorMng = EditorManager.ColorManager(activity)
             colorMng.changeColor(viewsArray, color)
             colorMng.changeColor(arrayListOf(EditorManager.ColorManager.ACTION_BAR_COLOR), color)
-            //TODO  if (editMode)
-            //TODO  MainActivity.noteToEdit!!.bgColor = currentColor
-            //TODO else noteObject!!.bgColor = currentColor
-            noteObject!!.BGColor = color
+
         } else if (colorOf == (EditorManager.ColorManager.COLOR_OF_TEXT)) {
             EditorManager.ColorManager(activity).changeColor(viewsArray, color)
-            //TODO if (editMode)
-            //TODO  MainActivity.noteToEdit!!.textColor = currentColor
-            //TODO else noteObject!!.textColor = currentColor
             noteObject!!.TXTColor = color
         }
     }

@@ -62,8 +62,8 @@ class MainActivity : AppCompatActivity(), NotesListFragment.OnListenRecyclerScro
         var NOTE_PREVIEW_FRAGMENT_TAG: String = "PREVIEW" //Fragment TAG'
         var NO_NOTES_FRAGMENT_TAG: String = "NO_NOTES" //Fragment TAG'
         val DATABASE_NOTES_ARRAY = "notes array"
+        val NOTE_TO_EDIT_EXTRA_KEY = "note_to_edit_key"
         lateinit var menuItemSearch: MenuItem //Toolbar menu item (set recycler view layout as linear layout)
-        var noteToEdit: NoteItem? = null
         var adapterSize = 0
     }
 
@@ -140,7 +140,7 @@ class MainActivity : AppCompatActivity(), NotesListFragment.OnListenRecyclerScro
         fm = supportFragmentManager
         ft = fm.beginTransaction()
 
-        val args = Bundle();
+        val args = Bundle()
         args.putParcelableArrayList(DATABASE_NOTES_ARRAY, array)
 
         val notesListFragment = NotesListFragment()
@@ -190,9 +190,15 @@ class MainActivity : AppCompatActivity(), NotesListFragment.OnListenRecyclerScro
     /*
     This fragment is setting when user click RecyclerView item
      */
-    private fun setNotePreviewFragment() {
+    private fun setNotePreviewFragment(noteObject: NoteItem) {
 
         val previewFragment = NotePreviewFragment()
+
+        val args = Bundle()
+
+        args.putParcelable(NOTE_TO_EDIT_EXTRA_KEY, noteObject)
+
+        previewFragment.arguments = args
 
         fm = supportFragmentManager
         ft = fm.beginTransaction()
@@ -357,7 +363,6 @@ class MainActivity : AppCompatActivity(), NotesListFragment.OnListenRecyclerScro
      */
 
     override fun editDestroy(noteObject: NoteItem?) { //Update object in database after edit
-        noteToEdit = noteObject
         ObjectToDatabaseOperations.updateObject(context = this, noteObjects = arrayListOf(noteObject))
     }
 
@@ -406,7 +411,6 @@ class MainActivity : AppCompatActivity(), NotesListFragment.OnListenRecyclerScro
 
     override fun onNoteClicked(noteObject: NoteItem) {
         CurrentFragmentState.backPressed = false //Set flag
-        noteToEdit = noteObject
-        setNotePreviewFragment()
+        setNotePreviewFragment(noteObject)
     }
 }

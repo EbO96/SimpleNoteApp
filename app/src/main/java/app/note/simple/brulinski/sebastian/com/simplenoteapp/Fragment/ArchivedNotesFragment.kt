@@ -60,7 +60,7 @@ class ArchivedNotesFragment : Fragment() {
         recycler.itemAnimator = SlideInRightAnimator()
         recycler.layoutManager = LinearLayoutManager(context)
 
-        myRecycler = ArchivesRecycler(itemsHolderArrayList, recycler, context, this)
+        myRecycler = ArchivesRecycler(itemsHolderArrayList, recycler, activity, this)
 
         recycler.adapter = myRecycler
     }

@@ -1,6 +1,6 @@
 package app.note.simple.brulinski.sebastian.com.simplenoteapp.RecyclerView
 
-import android.content.Context
+import android.app.Activity
 import android.support.v4.content.ContextCompat
 import android.support.v7.app.AlertDialog
 import android.support.v7.widget.CardView
@@ -12,11 +12,12 @@ import android.widget.CheckBox
 import android.widget.ImageButton
 import android.widget.TextView
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.Database.ObjectToDatabaseOperations
+import app.note.simple.brulinski.sebastian.com.simplenoteapp.Editor.EditorManager
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.Fragment.ArchivedNotesFragment
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.Model.NoteItem
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.R
 
-class ArchivesRecycler(private var notesArrayList: ArrayList<NoteItem>, private val recycler: RecyclerView, private val ctx: Context, private val fragment: ArchivedNotesFragment) : RecyclerView.Adapter<ArchivesRecycler.MyViewHolder>() {
+class ArchivesRecycler(private var notesArrayList: ArrayList<NoteItem>, private val recycler: RecyclerView, private val activity: Activity, private val fragment: ArchivedNotesFragment) : RecyclerView.Adapter<ArchivesRecycler.MyViewHolder>() {
 
     lateinit var mSizeCallback: OnRecyclerSizeListener
 
@@ -47,6 +48,7 @@ class ArchivesRecycler(private var notesArrayList: ArrayList<NoteItem>, private 
             holder.buttonsCard.visibility = View.VISIBLE
         }
 
+        EditorManager.ColorManager(activity).applyNoteTheme(arrayListOf(holder.titleTextView, holder.noteTextView, holder.card), arrayListOf(noteObject))
 
         holder.titleTextView.text = title
         holder.noteTextView.text = note
@@ -63,16 +65,15 @@ class ArchivesRecycler(private var notesArrayList: ArrayList<NoteItem>, private 
             fragment.onCheckBoxesListener(notesArrayList)
         }
 
-        //TODO new implementation of buttons (code below)
         holder.deleteImageButton.setOnClickListener {
             positionToDelete = recycler.getChildAdapterPosition(holder.itemView)
-            val alert = AlertDialog.Builder(ctx).create()
+            val alert = AlertDialog.Builder(activity).create()
 
-            alert.setIcon(ContextCompat.getDrawable(ctx, R.drawable.ic_delete_black_24dp))
-            alert.setTitle(ctx.getString(R.string.delete_this_note))
+            alert.setIcon(ContextCompat.getDrawable(activity, R.drawable.ic_delete_black_24dp))
+            alert.setTitle(activity.getString(R.string.delete_this_note))
 
-            alert.setButton(AlertDialog.BUTTON_POSITIVE, ctx.getString(R.string.yes), { _, i ->
-                ObjectToDatabaseOperations.deleteObjects(context = ctx, noteObjects = arrayListOf(noteObject))//Update object ( delete flag )
+            alert.setButton(AlertDialog.BUTTON_POSITIVE, activity.getString(R.string.yes), { _, i ->
+                ObjectToDatabaseOperations.deleteObjects(context = activity, noteObjects = arrayListOf(noteObject))//Update object ( delete flag )
 
                 notesArrayList.removeAt(positionToDelete)
                 notifyItemRemoved(positionToDelete)
@@ -80,7 +81,7 @@ class ArchivesRecycler(private var notesArrayList: ArrayList<NoteItem>, private 
                 mSizeCallback.recyclerSize(notesArrayList.size)
             })
 
-            alert.setButton(AlertDialog.BUTTON_NEGATIVE, ctx.getString(R.string.no), { _, _ ->
+            alert.setButton(AlertDialog.BUTTON_NEGATIVE, activity.getString(R.string.no), { _, _ ->
                 //Do nothing
             })
 
@@ -89,20 +90,20 @@ class ArchivesRecycler(private var notesArrayList: ArrayList<NoteItem>, private 
 
         holder.restoreImageButton.setOnClickListener {
             positionToDelete = recycler.getChildAdapterPosition(holder.itemView)
-            val alert = AlertDialog.Builder(ctx).create()
+            val alert = AlertDialog.Builder(activity).create()
 
-            alert.setIcon(ContextCompat.getDrawable(ctx, R.drawable.ic_restore_black_24dp))
-            alert.setTitle(ctx.getString(R.string.restore_this_note))
+            alert.setIcon(ContextCompat.getDrawable(activity, R.drawable.ic_restore_black_24dp))
+            alert.setTitle(activity.getString(R.string.restore_this_note))
 
-            alert.setButton(AlertDialog.BUTTON_POSITIVE, ctx.getString(R.string.yes), { _, _ ->
-                ObjectToDatabaseOperations.addDeleteFlag(context = ctx, noteObjects = arrayListOf(noteObject), flag = false) //Update object ( delete flag )
+            alert.setButton(AlertDialog.BUTTON_POSITIVE, activity.getString(R.string.yes), { _, _ ->
+                ObjectToDatabaseOperations.addDeleteFlag(context = activity, noteObjects = arrayListOf(noteObject), flag = false) //Update object ( delete flag )
                 notesArrayList.removeAt(positionToDelete)
                 notifyItemRemoved(positionToDelete)
 
                 mSizeCallback.recyclerSize(notesArrayList.size)
             })
 
-            alert.setButton(AlertDialog.BUTTON_NEGATIVE, ctx.getString(R.string.no), { _, i ->
+            alert.setButton(AlertDialog.BUTTON_NEGATIVE, activity.getString(R.string.no), { _, i ->
                 //Do nothing
             })
             alert.show()
