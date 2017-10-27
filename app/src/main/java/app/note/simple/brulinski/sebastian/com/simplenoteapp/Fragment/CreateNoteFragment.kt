@@ -25,7 +25,6 @@ import android.widget.Toast
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.Activity.MainActivity
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.Database.LocalSQLAnkoDatabase
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.Database.ObjectToDatabaseOperations
-import app.note.simple.brulinski.sebastian.com.simplenoteapp.Editor.ColorCreator
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.Editor.EditorManager
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.Fragment.BottomSheetFragments.BottomSheetColorFragment
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.Fragment.BottomSheetFragments.BottomSheetFontFragment
@@ -51,11 +50,16 @@ open class CreateNoteFragment : Fragment(), SaveNoteInterface, ChangeNoteLookInt
 
     @RequiresApi(Build.VERSION_CODES.LOLLIPOP)
     override fun changeNoteOrFontColors(colorOfWhat: String, color: Int) {
+        val viewsArray: ArrayList<Any>
+
         if (colorOfWhat == (EditorManager.ColorManager.COLOR_OF_TEXT)) {
-            applyColor(arrayListOf(binding.createNoteTitleField, binding.createNoteNoteField), colorOfWhat, color)
+            viewsArray = arrayListOf(binding.createNoteTitleField, binding.createNoteNoteField)
+            noteObject!!.TXTColor = color
         } else {
-            applyColor(arrayListOf(binding.createNoteParentCard), colorOfWhat, color)
+            viewsArray = arrayListOf(binding.createNoteParentCard, EditorManager.ColorManager.ACTION_BAR_COLOR)
+            noteObject!!.BGColor = color
         }
+        EditorManager.ColorManager(activity).applyNoteTheme(viewsArray, arrayListOf(noteObject!!))
     }
 
     lateinit var binding: CreateNoteFragmentBinding
@@ -64,6 +68,7 @@ open class CreateNoteFragment : Fragment(), SaveNoteInterface, ChangeNoteLookInt
     private val titleCharactersLimit = 50
     private var actualLimit = titleCharactersLimit
     private val STATUS_BAR_COLOR_KEY = "status_bar_color"
+    private val NOTE_OBJECT_SAVE_INSTANCE_KEY = "note_object_save_instance_key"
     private lateinit var colorManager: EditorManager.ColorManager
 
     @ColorInt
@@ -101,13 +106,14 @@ open class CreateNoteFragment : Fragment(), SaveNoteInterface, ChangeNoteLookInt
         if (savedInstanceState == null) {
             noteObject = NoteItem(null, "", "", "", ContextCompat.getColor(context, R.color.material_white), ContextCompat.getColor(context, R.color.material_black), EditorManager.FontStyleManager.DEFAULT_FONT, false, false)
         } else {
-            noteObject = savedInstanceState.getParcelable("note_object")
+            noteObject = savedInstanceState.getParcelable(NOTE_OBJECT_SAVE_INSTANCE_KEY)
             noteStyleEditor.changeColor(arrayListOf(EditorManager.ColorManager.ACTION_BAR_COLOR), Color.parseColor("#000000"))
         }
 
         //TODO change card color's
-        noteStyleEditor.changeColor(arrayListOf(cardView, actionBar), ColorCreator(255, 255, 255, activity).getColor())
-        noteStyleEditor.changeColor(arrayListOf(titleView, noteView), ColorCreator(0, 0, 0, activity).getColor())
+        EditorManager.ColorManager(activity).applyNoteTheme(arrayListOf(titleView, noteView, cardView, actionBar), arrayListOf(noteObject!!))
+//        noteStyleEditor.changeColor(arrayListOf(cardView, actionBar), ColorCreator(255, 255, 255, activity).getColor())
+//        noteStyleEditor.changeColor(arrayListOf(titleView, noteView), ColorCreator(0, 0, 0, activity).getColor())
 
         editListener()
 
@@ -122,7 +128,7 @@ open class CreateNoteFragment : Fragment(), SaveNoteInterface, ChangeNoteLookInt
 
     override fun onSaveInstanceState(outState: Bundle?) {
         super.onSaveInstanceState(outState)
-        outState!!.putParcelable("note_object", noteObject)
+        outState!!.putParcelable(NOTE_OBJECT_SAVE_INSTANCE_KEY, noteObject)
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
             outState.putInt(STATUS_BAR_COLOR_KEY, activity.window.statusBarColor)
         }
@@ -253,27 +259,6 @@ open class CreateNoteFragment : Fragment(), SaveNoteInterface, ChangeNoteLookInt
                 EditorManager.FontStyleManager.setUpFontStyle(Typeface.MONOSPACE, binding.createNoteNoteField, binding.createNoteTitleField)
                 fontStyle = EditorManager.FontStyleManager.MONOSPACE_FONT
             }
-        }
-    }
-
-    @RequiresApi(Build.VERSION_CODES.LOLLIPOP)
-    private fun applyColor(viewsArray: ArrayList<Any>, colorOf: String, color: Int) { //Change color of background
-
-
-        val frag = activity.supportFragmentManager.findFragmentById(activity.findViewById<FrameLayout>(R.id.main_container).id)
-        val editMode = frag != null && frag.isVisible && frag.tag.equals(MainActivity.EDIT_NOTE_FRAGMENT_TAG)
-//
-        /*
-        Change color
-         */
-        if (colorOf == (EditorManager.ColorManager.COLOR_OF_NOTE)) {
-            val colorMng = EditorManager.ColorManager(activity)
-            colorMng.changeColor(viewsArray, color)
-            colorMng.changeColor(arrayListOf(EditorManager.ColorManager.ACTION_BAR_COLOR), color)
-
-        } else if (colorOf == (EditorManager.ColorManager.COLOR_OF_TEXT)) {
-            EditorManager.ColorManager(activity).changeColor(viewsArray, color)
-            noteObject!!.TXTColor = color
         }
     }
 

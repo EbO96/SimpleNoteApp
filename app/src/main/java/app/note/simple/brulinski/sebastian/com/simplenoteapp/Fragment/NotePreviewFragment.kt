@@ -44,7 +44,7 @@ class NotePreviewFragment : Fragment() {
         val title = noteObj.title
         val note = noteObj.note
 
-        EditorManager.ColorManager(activity).applyNoteTheme(arrayListOf(titleView, noteView, cardView), arrayListOf(noteObj))
+        EditorManager.ColorManager(activity).applyNoteTheme(arrayListOf(titleView, noteView, cardView, EditorManager.ColorManager.ACTION_BAR_COLOR), arrayListOf(noteObj))
 
         titleView.text = title
         noteView.text = note
