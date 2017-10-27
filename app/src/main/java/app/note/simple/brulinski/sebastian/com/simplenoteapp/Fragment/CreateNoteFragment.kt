@@ -9,6 +9,7 @@ import android.graphics.Color
 import android.graphics.Typeface
 import android.os.Build
 import android.os.Bundle
+import android.os.Handler
 import android.support.annotation.ColorInt
 import android.support.annotation.RequiresApi
 import android.support.design.widget.BottomSheetDialogFragment
@@ -29,7 +30,6 @@ import app.note.simple.brulinski.sebastian.com.simplenoteapp.Editor.EditorManage
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.Fragment.BottomSheetFragments.BottomSheetColorFragment
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.Fragment.BottomSheetFragments.BottomSheetFontFragment
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.HelperClass.CurrentFragmentState
-import app.note.simple.brulinski.sebastian.com.simplenoteapp.Interfaces.AfterEditListener
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.Interfaces.ChangeNoteLookInterface
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.Interfaces.SaveNoteInterface
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.Model.NoteItem
@@ -71,10 +71,12 @@ open class CreateNoteFragment : Fragment(), SaveNoteInterface, ChangeNoteLookInt
     private val STATUS_BAR_COLOR_KEY = "status_bar_color"
     private val NOTE_OBJECT_SAVE_INSTANCE_KEY = "note_object_save_instance_key"
     private lateinit var colorManager: EditorManager.ColorManager
+    private var showToastFlag = true
 
     @ColorInt
     private val INFO_COLOR = Color.parseColor("#3F51B5")
     private var infoToastShowedAtStart: Boolean = false
+    private val delayBetweenToasts = 1500L
 
     companion object {
         @SuppressLint("SimpleDateFormat")
@@ -321,24 +323,39 @@ open class CreateNoteFragment : Fragment(), SaveNoteInterface, ChangeNoteLookInt
 
             afterTextChanged { text ->
                 noteObject!!.title = text.toString().trim()
+                if (checkLength(noteObject!!.title!!.length)) {
+                    if (!infoToastShowedAtStart)
+                        showLimitCharacterToast() //Show Toast when user type under 1000 characters
+                    infoToastShowedAtStart = false
+                }
             }
         }
 
         note.textChangedListener {
-            afterTextChanged { text ->
-                if (checkNoteLenghth()) {
-                    if (!infoToastShowedAtStart)
-                        showInfoToast(R.string.max_note_size_toast.toString() + actualLimit)
-                    infoToastShowedAtStart = false
-                }
-                noteObject!!.note = text.toString().trim()
-            }
-
             onTextChanged { p0, _, _, _ ->
                 if (actualLimit == noteCharactersLimit)
                     incrementCharacterCounter(p0!!.length)
             }
+
+            afterTextChanged { text ->
+                noteObject!!.note = text.toString().trim()
+                if ( checkLength(noteObject!!.note!!.length)) {
+                    if (!infoToastShowedAtStart)
+                        showLimitCharacterToast() //Show Toast when user type under 1000 characters
+                    infoToastShowedAtStart = false
+                }
+            }
         }
+    }
+
+    private fun showLimitCharacterToast() { //To display character limit toast when user type under 1000 characters
+        if (showToastFlag)
+            showInfoToast("${getString(R.string.max_note_size_toast)} $actualLimit")
+        showToastFlag = false
+
+        Handler().postDelayed({
+            showToastFlag = true
+        }, delayBetweenToasts)
     }
 
     private fun incrementCharacterCounter(charLength: Int) {
@@ -356,8 +373,13 @@ open class CreateNoteFragment : Fragment(), SaveNoteInterface, ChangeNoteLookInt
         binding.charactersCounterTextView.text = "$text/$actualLimit"
     }
 
-    private fun checkNoteLenghth(): Boolean {
-        return binding.createNoteNoteField.text.length == actualLimit
+    private fun checkLength(length: Int): Boolean {
+        return when (length) {
+            actualLimit -> {
+                true
+            }
+            else -> false
+        }
     }
 
     private fun showInfoToast(message: String) { //Show info toast
