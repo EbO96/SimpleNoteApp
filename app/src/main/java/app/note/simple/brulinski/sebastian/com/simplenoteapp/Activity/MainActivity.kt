@@ -22,10 +22,7 @@ import app.note.simple.brulinski.sebastian.com.simplenoteapp.Database.ObjectToDa
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.Fragment.*
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.HelperClass.CurrentFragmentState
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.HelperClass.LayoutManagerStyle
-import app.note.simple.brulinski.sebastian.com.simplenoteapp.Interfaces.ChangeNoteLookInterface
-import app.note.simple.brulinski.sebastian.com.simplenoteapp.Interfaces.MainRecyclerSizeListener
-import app.note.simple.brulinski.sebastian.com.simplenoteapp.Interfaces.OnNotePropertiesClickListener
-import app.note.simple.brulinski.sebastian.com.simplenoteapp.Interfaces.RecyclerMainInterface
+import app.note.simple.brulinski.sebastian.com.simplenoteapp.Interfaces.*
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.Model.NoteItem
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.R
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.RecyclerView.MainRecyclerAdapter
@@ -37,7 +34,7 @@ import net.yslibrary.android.keyboardvisibilityevent.KeyboardVisibilityEvent
 @Suppress("DEPRECATION")
 class MainActivity : AppCompatActivity(), NotesListFragment.OnListenRecyclerScroll,
         EditNoteFragment.OnEditDestroy, RecyclerMainInterface, NotesListFragment.OnGetNotesFromParentActivity, MainRecyclerSizeListener,
-        OnNotePropertiesClickListener {
+        OnNotePropertiesClickListener, AfterEditListener {
 
     lateinit var binding: ActivityMainBinding
     lateinit var fm: FragmentManager
@@ -171,12 +168,14 @@ class MainActivity : AppCompatActivity(), NotesListFragment.OnListenRecyclerScro
     /*
     This fragment is setting only from preview mode (NotePreviewFragment.kt)
      */
-    private fun setEditNoteFragment() {
+    private fun setEditNoteFragment(noteObject: Bundle) {
 
         fm = supportFragmentManager
         ft = fm.beginTransaction()
 
         val editNoteFragment = EditNoteFragment()
+
+        editNoteFragment.arguments = noteObject
 
         val containerId = binding.mainContainer.id
 
@@ -185,6 +184,13 @@ class MainActivity : AppCompatActivity(), NotesListFragment.OnListenRecyclerScro
         ft.addToBackStack(EDIT_NOTE_FRAGMENT_TAG)
 
         ft.commit()
+    }
+
+    //Update edited note in database
+    override fun updateEditedNoteItemObject(noteItem: NoteItem?) {
+        if (noteItem != null) {
+            ObjectToDatabaseOperations.updateObject(context = this, noteObjects = arrayListOf(noteItem))
+        }
     }
 
     /*
@@ -338,7 +344,7 @@ class MainActivity : AppCompatActivity(), NotesListFragment.OnListenRecyclerScro
                     supportFragmentManager.popBackStack()
                 }
             } else if (frag is NotePreviewFragment) {
-                setEditNoteFragment()
+                setEditNoteFragment(frag.arguments)
             }
         }
     }

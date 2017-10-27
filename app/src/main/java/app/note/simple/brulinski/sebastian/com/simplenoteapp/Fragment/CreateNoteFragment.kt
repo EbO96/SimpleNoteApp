@@ -29,6 +29,7 @@ import app.note.simple.brulinski.sebastian.com.simplenoteapp.Editor.EditorManage
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.Fragment.BottomSheetFragments.BottomSheetColorFragment
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.Fragment.BottomSheetFragments.BottomSheetFontFragment
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.HelperClass.CurrentFragmentState
+import app.note.simple.brulinski.sebastian.com.simplenoteapp.Interfaces.AfterEditListener
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.Interfaces.ChangeNoteLookInterface
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.Interfaces.SaveNoteInterface
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.Model.NoteItem
@@ -110,10 +111,7 @@ open class CreateNoteFragment : Fragment(), SaveNoteInterface, ChangeNoteLookInt
             noteStyleEditor.changeColor(arrayListOf(EditorManager.ColorManager.ACTION_BAR_COLOR), Color.parseColor("#000000"))
         }
 
-        //TODO change card color's
         EditorManager.ColorManager(activity).applyNoteTheme(arrayListOf(titleView, noteView, cardView, actionBar), arrayListOf(noteObject!!))
-//        noteStyleEditor.changeColor(arrayListOf(cardView, actionBar), ColorCreator(255, 255, 255, activity).getColor())
-//        noteStyleEditor.changeColor(arrayListOf(titleView, noteView), ColorCreator(0, 0, 0, activity).getColor())
 
         editListener()
 
@@ -260,6 +258,7 @@ open class CreateNoteFragment : Fragment(), SaveNoteInterface, ChangeNoteLookInt
                 fontStyle = EditorManager.FontStyleManager.MONOSPACE_FONT
             }
         }
+        noteObject!!.fontStyle = fontStyle
     }
 
     private fun selectAllText() {

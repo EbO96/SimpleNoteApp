@@ -96,8 +96,8 @@ class ObjectToDatabaseOperations {
                         contentValues.put(db.BG_COLOR, noteObjects[x]!!.BGColor)
                         contentValues.put(db.TXT_COLOR, noteObjects[x]!!.TXTColor)
                         contentValues.put(db.FONT_STYLE, noteObjects[x]!!.fontStyle)
-                        contentValues.put(db.IS_DELETED, noteObjects[x]!!.isDeleted)
-                        contentValues.put(db.IS_SELECTED, noteObjects[x]!!.isSelected)
+                        contentValues.put(db.IS_DELETED, noteObjects[x]!!.isDeleted.toString())
+                        contentValues.put(db.IS_SELECTED, noteObjects[x]!!.isSelected.toString())
 
                         context.database.use {
                             update(LocalSQLAnkoDatabase.TABLE_NAME, contentValues, "${LocalSQLAnkoDatabase.ID}=?", arrayOf(id.toString()))

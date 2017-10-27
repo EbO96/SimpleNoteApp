@@ -2,10 +2,10 @@ package app.note.simple.brulinski.sebastian.com.simplenoteapp.Editor
 
 import android.app.Activity
 import android.content.SharedPreferences
+import android.content.res.ColorStateList
 import android.graphics.Color.rgb
 import android.support.v4.content.ContextCompat
 import android.support.v7.widget.CardView
-import android.graphics.Color
 
 /**
 This class is used to create colors by the user.
@@ -37,6 +37,9 @@ class ColorCreator(private val R: Int, private val G: Int, private val B: Int, p
     }
 
     companion object {
+        //ColorListStates states array
+        private val states = intArrayOf(android.R.attr.state_enabled, android.R.attr.state_enabled, android.R.attr.state_checked,
+                android.R.attr.state_pressed)
         /*
        * Shared preferences KEY's
        */
@@ -75,12 +78,14 @@ class ColorCreator(private val R: Int, private val G: Int, private val B: Int, p
         }
 
         fun getColorFromCard(activity: Activity, cardView: CardView): Int {
-            val states = intArrayOf(android.R.attr.state_enabled, android.R.attr.state_enabled, android.R.attr.state_checked,
-                    android.R.attr.state_pressed)
             val defaultColor = ContextCompat.getColor(activity, app.note.simple.brulinski.sebastian.com.simplenoteapp.R.color.material_white)
             cardView.cardBackgroundColor.getColorForState(states, defaultColor)
 
             return cardView.cardBackgroundColor.getColorForState(states, defaultColor)
+        }
+
+        fun getColorIntFromColorStateList(colorStateList: ColorStateList): Int{
+            return colorStateList.getColorForState(states, rgb(255,255,255))
         }
     }
 }
