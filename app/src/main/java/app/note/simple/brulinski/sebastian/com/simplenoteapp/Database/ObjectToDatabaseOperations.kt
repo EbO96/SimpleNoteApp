@@ -1,39 +1,113 @@
 package app.note.simple.brulinski.sebastian.com.simplenoteapp.Database
 
+import android.content.ContentValues
 import android.content.Context
+import app.note.simple.brulinski.sebastian.com.simplenoteapp.HelperClass.MyRowParserNotes
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.Model.NoteItem
+import app.note.simple.brulinski.sebastian.com.simplenoteapp.Model.Notes
 import org.jetbrains.anko.db.insert
+import org.jetbrains.anko.db.select
 
 class ObjectToDatabaseOperations {
 
     //TODO new database operations
     companion object {
-        fun insertObject(context: Context, noteObject: NoteItem) {
+        fun insertObject(context: Context, noteObject: NoteItem?) {
 
-            val title = Pair<String, String>(LocalSQLAnkoDatabase.TITLE, noteObject.title.trim())
-            val note = Pair<String, String>(LocalSQLAnkoDatabase.NOTE, noteObject.note.trim())
-            val date = Pair<String, String>(LocalSQLAnkoDatabase.DATE, noteObject.date!!)
-            val rBGColor = Pair<String, Int>(LocalSQLAnkoDatabase.R_BG_COLOR, noteObject.rBGColor)
-            val bBGColor = Pair<String, Int>(LocalSQLAnkoDatabase.B_BG_COLOR, noteObject.bBGColor)
-            val gBGColor = Pair<String, Int>(LocalSQLAnkoDatabase.G_BG_COLOR, noteObject.gBGColor)
-            val rTXTColor = Pair<String, Int>(LocalSQLAnkoDatabase.R_TXT_COLOR, noteObject.rTXTColor)
-            val bTXTColor = Pair<String, Int>(LocalSQLAnkoDatabase.B_TXT_COLOR, noteObject.bTXTColor)
-            val gTXTColor = Pair<String, Int>(LocalSQLAnkoDatabase.G_TXT_COLOR, noteObject.gTXTColor)
-            val fontStyle = Pair<String, String>(LocalSQLAnkoDatabase.FONT_STYLE, noteObject.fontStyle)
-            val isDeleted = Pair<String, String>(LocalSQLAnkoDatabase.IS_DELETED, noteObject.isDeleted.toString())
+            if (noteObject != null) {
+                val title = Pair(LocalSQLAnkoDatabase.TITLE, noteObject.title!!.trim())
+                val note = Pair(LocalSQLAnkoDatabase.NOTE, noteObject.note!!.trim())
+                val date = Pair(LocalSQLAnkoDatabase.DATE, noteObject.date!!)
+                val BGColor = Pair(LocalSQLAnkoDatabase.BG_COLOR, noteObject.BGColor.toString())
+                val TXTColor = Pair(LocalSQLAnkoDatabase.TXT_COLOR, noteObject.TXTColor.toString())
+                val fontStyle = Pair(LocalSQLAnkoDatabase.FONT_STYLE, noteObject.fontStyle)
+                val isDeleted = Pair(LocalSQLAnkoDatabase.IS_DELETED, noteObject.isDeleted.toString())
 
-            context.database.use {
-                insert(LocalSQLAnkoDatabase.TABLE_NOTES, title, note, date, rBGColor, bBGColor, gBGColor, rTXTColor, bTXTColor, gTXTColor,
-                        fontStyle, isDeleted)
+                context.database.use {
+                    insert(LocalSQLAnkoDatabase.TABLE_NAME, title, note, date, BGColor, TXTColor, fontStyle, isDeleted)
+                }
             }
         }
 
-        fun deleteObject(context: Context, noteObject: NoteItem) {
-            val id = noteObject.id
+        fun deleteObjects(context: Context, noteObjects: ArrayList<NoteItem>) {
+
+            (0 until noteObjects.size)
+                    .map { noteObjects[it].id }
+                    .forEach {
+                        context.database.use {
+                            delete(LocalSQLAnkoDatabase.TABLE_NAME, "${LocalSQLAnkoDatabase.ID}=?", arrayOf(it.toString()))
+                        }
+                    }
+        }
+
+        fun addDeleteFlag(context: Context, noteObjects: ArrayList<NoteItem>?, flag: Boolean) {
+            for (x in 0 until noteObjects!!.size) {
+                val id = noteObjects[x].id
+                if (id != null) {
+                    val isDeletedValue = ContentValues()
+                    isDeletedValue.put(LocalSQLAnkoDatabase.IS_DELETED, flag.toString())
+
+                    context.database.use {
+                        update(LocalSQLAnkoDatabase.TABLE_NAME, isDeletedValue, "${LocalSQLAnkoDatabase.ID}=?", arrayOf(id.toString())
+                        )
+                    }
+                }
+            }
+        }
+
+        /**
+         * Pass null as 'isDeletedWhereClause' to get all from database. Pass 'true' or 'false' as
+         * second parameter to get specific's row's defined by this value 'is_deleted' row
+         */
+        fun getObjects(context: Context, isDeletedWhereClause: Boolean?): ArrayList<NoteItem> {
+            val array = ArrayList<NoteItem>()
+
+            var notes: List<List<Notes.Note>>
 
             context.database.use {
-                delete(LocalSQLAnkoDatabase.TABLE_NOTES, "${LocalSQLAnkoDatabase.ID}=?", arrayOf(id))
+                notes = if (isDeletedWhereClause == null)
+                    select(LocalSQLAnkoDatabase.TABLE_NAME).parseList(MyRowParserNotes())
+                else select(LocalSQLAnkoDatabase.TABLE_NAME).whereSimple("${LocalSQLAnkoDatabase.IS_DELETED}=?", isDeletedWhereClause.toString()).parseList(MyRowParserNotes())
+
+                val size = notes.size
+
+
+                (0 until size).mapTo(array) {
+                    NoteItem(
+                            notes[it][it].id, notes[it][it].title, notes[it][it].note, notes[it][it].date,
+                            notes[it][it].BGColor!!, notes[it][it].TXTColor!!, notes[it][it].fontStyle,
+                            notes[it][it].isDeleted, notes[it][it].isSelected)
+                }
             }
+            return array
+        }
+
+        //TODO implement method below
+        fun updateObject(context: Context, noteObjects: ArrayList<NoteItem?>?) {
+            val contentValues = ContentValues()
+            val db = LocalSQLAnkoDatabase
+
+            if (noteObjects != null) {
+                for (x in 0 until noteObjects.size) {
+                    val id = noteObjects[x]!!.id
+
+                    if (id != null) {
+                        contentValues.put(db.TITLE, noteObjects[x]!!.title)
+                        contentValues.put(db.NOTE, noteObjects[x]!!.note)
+                        contentValues.put(db.DATE, noteObjects[x]!!.date)
+                        contentValues.put(db.BG_COLOR, noteObjects[x]!!.BGColor)
+                        contentValues.put(db.TXT_COLOR, noteObjects[x]!!.TXTColor)
+                        contentValues.put(db.FONT_STYLE, noteObjects[x]!!.fontStyle)
+                        contentValues.put(db.IS_DELETED, noteObjects[x]!!.isDeleted)
+                        contentValues.put(db.IS_SELECTED, noteObjects[x]!!.isSelected)
+
+                        context.database.use {
+                            update(LocalSQLAnkoDatabase.TABLE_NAME, contentValues, "${LocalSQLAnkoDatabase.ID}=?", arrayOf(id.toString()))
+                        }
+                    }
+                }
+            }
+
         }
     }
 }

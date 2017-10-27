@@ -18,6 +18,7 @@ import android.view.MenuInflater
 import android.view.MenuItem
 import android.widget.FrameLayout
 import android.widget.Toast
+import app.note.simple.brulinski.sebastian.com.simplenoteapp.Database.ObjectToDatabaseOperations
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.Fragment.*
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.HelperClass.CurrentFragmentState
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.HelperClass.LayoutManagerStyle
@@ -31,7 +32,6 @@ import app.note.simple.brulinski.sebastian.com.simplenoteapp.RecyclerView.MainRe
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.databinding.ActivityMainBinding
 import es.dmoral.toasty.Toasty
 import net.yslibrary.android.keyboardvisibilityevent.KeyboardVisibilityEvent
-import net.yslibrary.android.keyboardvisibilityevent.KeyboardVisibilityEventListener
 
 
 @Suppress("DEPRECATION")
@@ -84,7 +84,9 @@ class MainActivity : AppCompatActivity(), NotesListFragment.OnListenRecyclerScro
             if (array.size != 0)
                 setNotesListFragment(getNotesFromDatabase())
             else setNoNotesFragment()
-            val v: NoteItem? = intent.getParcelableExtra<NoteItem>("noteObject")
+
+            val v: NoteItem? = intent.getParcelableExtra("noteObject")
+
             if (v != null) {
                 onNoteClicked(v)
                 intent.removeExtra("noteObject")
@@ -97,14 +99,13 @@ class MainActivity : AppCompatActivity(), NotesListFragment.OnListenRecyclerScro
 
         infoToastShowedAtStart = true
 
+        //Listen for event when keyboard is open
         KeyboardVisibilityEvent.setEventListener(
-                this, object : KeyboardVisibilityEventListener {
-            override fun onVisibilityChanged(isOpen: Boolean) {
-                if (isOpen) binding.mainFab.hide()
-                else binding.mainFab.show()
-            }
+                this
+        ) { isOpen ->
+            if (isOpen) binding.mainFab.hide()
+            else binding.mainFab.show()
         }
-        )
     } //END OF onCreate(...)
 
     override fun onSaveInstanceState(outState: Bundle?) {
@@ -113,29 +114,7 @@ class MainActivity : AppCompatActivity(), NotesListFragment.OnListenRecyclerScro
     }
 
     private fun getNotesFromDatabase(): ArrayList<NoteItem> {
-        val itemsObjectsArray = ArrayList<NoteItem>()
-        //TODO new implementation of code below
-//        val notesPropertiesArray: ArrayList<NotesProperties> = ArrayList()
-//
-//        database.use {
-//            val properties = select(LocalSQLAnkoDatabase.TABLE_NOTES_PROPERTIES).whereSimple("${LocalSQLAnkoDatabase.IS_DELETED}=?", false.toString()).parseList(MyRowParserNoteProperties())
-//            var size = properties.size - 1
-//
-//            for (x in 0..size) {
-//                notesPropertiesArray.add(NotesProperties(properties[x].get(x).id, properties[x].get(x).bgColor,
-//                        properties[x].get(x).textColor, properties[x].get(x).fontStyle))
-//            }
-//
-//            val notes = select(LocalSQLAnkoDatabase.TABLE_NOTES).whereSimple("${LocalSQLAnkoDatabase.IS_DELETED}=?", false.toString()).parseList(MyRowParserNotes())
-//            size = notes.size
-//
-//            for (x in 0 until size) {
-//                itemsObjectsArray.add(NoteItem(notes[x].get(x).id!!, notes[x].get(x).title!!, notes[x].get(x).note!!,
-//                        notes[x].get(x).date!!, notesPropertiesArray[x].bgColor!!, notesPropertiesArray[x].textColor!!,
-//                        notesPropertiesArray.get(x).fontStyle!!, false))
-//            }
-//        }
-        return itemsObjectsArray
+        return ObjectToDatabaseOperations.getObjects(this, false)
     }
 
     /*
@@ -377,45 +356,10 @@ class MainActivity : AppCompatActivity(), NotesListFragment.OnListenRecyclerScro
     Listen form fragmnt destroyed
      */
 
-    override fun editDestroy(noteObject: NoteItem?) {
+    override fun editDestroy(noteObject: NoteItem?) { //Update object in database after edit
         //TODO new implementation of code below
-//        noteToEdit = noteObject
-//
-//        val id = noteObject!!.id
-//        val whereClause = "_id=?"
-//
-//        val title = noteObject.title
-//        val note = noteObject.note
-//        val date = noteObject.date
-//
-//        val bgColor = noteObject.bgColor
-//        val textColor = noteObject.textColor
-//        val fontStyle = noteObject.fontStyle
-//
-//        val valuesNote = ContentValues()
-//        val valuesProperties = ContentValues()
-//
-//        valuesNote.put(LocalSQLAnkoDatabase.TITLE, title)
-//        valuesNote.put(LocalSQLAnkoDatabase.NOTE, note)
-//        valuesNote.put(LocalSQLAnkoDatabase.DATE, date)
-//
-//        database.use {
-//            //Update notes database
-//            update(
-//                    LocalSQLAnkoDatabase.TABLE_NOTES, valuesNote, whereClause, arrayOf(id)
-//            )
-//        }
-//
-//        //valuesProperties.put(LocalSQLAnkoDatabase.BG_COLOR, bgColor)
-//        //valuesProperties.put(LocalSQLAnkoDatabase.TEXT_COLOR, textColor)
-//        valuesProperties.put(LocalSQLAnkoDatabase.FONT_STYLE, fontStyle)
-//
-//        database.use {
-//            //Update notes properties database
-//            update(
-//                    LocalSQLAnkoDatabase.TABLE_NOTES_PROPERTIES, valuesProperties, whereClause, arrayOf(id)
-//            )
-//        }
+        noteToEdit = noteObject
+        ObjectToDatabaseOperations.updateObject(context = this, noteObjects = arrayListOf(noteObject))
     }
 
     /*
@@ -462,7 +406,7 @@ class MainActivity : AppCompatActivity(), NotesListFragment.OnListenRecyclerScro
     }
 
     override fun onNoteClicked(noteObject: NoteItem) {
-        CurrentFragmentState.backPressed = false
+        CurrentFragmentState.backPressed = false //Set flag
         noteToEdit = noteObject
         setNotePreviewFragment()
     }

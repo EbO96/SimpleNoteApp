@@ -1,6 +1,5 @@
 package app.note.simple.brulinski.sebastian.com.simplenoteapp.RecyclerView
 
-import android.content.ContentValues
 import android.content.Context
 import android.content.SharedPreferences
 import android.preference.PreferenceManager
@@ -14,8 +13,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.Activity.MainActivity
-import app.note.simple.brulinski.sebastian.com.simplenoteapp.Database.LocalSQLAnkoDatabase
-import app.note.simple.brulinski.sebastian.com.simplenoteapp.Database.database
+import app.note.simple.brulinski.sebastian.com.simplenoteapp.Database.ObjectToDatabaseOperations
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.Interfaces.MainRecyclerSizeListener
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.Model.NoteItem
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.R
@@ -46,9 +44,9 @@ class MainRecyclerAdapter(private var noteItemArray: ArrayList<NoteItem>, var re
         var note = noteItemArray[position].note
         var positionToDelete: Int
 
-        if (title.length > 30)
+        if (title!!.length > 30)
             title = title.substring(0, 30) + "..."
-        if (note.length > 260)
+        if (note!!.length > 260)
             note = note.substring(0, 260) + "..."
 
         //TODO change card color's
@@ -86,8 +84,8 @@ class MainRecyclerAdapter(private var noteItemArray: ArrayList<NoteItem>, var re
                 sizeCallback.getRecyclerAdapterSize(noteItemArray.size)
 
                 if (flag)
-                    addDeleteFlag(deletedItem!!.id, false)
-               // else ObjectToDatabaseOperations.insertNoteObject(deletedItem!!, ctx) //TODO delete note from database
+                    ObjectToDatabaseOperations.addDeleteFlag(context = ctx, noteObjects = arrayListOf(deletedItem!!), flag = false)
+                else ObjectToDatabaseOperations.insertObject(ctx, deletedItem!!)
 
             }).setCallback(object : Snackbar.Callback() {
                 override fun onDismissed(transientBottomBar: Snackbar?, event: Int) {
@@ -104,8 +102,8 @@ class MainRecyclerAdapter(private var noteItemArray: ArrayList<NoteItem>, var re
             notifyItemRemoved(positionToDelete)
 
             if (flag)
-                addDeleteFlag(deletedItem!!.id, true)
-            //else ObjectToDatabaseOperations.deleteNoteObject(deletedItem!!, ctx) //TODO delete note from database
+                ObjectToDatabaseOperations.addDeleteFlag(context = ctx, noteObjects = arrayListOf(deletedItem!!), flag = true)
+            else ObjectToDatabaseOperations.deleteObjects(ctx, arrayListOf(deletedItem!!))
 
             Log.i("recyclerSize", "recycler size is ${noteItemArray.size}")
             sizeCallback.getRecyclerAdapterSize(noteItemArray.size)
@@ -115,22 +113,6 @@ class MainRecyclerAdapter(private var noteItemArray: ArrayList<NoteItem>, var re
 
     fun getArray(): ArrayList<NoteItem> {
         return noteItemArray
-    }
-
-    private fun addDeleteFlag(itemId: String, flag: Boolean) {
-        //TODO new implementation of code below
-//        val isDeletedValue = ContentValues()
-//        isDeletedValue.put(LocalSQLAnkoDatabase.IS_DELETED, flag.toString())
-//
-//        ctx.database.use {
-//            //Delete from database
-//            update(
-//                    LocalSQLAnkoDatabase.TABLE_NOTES, isDeletedValue, "${LocalSQLAnkoDatabase.ID}=?", arrayOf(itemId)
-//            )
-//            update(
-//                    LocalSQLAnkoDatabase.TABLE_NOTES_PROPERTIES, isDeletedValue, "${LocalSQLAnkoDatabase.ID}=?", arrayOf(itemId)
-//            )
-//        }
     }
 
     override fun onCreateViewHolder(parent: ViewGroup?, viewType: Int): ViewHolder {

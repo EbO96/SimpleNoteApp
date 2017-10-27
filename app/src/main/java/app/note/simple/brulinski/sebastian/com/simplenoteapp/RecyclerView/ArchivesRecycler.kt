@@ -1,25 +1,22 @@
 package app.note.simple.brulinski.sebastian.com.simplenoteapp.RecyclerView
 
-import android.app.AlertDialog
-import android.content.ContentValues
 import android.content.Context
 import android.support.v4.content.ContextCompat
+import android.support.v7.app.AlertDialog
 import android.support.v7.widget.CardView
 import android.support.v7.widget.RecyclerView
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.CheckBox
 import android.widget.ImageButton
 import android.widget.TextView
-import app.note.simple.brulinski.sebastian.com.simplenoteapp.Database.LocalSQLAnkoDatabase
-import app.note.simple.brulinski.sebastian.com.simplenoteapp.Database.database
+import app.note.simple.brulinski.sebastian.com.simplenoteapp.Database.ObjectToDatabaseOperations
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.Fragment.ArchivedNotesFragment
-import app.note.simple.brulinski.sebastian.com.simplenoteapp.Model.ArchivedNotesNoteItem
+import app.note.simple.brulinski.sebastian.com.simplenoteapp.Model.NoteItem
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.R
 
-class ArchivesRecycler(private var notesArrayList: ArrayList<ArchivedNotesNoteItem>, private val recycler: RecyclerView, private val ctx: Context, private val fragment: ArchivedNotesFragment) : RecyclerView.Adapter<ArchivesRecycler.MyViewHolder>() {
+class ArchivesRecycler(private var notesArrayList: ArrayList<NoteItem>, private val recycler: RecyclerView, private val ctx: Context, private val fragment: ArchivedNotesFragment) : RecyclerView.Adapter<ArchivesRecycler.MyViewHolder>() {
 
     lateinit var mSizeCallback: OnRecyclerSizeListener
 
@@ -32,7 +29,6 @@ class ArchivesRecycler(private var notesArrayList: ArrayList<ArchivedNotesNoteIt
     }
 
     override fun onBindViewHolder(holder: MyViewHolder?, position: Int) {
-        Log.i("checkbox", "recycler bind")
         val noteObject = notesArrayList[position]
         var positionToDelete: Int
 
@@ -43,7 +39,7 @@ class ArchivesRecycler(private var notesArrayList: ArrayList<ArchivedNotesNoteIt
 
         holder!!.checkBox.setOnCheckedChangeListener(null)
 
-        if (checkedObject) {
+        if (checkedObject!!) {
             holder.checkBox.isChecked = true
             holder.buttonsCard.visibility = View.INVISIBLE
         } else {
@@ -68,63 +64,53 @@ class ArchivesRecycler(private var notesArrayList: ArrayList<ArchivedNotesNoteIt
         }
 
         //TODO new implementation of buttons (code below)
-//        holder.deleteImageButton.setOnClickListener {
-//            positionToDelete = recycler.getChildAdapterPosition(holder.itemView)
-//            val alert = AlertDialog.Builder(ctx).create()
-//
-//            alert.setIcon(ContextCompat.getDrawable(ctx, R.drawable.ic_delete_black_24dp))
-//            alert.setTitle(ctx.getString(R.string.delete_this_note))
-//
-//            alert.setButton(AlertDialog.BUTTON_POSITIVE, ctx.getString(R.string.yes), { _, i ->
-//                ctx.database.use {
-//                    delete(LocalSQLAnkoDatabase.TABLE_NOTES, "${LocalSQLAnkoDatabase.ID}=?", arrayOf(noteObject.id))
-//                    delete(LocalSQLAnkoDatabase.TABLE_NOTES_PROPERTIES, "${LocalSQLAnkoDatabase.NOTE_ID}=?", arrayOf(noteObject.id))
-//                }
-//
-//                notesArrayList.removeAt(positionToDelete)
-//                notifyItemRemoved(positionToDelete)
-//
-//                mSizeCallback.recyclerSize(notesArrayList.size)
-//            })
-//
-//            alert.setButton(AlertDialog.BUTTON_NEGATIVE, ctx.getString(R.string.no), { _, i ->
-//                //Do nothing
-//            })
-//
-//            alert.show()
-//        }
-//
-//        holder.restoreImageButton.setOnClickListener {
-//            positionToDelete = recycler.getChildAdapterPosition(holder.itemView)
-//            val alert = AlertDialog.Builder(ctx).create()
-//
-//            alert.setIcon(ContextCompat.getDrawable(ctx, R.drawable.ic_restore_black_24dp))
-//            alert.setTitle(ctx.getString(R.string.restore_this_note))
-//
-//            alert.setButton(AlertDialog.BUTTON_POSITIVE, ctx.getString(R.string.yes), { _, i ->
-//                val isDeletedValue = ContentValues()
-//                isDeletedValue.put(LocalSQLAnkoDatabase.IS_DELETED, false.toString())
-//
-//                ctx.database.use {
-//                    update(LocalSQLAnkoDatabase.TABLE_NOTES, isDeletedValue, "${LocalSQLAnkoDatabase.ID}=?", arrayOf(noteObject.id))
-//                    update(LocalSQLAnkoDatabase.TABLE_NOTES_PROPERTIES, isDeletedValue, "${LocalSQLAnkoDatabase.NOTE_ID}=?", arrayOf(noteObject.id))
-//                }
-//                notesArrayList.removeAt(positionToDelete)
-//                notifyItemRemoved(positionToDelete)
-//
-//                mSizeCallback.recyclerSize(notesArrayList.size)
-//            })
-//
-//            alert.setButton(AlertDialog.BUTTON_NEGATIVE, ctx.getString(R.string.no), { _, i ->
-//                //Do nothing
-//            })
-//            alert.show()
-//        }
+        holder.deleteImageButton.setOnClickListener {
+            positionToDelete = recycler.getChildAdapterPosition(holder.itemView)
+            val alert = AlertDialog.Builder(ctx).create()
+
+            alert.setIcon(ContextCompat.getDrawable(ctx, R.drawable.ic_delete_black_24dp))
+            alert.setTitle(ctx.getString(R.string.delete_this_note))
+
+            alert.setButton(AlertDialog.BUTTON_POSITIVE, ctx.getString(R.string.yes), { _, i ->
+                ObjectToDatabaseOperations.deleteObjects(context = ctx, noteObjects = arrayListOf(noteObject))//Update object ( delete flag )
+
+                notesArrayList.removeAt(positionToDelete)
+                notifyItemRemoved(positionToDelete)
+
+                mSizeCallback.recyclerSize(notesArrayList.size)
+            })
+
+            alert.setButton(AlertDialog.BUTTON_NEGATIVE, ctx.getString(R.string.no), { _, _ ->
+                //Do nothing
+            })
+
+            alert.show()
+        }
+
+        holder.restoreImageButton.setOnClickListener {
+            positionToDelete = recycler.getChildAdapterPosition(holder.itemView)
+            val alert = AlertDialog.Builder(ctx).create()
+
+            alert.setIcon(ContextCompat.getDrawable(ctx, R.drawable.ic_restore_black_24dp))
+            alert.setTitle(ctx.getString(R.string.restore_this_note))
+
+            alert.setButton(AlertDialog.BUTTON_POSITIVE, ctx.getString(R.string.yes), { _, _ ->
+                ObjectToDatabaseOperations.addDeleteFlag(context = ctx, noteObjects = arrayListOf(noteObject), flag = false) //Update object ( delete flag )
+                notesArrayList.removeAt(positionToDelete)
+                notifyItemRemoved(positionToDelete)
+
+                mSizeCallback.recyclerSize(notesArrayList.size)
+            })
+
+            alert.setButton(AlertDialog.BUTTON_NEGATIVE, ctx.getString(R.string.no), { _, i ->
+                //Do nothing
+            })
+            alert.show()
+        }
     }
 
     override fun getItemCount(): Int {
-        val size = notesArrayList.size
-        return size
+        return notesArrayList.size
     }
 
     override fun onCreateViewHolder(parent: ViewGroup?, viewType: Int): MyViewHolder {
@@ -133,19 +119,16 @@ class ArchivesRecycler(private var notesArrayList: ArrayList<ArchivedNotesNoteIt
     }
 
     class MyViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
-        val titleTextView = itemView.findViewById<TextView>(R.id.titleTextViewArch)
-        val noteTextView = itemView.findViewById<TextView>(R.id.noteTextViewArch)
-        val deleteImageButton = itemView.findViewById<ImageButton>(R.id.deleteArchivedNoteImageButtonArch)
-        val restoreImageButton = itemView.findViewById<ImageButton>(R.id.restoreArchivedNoteImageButtonArch)
+        val titleTextView: TextView = itemView.findViewById(R.id.titleTextViewArch)
+        val noteTextView: TextView = itemView.findViewById(R.id.noteTextViewArch)
+        val deleteImageButton: ImageButton = itemView.findViewById(R.id.deleteArchivedNoteImageButtonArch)
+        val restoreImageButton: ImageButton = itemView.findViewById(R.id.restoreArchivedNoteImageButtonArch)
         val card = itemView.findViewById<CardView>(R.id.archives_card)
-        val buttonsCard = itemView.findViewById<CardView>(R.id.archived_note_card_buttons_card)
-        val checkBox = itemView.findViewById<CheckBox>(R.id.archived_note_card_checkBox)
+        val buttonsCard: CardView = itemView.findViewById(R.id.archived_note_card_buttons_card)
+        val checkBox: CheckBox = itemView.findViewById(R.id.archived_note_card_checkBox)
     }
 
-    fun getArray(): ArrayList<ArchivedNotesNoteItem> {
-
+    fun getArray(): ArrayList<NoteItem> {
         return notesArrayList
     }
-
-
 }

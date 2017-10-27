@@ -4,38 +4,30 @@ import android.os.Parcel
 import android.os.Parcelable
 
 
-open class NoteItem(var id: String, var title: String, var note: String, var date: String?, var rBGColor: Int,
-                    var gBGColor: Int, var bBGColor: Int, var rTXTColor: Int, var gTXTColor: Int, var bTXTColor: Int,
-                    var fontStyle: String, var isDeleted: Boolean) : Parcelable {
-
+open class NoteItem(var id: Int?, var title: String?, var note: String?, var date: String?, var BGColor: Int?,
+                    var TXTColor: Int?, var fontStyle: String?, var isDeleted: Boolean?, var isSelected: Boolean?) : Parcelable {
     constructor(parcel: Parcel) : this(
+            parcel.readValue(Int::class.java.classLoader) as? Int,
             parcel.readString(),
             parcel.readString(),
             parcel.readString(),
+            parcel.readValue(Int::class.java.classLoader) as? Int,
+            parcel.readValue(Int::class.java.classLoader) as? Int,
             parcel.readString(),
-            parcel.readInt(),
-            parcel.readInt(),
-            parcel.readInt(),
-            parcel.readInt(),
-            parcel.readInt(),
-            parcel.readInt(),
-            parcel.readString(),
-            parcel.readByte() != 0.toByte()) {
+            parcel.readValue(Boolean::class.java.classLoader) as? Boolean,
+            parcel.readValue(Boolean::class.java.classLoader) as? Boolean) {
     }
 
     override fun writeToParcel(parcel: Parcel, flags: Int) {
-        parcel.writeString(id)
+        parcel.writeValue(id)
         parcel.writeString(title)
         parcel.writeString(note)
         parcel.writeString(date)
-        parcel.writeInt(rBGColor)
-        parcel.writeInt(gBGColor)
-        parcel.writeInt(bBGColor)
-        parcel.writeInt(rTXTColor)
-        parcel.writeInt(gTXTColor)
-        parcel.writeInt(bTXTColor)
+        parcel.writeValue(BGColor)
+        parcel.writeValue(TXTColor)
         parcel.writeString(fontStyle)
-        parcel.writeByte(if (isDeleted) 1 else 0)
+        parcel.writeValue(isDeleted)
+        parcel.writeValue(isSelected)
     }
 
     override fun describeContents(): Int {
@@ -51,5 +43,4 @@ open class NoteItem(var id: String, var title: String, var note: String, var dat
             return arrayOfNulls(size)
         }
     }
-
 }

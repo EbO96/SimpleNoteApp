@@ -5,7 +5,7 @@ class Notes {
 
     class Note {
 
-        var id: String? = null
+        var id: Int? = null
 
         var title: String? = null
 
@@ -13,37 +13,28 @@ class Notes {
 
         var date: String? = null
 
-        var rBGColor: Int? = null
+        var BGColor: Int? = null
 
-        var gBGColor: Int? = null
-
-        var bBGColor: Int? = null
-
-        var rTXTColor: Int? = null
-
-        var gTXTColor: Int? = null
-
-        var bTXTColor: Int? = null
+        var TXTColor: Int? = null
 
         var fontStyle: String? = null
 
         var isDeleted: Boolean? = null
 
+        var isSelected: Boolean? = null
 
-        constructor(id: String?, title: String?, note: String?, date: String?, rBGColor: Int?, gBGColor: Int?, bBGColor: Int?, rTXTColor: Int?, gTXTColor: Int?, bTXTColor: Int?,
-                    fontStyle: String?, isDeleted: Boolean?) {
+
+        constructor(id: Int?, title: String?, note: String?, date: String?, BGColor: Int?, TXTColor: Int?,
+                    fontStyle: String?, isDeleted: Boolean?, isSelected: Boolean?) {
             this.id = id
             this.title = title
             this.note = note
             this.date = date
-            this.rBGColor = rBGColor
-            this.bBGColor = bBGColor
-            this.gBGColor = gBGColor
-            this.rTXTColor = rTXTColor
-            this.bTXTColor = bTXTColor
-            this.gTXTColor = gTXTColor
+            this.BGColor = BGColor
+            this.TXTColor = TXTColor
             this.fontStyle = fontStyle
             this.isDeleted = isDeleted
+            this.isSelected = isSelected
         }
     }
 }

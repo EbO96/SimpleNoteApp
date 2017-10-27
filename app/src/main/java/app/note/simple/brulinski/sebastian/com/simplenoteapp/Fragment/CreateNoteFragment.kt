@@ -24,6 +24,7 @@ import android.widget.FrameLayout
 import android.widget.Toast
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.Activity.MainActivity
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.Database.LocalSQLAnkoDatabase
+import app.note.simple.brulinski.sebastian.com.simplenoteapp.Database.ObjectToDatabaseOperations
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.Editor.ColorCreator
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.Editor.EditorManager
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.Fragment.BottomSheetFragments.BottomSheetColorFragment
@@ -98,15 +99,15 @@ open class CreateNoteFragment : Fragment(), SaveNoteInterface, ChangeNoteLookInt
 
         //Create empty note object
         if (savedInstanceState == null) {
-            noteObject = NoteItem("", "", "", "", 255, 255, 255, 0, 0, 0, EditorManager.FontStyleManager.DEFAULT_FONT, false)
+            noteObject = NoteItem(null, "", "", "", 0, 0, EditorManager.FontStyleManager.DEFAULT_FONT, false, false)
         } else {
             noteObject = savedInstanceState.getParcelable("note_object")
             noteStyleEditor.changeColor(arrayListOf(EditorManager.ColorManager.ACTION_BAR_COLOR), Color.parseColor("#000000"))
         }
 
         //TODO change card color's
-        noteStyleEditor.changeColor(arrayListOf(cardView, actionBar), ColorCreator(noteObject!!.rBGColor, noteObject!!.gBGColor, noteObject!!.bBGColor, activity).getColor())
-        noteStyleEditor.changeColor(arrayListOf(titleView, noteView), ColorCreator(noteObject!!.rTXTColor, noteObject!!.gTXTColor, noteObject!!.bTXTColor, activity).getColor())
+        noteStyleEditor.changeColor(arrayListOf(cardView, actionBar), ColorCreator(255, 255, 255, activity).getColor())
+        noteStyleEditor.changeColor(arrayListOf(titleView, noteView), ColorCreator(0, 0, 0, activity).getColor())
 
         editListener()
 
@@ -138,7 +139,7 @@ open class CreateNoteFragment : Fragment(), SaveNoteInterface, ChangeNoteLookInt
     private fun onTitleAndNoteFieldFocusListener() {
         var textLength: Int
 
-        binding.createNoteTitleField.setOnFocusChangeListener { _, p1 ->
+        binding.createNoteTitleField.setOnFocusChangeListener { _, _ ->
             textLength = binding.createNoteTitleField.text.length
 
             actualLimit = titleCharactersLimit
@@ -146,7 +147,7 @@ open class CreateNoteFragment : Fragment(), SaveNoteInterface, ChangeNoteLookInt
             changeCounterColor(textLength)
         }
 
-        binding.createNoteNoteField.setOnFocusChangeListener { _, p1 ->
+        binding.createNoteNoteField.setOnFocusChangeListener { _, _ ->
             textLength = binding.createNoteNoteField.text.length
 
             actualLimit = noteCharactersLimit
@@ -171,36 +172,10 @@ open class CreateNoteFragment : Fragment(), SaveNoteInterface, ChangeNoteLookInt
 
     override fun onSaveNote() {
         //TODO new implementation of code below
-//        try {
-//            val titleCol = Pair<String, String>(LocalSQLAnkoDatabase.TITLE, binding.createNoteTitleField.text.toString().trim())
-//            val noteCol = Pair<String, String>(LocalSQLAnkoDatabase.NOTE, binding.createNoteNoteField.text.toString().trim())
-//            val dateCol = Pair<String, String>(LocalSQLAnkoDatabase.DATE, getCurrentDateAndTime())
-//            val isDeletedCol = Pair<String, String>(LocalSQLAnkoDatabase.IS_DELETED, false.toString())
-//            var idList: List<List<Notes.Note>>? = null
-//            var size = 0
-//
-//            database.use {
-//                insert(LocalSQLAnkoDatabase.TABLE_NOTES, titleCol, noteCol, dateCol, isDeletedCol)
-//                select(LocalSQLAnkoDatabase.TABLE_NOTES)
-//            }
-//
-//            database.use {
-//                idList = select(LocalSQLAnkoDatabase.TABLE_NOTES).whereArgs(LocalSQLAnkoDatabase.ID, titleCol, noteCol).
-//                        parseList(MyRowParserNotes())
-//                size = idList!!.size
-//            }
-//
-//            val noteIdCol = Pair<String, String>(LocalSQLAnkoDatabase.NOTE_ID, idList!!.get(size - 1).get(size - 1).id!!)
-//            // val bgColorCol = Pair<String, String>(LocalSQLAnkoDatabase.BG_COLOR, noteObject!!.bgColor)
-//            // val textColorCol = Pair<String, String>(LocalSQLAnkoDatabase.TEXT_COLOR, noteObject!!.textColor)
-//            val fontStyleCol = Pair<String, String>(LocalSQLAnkoDatabase.FONT_STYLE, noteObject!!.fontStyle)
-//
-//            database.use {
-//                //insert(LocalSQLAnkoDatabase.TABLE_NOTES_PROPERTIES, noteIdCol, bgColorCol, textColorCol, fontStyleCol, isDeletedCol)
-//            }
-//        } catch (e: Exception) {
-//            e.printStackTrace()
-//        }
+
+        noteObject!!.date = getCurrentDateAndTime()
+
+        ObjectToDatabaseOperations.insertObject(context, noteObject)
     }
 
     @RequiresApi(Build.VERSION_CODES.LOLLIPOP)
@@ -290,64 +265,9 @@ open class CreateNoteFragment : Fragment(), SaveNoteInterface, ChangeNoteLookInt
     }
 
     @RequiresApi(Build.VERSION_CODES.LOLLIPOP)
-    fun applyColor(viewsArray: ArrayList<Any>, colorOf: String, color: Int) { //Change color of background
-        //TODO new implementation of code below
-//        var resColor = ContextCompat.getColor(context, R.color.material_white)
-//        var currentColor = noteObject!!.bgColor
-//
-//
-//        when (color) {
-//            EditorManager.ColorManager.RED -> {
-//                resColor = ContextCompat.getColor(context, R.color.material_red)
-//                currentColor = EditorManager.ColorManager.RED
-//            }
-//            EditorManager.ColorManager.PINK -> {
-//                resColor = ContextCompat.getColor(context, R.color.material_pink)
-//                currentColor = EditorManager.ColorManager.PINK
-//            }
-//            EditorManager.ColorManager.PURPLE -> {
-//                resColor = ContextCompat.getColor(context, R.color.material_purple)
-//                currentColor = EditorManager.ColorManager.PURPLE
-//            }
-//            EditorManager.ColorManager.BLUE -> {
-//                resColor = ContextCompat.getColor(context, R.color.material_blue)
-//                currentColor = EditorManager.ColorManager.BLUE
-//            }
-//            EditorManager.ColorManager.INDIGO -> {
-//                resColor = ContextCompat.getColor(context, R.color.material_indigo)
-//                currentColor = EditorManager.ColorManager.INDIGO
-//            }
-//            EditorManager.ColorManager.GREEN -> {
-//                resColor = ContextCompat.getColor(context, R.color.material_green)
-//                currentColor = EditorManager.ColorManager.GREEN
-//            }
-//            EditorManager.ColorManager.TEAL -> {
-//                resColor = ContextCompat.getColor(context, R.color.material_teal)
-//                currentColor = EditorManager.ColorManager.TEAL
-//            }
-//            EditorManager.ColorManager.YELLOW -> {
-//                resColor = ContextCompat.getColor(context, R.color.material_yellow)
-//                currentColor = EditorManager.ColorManager.YELLOW
-//            }
-//            EditorManager.ColorManager.WHITE -> {
-//                resColor = ContextCompat.getColor(context, R.color.material_white)
-//                currentColor = EditorManager.ColorManager.WHITE
-//            }
-//            EditorManager.ColorManager.BLUE_GRAY -> {
-//                resColor = ContextCompat.getColor(context, R.color.material_blue_grey)
-//                currentColor = EditorManager.ColorManager.BLUE_GRAY
-//            }
-//            EditorManager.ColorManager.BLACK -> {
-//                resColor = ContextCompat.getColor(context, R.color.material_black)
-//                currentColor = EditorManager.ColorManager.BLACK
-//            }
-//            EditorManager.ColorManager.BROWN -> {
-//                resColor = ContextCompat.getColor(context, R.color.material_brown)
-//                currentColor = EditorManager.ColorManager.BROWN
-//            }
-//        }
-//
-//
+    private fun applyColor(viewsArray: ArrayList<Any>, colorOf: String, color: Int) { //Change color of background
+
+
         val frag = activity.supportFragmentManager.findFragmentById(activity.findViewById<FrameLayout>(R.id.main_container).id)
         val editMode = frag != null && frag.isVisible && frag.tag.equals(MainActivity.EDIT_NOTE_FRAGMENT_TAG)
 //
@@ -361,12 +281,13 @@ open class CreateNoteFragment : Fragment(), SaveNoteInterface, ChangeNoteLookInt
             //TODO  if (editMode)
             //TODO  MainActivity.noteToEdit!!.bgColor = currentColor
             //TODO else noteObject!!.bgColor = currentColor
+            noteObject!!.BGColor = color
         } else if (colorOf == (EditorManager.ColorManager.COLOR_OF_TEXT)) {
             EditorManager.ColorManager(activity).changeColor(viewsArray, color)
-            Log.i("abcd", "$color")
             //TODO if (editMode)
             //TODO  MainActivity.noteToEdit!!.textColor = currentColor
             //TODO else noteObject!!.textColor = currentColor
+            noteObject!!.TXTColor = color
         }
     }
 
@@ -423,9 +344,13 @@ open class CreateNoteFragment : Fragment(), SaveNoteInterface, ChangeNoteLookInt
 
         title.textChangedListener {
 
-            onTextChanged { p0, p1, p2, p3 ->
+            onTextChanged { p0, _, _, _ ->
                 if (actualLimit == titleCharactersLimit)
                     incrementCharacterCounter(p0!!.length)
+            }
+
+            afterTextChanged { text ->
+                noteObject!!.title = text.toString().trim()
             }
         }
 
@@ -436,9 +361,10 @@ open class CreateNoteFragment : Fragment(), SaveNoteInterface, ChangeNoteLookInt
                         showInfoToast(R.string.max_note_size_toast.toString() + actualLimit)
                     infoToastShowedAtStart = false
                 }
+                noteObject!!.note = text.toString().trim()
             }
 
-            onTextChanged { p0, p1, p2, p3 ->
+            onTextChanged { p0, _, _, _ ->
                 if (actualLimit == noteCharactersLimit)
                     incrementCharacterCounter(p0!!.length)
             }
