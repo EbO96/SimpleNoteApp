@@ -19,6 +19,10 @@ class FragmentAdapter(fm: FragmentManager?) : FragmentStatePagerAdapter(fm) {
         return fragmentsArrayList[position]
     }
 
+    override fun getItemPosition(`object`: Any?): Int {
+        return super.getItemPosition(`object`)
+    }
+
     override fun getCount(): Int {
         return fragmentsArrayList.size
     }

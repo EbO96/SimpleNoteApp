@@ -12,7 +12,7 @@ import android.view.MenuInflater
 import android.view.MenuItem
 import android.widget.SeekBar
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.Editor.ColorCreator
-import app.note.simple.brulinski.sebastian.com.simplenoteapp.Fragment.CreateNoteFragment
+import app.note.simple.brulinski.sebastian.com.simplenoteapp.HelperClass.FragmentAndObjectStates
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.Model.NoteItem
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.R
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.databinding.ActivityOwnColorCreatorBinding
@@ -25,31 +25,10 @@ class OwnColorCreatorActivity : AppCompatActivity() {
     RGB value range 0-255
      */
     private val RGB_MAX_VALUE = 255
-
-    /**
-     * Edited note object (NoteItem.class)
-     */
-    private var noteItem: NoteItem? = null
     /*
     SeekBar's control values
      */
     private var isEditTextUnlocked = false
-
-    /**
-     * Interfaces
-     */
-
-    companion object {
-        lateinit var mSetEditCallback: OnSetEditFragmentListener
-
-        interface OnSetEditFragmentListener {
-            fun setEditFragment(noteItem: NoteItem)
-        }
-
-        fun setOnSetEditFragmentListener(mSetEditCallback: OnSetEditFragmentListener) {
-            this.mSetEditCallback = mSetEditCallback
-        }
-    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -61,8 +40,6 @@ class OwnColorCreatorActivity : AppCompatActivity() {
         rgbEditsListeners()
 
         setLayout()
-
-        noteItem = intent.getParcelableArrayListExtra<NoteItem>(CreateNoteFragment.NOTE_OBJECT_TO_COLOR_CREATOR)[0]
     }
 
     private fun setLayout() { //This method gets the data from shared preferences and sets the RGB values at SeekBar's
@@ -248,6 +225,5 @@ class OwnColorCreatorActivity : AppCompatActivity() {
 
     private fun navigateToParent() {
         NavUtils.navigateUpFromSameTask(this)
-        //mSetEditCallback.setEditFragment(noteItem!!)
     }
 }

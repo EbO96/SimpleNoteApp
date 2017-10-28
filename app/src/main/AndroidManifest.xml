@@ -21,6 +21,7 @@
         </activity>
         <activity
             android:name=".Activity.SearchActivity"
+            android:label=""
             android:parentActivityName=".Activity.MainActivity"
             tools:ignore="InnerclassSeparator">
             <meta-data

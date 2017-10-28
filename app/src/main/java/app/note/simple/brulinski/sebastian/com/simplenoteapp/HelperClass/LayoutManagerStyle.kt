@@ -6,7 +6,7 @@ import android.content.SharedPreferences
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.R
 
 /**
- * Created by sebas on 18.09.2017.
+ * Get RecyclerView LayoutManager style from preferences
  */
 class LayoutManagerStyle(val activity: Activity) {
 

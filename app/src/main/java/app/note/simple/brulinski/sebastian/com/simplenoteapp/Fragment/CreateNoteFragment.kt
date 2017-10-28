@@ -15,27 +15,24 @@ import android.support.annotation.RequiresApi
 import android.support.design.widget.BottomSheetDialogFragment
 import android.support.v4.app.Fragment
 import android.support.v4.content.ContextCompat
+import android.support.v7.widget.CardView
 import android.text.TextUtils
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.view.animation.Animation
-import android.widget.FrameLayout
+import android.widget.EditText
 import android.widget.Toast
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.Activity.MainActivity
-import app.note.simple.brulinski.sebastian.com.simplenoteapp.Database.LocalSQLAnkoDatabase
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.Database.ObjectToDatabaseOperations
+import app.note.simple.brulinski.sebastian.com.simplenoteapp.Editor.ColorCreator
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.Editor.EditorManager
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.Fragment.BottomSheetFragments.BottomSheetColorFragment
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.Fragment.BottomSheetFragments.BottomSheetFontFragment
-import app.note.simple.brulinski.sebastian.com.simplenoteapp.HelperClass.CurrentFragmentState
+import app.note.simple.brulinski.sebastian.com.simplenoteapp.HelperClass.FragmentAndObjectStates
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.Interfaces.ChangeNoteLookInterface
-import app.note.simple.brulinski.sebastian.com.simplenoteapp.Interfaces.SaveNoteInterface
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.Model.NoteItem
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.R
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.databinding.CreateNoteFragmentBinding
-import com.labo.kaji.fragmentanimations.MoveAnimation
 import es.dmoral.toasty.Toasty
 import org.jetbrains.anko.sdk25.coroutines.textChangedListener
 import org.jetbrains.anko.textColor
@@ -43,42 +40,43 @@ import java.text.SimpleDateFormat
 import java.util.*
 
 
-open class CreateNoteFragment : Fragment(), SaveNoteInterface, ChangeNoteLookInterface {
+open class CreateNoteFragment : Fragment(), ChangeNoteLookInterface {
 
-    override fun changeFontStyle(whichFont: String) {
-        applyFont(whichFont)
-    }
-
-    @RequiresApi(Build.VERSION_CODES.LOLLIPOP)
-    override fun changeNoteOrFontColors(colorOfWhat: String, color: Int) {
-        val viewsArray: ArrayList<Any>
-
-        if (colorOfWhat == (EditorManager.ColorManager.COLOR_OF_TEXT)) {
-            viewsArray = arrayListOf(binding.createNoteTitleField, binding.createNoteNoteField)
-            noteObject!!.TXTColor = color
-        } else {
-            viewsArray = arrayListOf(binding.createNoteParentCard, EditorManager.ColorManager.ACTION_BAR_COLOR)
-            noteObject!!.BGColor = color
-        }
-        EditorManager.ColorManager(activity).applyNoteTheme(viewsArray, arrayListOf(noteObject!!))
-    }
-
-    lateinit var binding: CreateNoteFragmentBinding
-    private lateinit var database: LocalSQLAnkoDatabase
-    private val noteCharactersLimit = 1000
-    private val titleCharactersLimit = 50
-    private var actualLimit = titleCharactersLimit
+    /**
+     * Keys and final fields values
+     */
     private val STATUS_BAR_COLOR_KEY = "status_bar_color"
     private val NOTE_OBJECT_SAVE_INSTANCE_KEY = "note_object_save_instance_key"
+    private val noteCharactersLimit = 1000
+    private val titleCharactersLimit = 50
+    /**
+     * Others
+     */
+    lateinit var binding: CreateNoteFragmentBinding
+    private var actualLimit = titleCharactersLimit
     private lateinit var colorManager: EditorManager.ColorManager
     private var showToastFlag = true
-
+    /**
+     * Layout
+     */
+    private lateinit var titleView: EditText
+    private lateinit var noteView: EditText
+    private lateinit var cardView: CardView
+    private var actionBar = EditorManager.ColorManager.ACTION_BAR_COLOR
+    /**
+     * Toasty toast values
+     */
     @ColorInt
     private val INFO_COLOR = Color.parseColor("#3F51B5")
     private var infoToastShowedAtStart: Boolean = false
     private val delayBetweenToasts = 1500L
 
+    /**
+     * Static fields
+     */
     companion object {
+        var noteObject: NoteItem? = null //Singe note object
+
         @SuppressLint("SimpleDateFormat")
         fun getCurrentDateAndTime(): String { //Get current time from system
             val calendar = Calendar.getInstance()
@@ -86,15 +84,13 @@ open class CreateNoteFragment : Fragment(), SaveNoteInterface, ChangeNoteLookInt
             return SimpleDateFormat("yyyy-MM-dd 'at' HH:mm:ss a").format(calendar.time)
         }
 
-        var noteObject: NoteItem? = null
-
         /**
-         * KEY values to intent's and savedInstanceState and etc.
+         * KEY values
          */
         val NOTE_OBJECT_TO_COLOR_CREATOR = "note_object_to_color_creator"
     }
 
-    fun getNoteObject(): NoteItem?{
+    fun getNoteObject(): NoteItem? {
         return noteObject
     }
 
@@ -104,13 +100,10 @@ open class CreateNoteFragment : Fragment(), SaveNoteInterface, ChangeNoteLookInt
         //init color manager
         colorManager = EditorManager.ColorManager(activity)
 
-        Log.i("save", savedInstanceState.toString())
-        database = LocalSQLAnkoDatabase(context)
-
-        val titleView = binding.createNoteTitleField
-        val noteView = binding.createNoteNoteField
-        val cardView = binding.createNoteParentCard
-        val actionBar = EditorManager.ColorManager.ACTION_BAR_COLOR
+        titleView = binding.createNoteTitleField
+        noteView = binding.createNoteNoteField
+        cardView = binding.createNoteParentCard
+        actionBar = EditorManager.ColorManager.ACTION_BAR_COLOR
 
         val noteStyleEditor = EditorManager.ColorManager(activity)
 
@@ -132,7 +125,45 @@ open class CreateNoteFragment : Fragment(), SaveNoteInterface, ChangeNoteLookInt
 
         onTitleAndNoteFieldFocusListener()
 
+        //Listen FloatingActionButton action
+        binding.createFab.setOnClickListener {
+            when ((activity as MainActivity).getViewPager().currentItem) {
+                0 -> { //Create
+                    ObjectToDatabaseOperations.insertObject(context, noteObject)
+                    (activity as MainActivity).setFragmentInViewPager(1, null)
+                    ((activity as MainActivity).getFragmentAdapter().getItem(1) as NotesListFragment).refreshRecyclerAfterCreate(noteObject)
+                    resetLayout()
+                }
+                3 -> { //Edit
+                    ((activity as MainActivity)).setFragmentInViewPager(1, null)
+                    if (FragmentAndObjectStates.currentNote != null) {
+                        val noteAfterEdit = prepareAndGetNoteObject()
+                        val itemPosition = FragmentAndObjectStates.itemPositionInRecycler
+                        ((activity as MainActivity).getFragmentAdapter().getItem(1) as NotesListFragment).refreshRecyclerAfterEdit(noteAfterEdit, itemPosition)
+                        FragmentAndObjectStates.currentNote = noteAfterEdit
+                    }
+                }
+            }
+        }
         return binding.root
+    }
+
+    /*
+    Make object after edit
+     */
+    fun prepareAndGetNoteObject(): NoteItem {
+        return NoteItem(
+                FragmentAndObjectStates.currentNote!!.id, binding.createNoteTitleField.text.toString().trim(), binding.createNoteNoteField.text.toString().trim(),
+                getCurrentDateAndTime(), ColorCreator.getColorFromCard(activity, binding.createNoteParentCard), ColorCreator.getColorIntFromColorStateList(binding.createNoteTitleField.textColors),
+                noteObject!!.fontStyle, false, false
+        )
+    }
+
+    private fun resetLayout() {//Reset all values to default
+        noteObject = FragmentAndObjectStates.getDefaultNote(context)
+        EditorManager.ColorManager(activity).applyNoteTheme(arrayListOf(titleView, noteView, cardView, actionBar), arrayListOf(noteObject!!))
+        titleView.text = null
+        noteView.text = null
     }
 
     override fun onSaveInstanceState(outState: Bundle?) {
@@ -147,11 +178,13 @@ open class CreateNoteFragment : Fragment(), SaveNoteInterface, ChangeNoteLookInt
     override fun onViewCreated(view: View?, savedInstanceState: Bundle?) {
         setHasOptionsMenu(true)
         super.onViewCreated(view, savedInstanceState)
-
         listenBarOptions()
     }
 
-    private fun onTitleAndNoteFieldFocusListener() {
+    /**
+     * Text operations
+     */
+    private fun onTitleAndNoteFieldFocusListener() {//Listen for changes in note and title EditText
         var textLength: Int
 
         binding.createNoteTitleField.setOnFocusChangeListener { _, _ ->
@@ -170,106 +203,25 @@ open class CreateNoteFragment : Fragment(), SaveNoteInterface, ChangeNoteLookInt
             changeCounterColor(textLength)
         }
     }
-        //TODO
-//    override fun onActivityCreated(savedInstanceState: Bundle?) {
-//        super.onActivityCreated(savedInstanceState)
-//
-//        val frag = activity.supportFragmentManager.findFragmentById(activity.findViewById<FrameLayout>(R.id.main_container).id)
-//        if (frag is EditNoteFragment && frag.tag.equals(MainActivity.EDIT_NOTE_FRAGMENT_TAG)) {
-//            (activity as MainActivity).setTitleAndFab(ContextCompat.getDrawable(context, R.drawable.ic_done_white_24dp),
-//                    resources.getString(R.string.edit))
-//        } else {
-//            (activity as MainActivity).setTitleAndFab(ContextCompat.getDrawable(context, R.drawable.ic_done_white_24dp),
-//                    resources.getString(R.string.create))
-//        }
-//
-//    }
 
-    override fun onSaveNote() {
-        noteObject!!.date = getCurrentDateAndTime()
+    private fun pasteText() {
+        val clipboardManager = (context.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager)
+        if (clipboardManager.primaryClip != null) {
+            val pasteData = clipboardManager.primaryClip.getItemAt(0).text
 
-        ObjectToDatabaseOperations.insertObject(context, noteObject)
-    }
+            val title = binding.createNoteTitleField
+            val note = binding.createNoteNoteField
 
-    @RequiresApi(Build.VERSION_CODES.LOLLIPOP)
-    fun listenBarOptions() {
-        val bottomSheetColors: BottomSheetDialogFragment = BottomSheetColorFragment()
-        val bottomSheetFonts: BottomSheetDialogFragment = BottomSheetFontFragment()
+            val startIndex: Int
 
-        binding.selectAll.setOnClickListener {
-            selectAllText()
-        }
-
-        binding.copyAll.setOnClickListener {
-            copySelectedText()
-        }
-
-        binding.paste.setOnClickListener {
-            pasteText()
-        }
-
-        binding.fontStyle.setOnClickListener {
-            if (!bottomSheetFonts.isAdded) {
-                bottomSheetFonts.show(activity.supportFragmentManager, bottomSheetFonts.tag)
+            if (title.isFocused && clipboardManager.hasPrimaryClip()) {
+                startIndex = title.selectionStart
+                title.text.insert(startIndex, pasteData)
+            } else if (note.isFocused && clipboardManager.hasPrimaryClip()) {
+                startIndex = note.selectionStart
+                note.text.insert(startIndex, pasteData)
             }
         }
-
-        binding.textColor.setOnClickListener {
-            val args = Bundle()
-            args.putString(EditorManager.ColorManager.COLOR_OF_KEY, EditorManager.ColorManager.COLOR_OF_TEXT)
-            bottomSheetColors.arguments = args
-            if (!bottomSheetColors.isAdded) {
-                bottomSheetColors.show(activity.supportFragmentManager, bottomSheetColors.tag)
-            }
-
-        }
-
-        binding.noteColor.setOnClickListener {
-            val args = Bundle()
-            args.putString(EditorManager.ColorManager.COLOR_OF_KEY, EditorManager.ColorManager.COLOR_OF_NOTE)
-            bottomSheetColors.arguments = args
-            if (!bottomSheetColors.isAdded) {
-                bottomSheetColors.show(activity.supportFragmentManager, bottomSheetColors.tag)
-            }
-        }
-
-    }
-
-
-    /*
-    Options bar
-     */
-    private fun applyFont(whichFont: String) {
-        var fontStyle = ""
-        val editor = EditorManager.FontStyleManager
-
-        when (whichFont) {
-            editor.DEFAULT_FONT -> {
-                EditorManager.FontStyleManager.setUpFontStyle(Typeface.DEFAULT, binding.createNoteNoteField, binding.createNoteTitleField)
-                fontStyle = EditorManager.FontStyleManager.DEFAULT_FONT
-            }
-            editor.ITALIC_FONT -> {
-                EditorManager.FontStyleManager.setUpFontStyle(Typeface.ITALIC, binding.createNoteNoteField, binding.createNoteTitleField)
-                fontStyle = EditorManager.FontStyleManager.ITALIC_FONT
-            }
-            editor.BOLD_ITALIC_FONT -> {
-                EditorManager.FontStyleManager.setUpFontStyle(Typeface.BOLD_ITALIC, binding.createNoteNoteField, binding.createNoteTitleField)
-                fontStyle = EditorManager.FontStyleManager.BOLD_ITALIC_FONT
-            }
-            editor.SERIF_FONT -> {
-                EditorManager.FontStyleManager.setUpFontStyle(Typeface.SERIF, binding.createNoteNoteField, binding.createNoteTitleField)
-                fontStyle = EditorManager.FontStyleManager.SERIF_FONT
-            }
-            editor.SANS_SERIF_FONT -> {
-                EditorManager.FontStyleManager.setUpFontStyle(Typeface.SANS_SERIF, binding.createNoteNoteField, binding.createNoteTitleField)
-                fontStyle = EditorManager.FontStyleManager.SANS_SERIF_FONT
-            }
-            editor.MONOSPACE_FONT -> {
-                EditorManager.FontStyleManager.setUpFontStyle(Typeface.MONOSPACE, binding.createNoteNoteField, binding.createNoteTitleField)
-                fontStyle = EditorManager.FontStyleManager.MONOSPACE_FONT
-            }
-        }
-        noteObject!!.fontStyle = fontStyle
     }
 
     private fun selectAllText() {
@@ -316,6 +268,50 @@ open class CreateNoteFragment : Fragment(), SaveNoteInterface, ChangeNoteLookInt
         }
     }
 
+    @RequiresApi(Build.VERSION_CODES.LOLLIPOP)
+    fun listenBarOptions() {
+        val bottomSheetColors: BottomSheetDialogFragment = BottomSheetColorFragment()
+        val bottomSheetFonts: BottomSheetDialogFragment = BottomSheetFontFragment()
+
+        binding.selectAll.setOnClickListener {
+            selectAllText()
+        }
+
+        binding.copyAll.setOnClickListener {
+            copySelectedText()
+        }
+
+        binding.paste.setOnClickListener {
+            pasteText()
+        }
+
+        binding.fontStyle.setOnClickListener {
+            if (!bottomSheetFonts.isAdded) {
+                bottomSheetFonts.show(activity.supportFragmentManager, bottomSheetFonts.tag)
+            }
+        }
+
+        binding.textColor.setOnClickListener {
+            val args = Bundle()
+            args.putString(EditorManager.ColorManager.COLOR_OF_KEY, EditorManager.ColorManager.COLOR_OF_TEXT)
+            bottomSheetColors.arguments = args
+            if (!bottomSheetColors.isAdded) {
+                bottomSheetColors.show(activity.supportFragmentManager, bottomSheetColors.tag)
+            }
+
+        }
+
+        binding.noteColor.setOnClickListener {
+            val args = Bundle()
+            args.putString(EditorManager.ColorManager.COLOR_OF_KEY, EditorManager.ColorManager.COLOR_OF_NOTE)
+            bottomSheetColors.arguments = args
+            if (!bottomSheetColors.isAdded) {
+                bottomSheetColors.show(activity.supportFragmentManager, bottomSheetColors.tag)
+            }
+        }
+
+    }
+
     /*
     Listen for changes in title and note editText's
      */
@@ -348,7 +344,7 @@ open class CreateNoteFragment : Fragment(), SaveNoteInterface, ChangeNoteLookInt
 
             afterTextChanged { text ->
                 noteObject!!.note = text.toString().trim()
-                if ( checkLength(noteObject!!.note!!.length)) {
+                if (checkLength(noteObject!!.note!!.length)) {
                     if (!infoToastShowedAtStart)
                         showLimitCharacterToast() //Show Toast when user type under 1000 characters
                     infoToastShowedAtStart = false
@@ -372,11 +368,6 @@ open class CreateNoteFragment : Fragment(), SaveNoteInterface, ChangeNoteLookInt
         changeCounterColor(charLength)
     }
 
-    private fun changeCounterColor(charLength: Int) {
-        if (charLength >= actualLimit)
-            binding.charactersCounterTextView.textColor = ContextCompat.getColor(context, R.color.material_red)
-        else binding.charactersCounterTextView.textColor = ContextCompat.getColor(context, R.color.material_blue_grey)
-    }
 
     private fun setCounterText(text: Int) {
         binding.charactersCounterTextView.text = "$text/$actualLimit"
@@ -395,35 +386,68 @@ open class CreateNoteFragment : Fragment(), SaveNoteInterface, ChangeNoteLookInt
         Toasty.info(activity, message, Toast.LENGTH_SHORT, true).show()
     }
 
-    private fun pasteText() {
-        val clipboardManager = (context.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager)
-        if (clipboardManager.primaryClip != null) {
-            val pasteData = clipboardManager.primaryClip.getItemAt(0).text
+    /**
+     * Apply note theme
+     */
+    override fun changeFontStyle(whichFont: String) { //This is method brought by interface
+        applyFont(whichFont)
+    }
 
-            val title = binding.createNoteTitleField
-            val note = binding.createNoteNoteField
+    @RequiresApi(Build.VERSION_CODES.LOLLIPOP)
+    override fun changeNoteOrFontColors(colorOfWhat: String, color: Int) {
+        //Change color of font or background (CardView)
+        val viewsArray: ArrayList<Any>
 
-            val startIndex: Int
+        if (colorOfWhat == (EditorManager.ColorManager.COLOR_OF_TEXT)) {
+            viewsArray = arrayListOf(binding.createNoteTitleField, binding.createNoteNoteField)
+            noteObject!!.TXTColor = color
+        } else {
+            viewsArray = arrayListOf(binding.createNoteParentCard, EditorManager.ColorManager.ACTION_BAR_COLOR)
+            noteObject!!.BGColor = color
+        }
+        EditorManager.ColorManager(activity).applyNoteTheme(viewsArray, arrayListOf(noteObject!!))
+    }
 
-            if (title.isFocused && clipboardManager.hasPrimaryClip()) {
-                startIndex = title.selectionStart
-                title.text.insert(startIndex, pasteData)
-            } else if (note.isFocused && clipboardManager.hasPrimaryClip()) {
-                startIndex = note.selectionStart
-                note.text.insert(startIndex, pasteData)
+    private fun applyFont(whichFont: String) { //TODO implement better solution later
+        var fontStyle = ""
+        val editor = EditorManager.FontStyleManager
+
+        when (whichFont) {
+            editor.DEFAULT_FONT -> {
+                EditorManager.FontStyleManager.setUpFontStyle(Typeface.DEFAULT, binding.createNoteNoteField, binding.createNoteTitleField)
+                fontStyle = EditorManager.FontStyleManager.DEFAULT_FONT
+            }
+            editor.ITALIC_FONT -> {
+                EditorManager.FontStyleManager.setUpFontStyle(Typeface.ITALIC, binding.createNoteNoteField, binding.createNoteTitleField)
+                fontStyle = EditorManager.FontStyleManager.ITALIC_FONT
+            }
+            editor.BOLD_ITALIC_FONT -> {
+                EditorManager.FontStyleManager.setUpFontStyle(Typeface.BOLD_ITALIC, binding.createNoteNoteField, binding.createNoteTitleField)
+                fontStyle = EditorManager.FontStyleManager.BOLD_ITALIC_FONT
+            }
+            editor.SERIF_FONT -> {
+                EditorManager.FontStyleManager.setUpFontStyle(Typeface.SERIF, binding.createNoteNoteField, binding.createNoteTitleField)
+                fontStyle = EditorManager.FontStyleManager.SERIF_FONT
+            }
+            editor.SANS_SERIF_FONT -> {
+                EditorManager.FontStyleManager.setUpFontStyle(Typeface.SANS_SERIF, binding.createNoteNoteField, binding.createNoteTitleField)
+                fontStyle = EditorManager.FontStyleManager.SANS_SERIF_FONT
+            }
+            editor.MONOSPACE_FONT -> {
+                EditorManager.FontStyleManager.setUpFontStyle(Typeface.MONOSPACE, binding.createNoteNoteField, binding.createNoteTitleField)
+                fontStyle = EditorManager.FontStyleManager.MONOSPACE_FONT
             }
         }
+        noteObject!!.fontStyle = fontStyle
     }
-        //TODO
-//    override fun onCreateAnimation(transit: Int, enter: Boolean, nextAnim: Int): Animation {
-//
-//        if (CurrentFragmentState.backPressed) {
-//            return MoveAnimation.create(MoveAnimation.RIGHT, enter, CurrentFragmentState.FRAGMENT_ANIM_DURATION)
-//
-//        } else {
-//            return MoveAnimation.create(MoveAnimation.LEFT, enter, CurrentFragmentState.FRAGMENT_ANIM_DURATION)
-//        }
-//    }
+
+    private fun changeCounterColor(charLength: Int) {
+        //Method change counter color depending on the character characters limit
+        if (charLength >= actualLimit)
+            binding.charactersCounterTextView.textColor = ContextCompat.getColor(context, R.color.material_red)
+        else binding.charactersCounterTextView.textColor = ContextCompat.getColor(context, R.color.material_blue_grey)
+    }
+
 }
 
 

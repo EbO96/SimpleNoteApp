@@ -6,11 +6,7 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.view.animation.Animation
-import app.note.simple.brulinski.sebastian.com.simplenoteapp.HelperClass.CurrentFragmentState
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.R
-import com.labo.kaji.fragmentanimations.MoveAnimation
-import com.labo.kaji.fragmentanimations.PushPullAnimation
 
 class NoArchivedNotesFragment : Fragment() {
 

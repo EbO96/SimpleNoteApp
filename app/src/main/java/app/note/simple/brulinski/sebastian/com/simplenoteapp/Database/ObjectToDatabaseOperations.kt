@@ -2,7 +2,6 @@ package app.note.simple.brulinski.sebastian.com.simplenoteapp.Database
 
 import android.content.ContentValues
 import android.content.Context
-import app.note.simple.brulinski.sebastian.com.simplenoteapp.HelperClass.MyRowParserNotes
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.Model.NoteItem
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.Model.Notes
 import org.jetbrains.anko.db.insert

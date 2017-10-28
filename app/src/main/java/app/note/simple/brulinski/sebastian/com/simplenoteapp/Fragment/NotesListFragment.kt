@@ -6,98 +6,76 @@ import android.content.SharedPreferences
 import android.databinding.DataBindingUtil
 import android.graphics.Color
 import android.os.Bundle
+import android.preference.PreferenceManager
+import android.support.design.widget.Snackbar
 import android.support.v4.app.Fragment
 import android.support.v4.content.ContextCompat
-import android.support.v7.widget.LinearLayoutManager
-import android.support.v7.widget.RecyclerView
-import android.support.v7.widget.StaggeredGridLayoutManager
+import android.support.v7.widget.*
 import android.view.*
-import android.view.animation.Animation
+import android.widget.TextView
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.Activity.MainActivity
+import app.note.simple.brulinski.sebastian.com.simplenoteapp.Database.ObjectToDatabaseOperations
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.Editor.EditorManager
-import app.note.simple.brulinski.sebastian.com.simplenoteapp.HelperClass.CurrentFragmentState
+import app.note.simple.brulinski.sebastian.com.simplenoteapp.HelperClass.FragmentAndObjectStates
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.HelperClass.LayoutManagerStyle
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.Model.NoteItem
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.R
-import app.note.simple.brulinski.sebastian.com.simplenoteapp.RecyclerView.MainRecyclerAdapter
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.databinding.NotesListFragmentBinding
-import com.labo.kaji.fragmentanimations.MoveAnimation
-import jp.wasabeef.recyclerview.animators.SlideInRightAnimator
 import java.util.*
 
 @Suppress("DEPRECATION", "OverridingDeprecatedMember")
 class NotesListFragment : Fragment() {
 
-    companion object {
-        lateinit var itemsObjectsArray: ArrayList<NoteItem>
-    }
-
-    lateinit var binding: NotesListFragmentBinding
-    lateinit var myRecycler: MainRecyclerAdapter
-    lateinit var layoutStyle: LayoutManagerStyle
-    var styleFlag: Boolean = true
+    lateinit var binding: NotesListFragmentBinding //Bind layout
+    /**
+    Values related with recycler
+     */
+    lateinit var myRecycler: NoteListRecyclerAdapter //Notes recycler
+    lateinit var layoutStyle: LayoutManagerStyle //Recycler items layout manager
+    var styleFlag: Boolean = true //Flag define what type of layout can be apply
+    lateinit var noteItemArrayList: ArrayList<NoteItem> //Array of note object
+    /**
+     * Keys
+     */
     private val NOTES_ARRAY_KEY = "notes"
     private val LAYOUT_STYLE_KEY = "layout style"
 
-    //lateinit var mScrollCallback: OnListenRecyclerScroll
-
-    interface OnListenRecyclerScroll {
-        fun recyclerScrolling(dx: Int?, dy: Int?, newState: Int?)
-    }
-
-    lateinit var mGetNotesCallback: OnGetNotesFromParentActivity
-
-    interface OnGetNotesFromParentActivity {
-        fun getNotes(): ArrayList<NoteItem>
-    }
-
-    fun setOnGetNotesFromParentActivity(mGetNotesCallback: OnGetNotesFromParentActivity) {
-        this.mGetNotesCallback = mGetNotesCallback
-    }
-
+    /**
+     * START
+     */
     override fun onCreateView(inflater: LayoutInflater?, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         binding = DataBindingUtil.inflate(inflater, R.layout.notes_list_fragment, container, false)
         setHasOptionsMenu(true)
-
         /*
         Change color of status bar
          */
         val colorMng = EditorManager.ColorManager(activity)
         colorMng.changeColor(arrayListOf(EditorManager.ColorManager.ACTION_BAR_COLOR), Color.BLACK)
 
-        if (savedInstanceState == null) {
-            //itemsObjectsArray = arguments.getParcelableArrayList(MainActivity.DATABASE_NOTES_ARRAY)
-            itemsObjectsArray = (activity as MainActivity).getNotes()
+        noteItemArrayList = if (savedInstanceState == null) {
+            ObjectToDatabaseOperations.getObjects(context, false)
         } else {
-            itemsObjectsArray = savedInstanceState.getParcelableArrayList<NoteItem>(NOTES_ARRAY_KEY)
+            savedInstanceState.getParcelableArrayList<NoteItem>(NOTES_ARRAY_KEY)
         }
 
+        /*
+        Recycler related witch recycler
+         */
         initRecyclerAdapter()
-
         sortNotes() //Sort notes by date and time
 
-        //Listen for recycler scrolling
-        recyclerScrollingListener()
         return binding.root
     }
 
     override fun onSaveInstanceState(outState: Bundle?) {
         super.onSaveInstanceState(outState)
-        outState?.putBoolean(LAYOUT_STYLE_KEY, layoutStyle.flag)
+        outState?.putBoolean(LAYOUT_STYLE_KEY, layoutStyle.flag) //Save layout style
         /*
-        Save fragment state do Bundle and restore notes from it instead of
+        Save fragment state to Bundle and restore notes from it instead of
         getting this data from database
          */
-        itemsObjectsArray = myRecycler.getArray()
-        outState?.putParcelableArrayList(NOTES_ARRAY_KEY, itemsObjectsArray)
+        outState?.putParcelableArrayList(NOTES_ARRAY_KEY, noteItemArrayList)
     }
-//TODO
-//    override fun onActivityCreated(savedInstanceState: Bundle?) {
-//        super.onActivityCreated(savedInstanceState)
-//
-//        (activity as MainActivity).setTitleAndFab(ContextCompat.getDrawable(context, R.drawable.ic_add_white_24dp),
-//                resources.getString(R.string.notes))
-//    }
 
     /*
   Save Layout Manager style in SharedPreference file
@@ -116,33 +94,32 @@ class NotesListFragment : Fragment() {
         } else binding.recyclerView.layoutManager = StaggeredGridLayoutManager(2, StaggeredGridLayoutManager.VERTICAL)
     }
 
+    /*
+    Recycler
+     */
     private fun initRecyclerAdapter() { //Init recycler view
         binding.recyclerView.setHasFixedSize(true)
-
+        binding.recyclerView.itemAnimator = DefaultItemAnimator()
         layoutStyle = LayoutManagerStyle(this.activity)
-
         styleFlag = layoutStyle.flag
 
-
+        //Recognize and set layout style
         if (styleFlag)
             binding.recyclerView.layoutManager = LinearLayoutManager(context, LinearLayoutManager.VERTICAL, false)
         else binding.recyclerView.layoutManager = StaggeredGridLayoutManager(2, StaggeredGridLayoutManager.VERTICAL)
 
-        binding.recyclerView.itemAnimator = SlideInRightAnimator()
-
-        myRecycler = MainRecyclerAdapter(itemsObjectsArray, binding.recyclerView, activity)
+        myRecycler = NoteListRecyclerAdapter(noteItemArrayList, binding.recyclerView, activity)
         binding.recyclerView.adapter = myRecycler
     }
 
+    //Sort items in recycler by date
     private fun sortNotes() {
         try {
-            Collections.sort(itemsObjectsArray, object : Comparator<NoteItem> {
-                override fun compare(o1: NoteItem, o2: NoteItem): Int {
-                    if (o1.date == null || o2.date == null) {
-                        return 0
-                    }
-                    return o2.date!!.compareTo(o1.date!!)
+            Collections.sort(noteItemArrayList, Comparator<NoteItem> { o1, o2 ->
+                if (o1.date == null || o2.date == null) {
+                    return@Comparator 0
                 }
+                o2.date!!.compareTo(o1.date!!)
             })
         } catch (e: Exception) {
             e.printStackTrace()
@@ -150,22 +127,23 @@ class NotesListFragment : Fragment() {
         myRecycler.notifyDataSetChanged()
     }
 
-    private fun recyclerScrollingListener() {
-        binding.recyclerView.addOnScrollListener(object : RecyclerView.OnScrollListener() {
-            override fun onScrolled(recyclerView: RecyclerView?, dx: Int, dy: Int) {
-               // mScrollCallback.recyclerScrolling(dx, dy, null)
-            }
+    fun refreshRecyclerAfterCreate(noteItem: NoteItem?) {
+        if (noteItem != null)
+            noteItemArrayList.add(noteItem)
+        myRecycler.notifyDataSetChanged()
+    }
 
-            override fun onScrollStateChanged(recyclerView: RecyclerView?, newState: Int) {
-               // mScrollCallback.recyclerScrolling(null, null, newState)
-            }
-        })
+    fun refreshRecyclerAfterEdit(noteItem: NoteItem?, position: Int?) {
+        if (noteItem != null && position != null) {
+            ObjectToDatabaseOperations.updateObject(context, arrayListOf(noteItem))
+            noteItemArrayList[position] = noteItem
+            myRecycler.notifyItemChanged(position)
+        }
     }
 
     /*
     MENU
      */
-
     override fun onCreateOptionsMenu(menu: Menu?, inflater: MenuInflater?) {
         val menuInflater: MenuInflater = activity.menuInflater
         menuInflater.inflate(R.menu.items_layout_style_menu, menu)
@@ -173,52 +151,109 @@ class NotesListFragment : Fragment() {
     }
 
     override fun onOptionsItemSelected(item: MenuItem?): Boolean {
-        var flag = true
 
         when (item!!.itemId) {
             R.id.main_menu_grid -> {
-                flag = false
+                setAndSaveLayoutManagerStyle(false)
             }
             R.id.main_menu_linear -> {
-                flag = true
+                setAndSaveLayoutManagerStyle(true)
             }
         }
-        setAndSaveLayoutManagerStyle(flag)
         return super.onOptionsItemSelected(item)
     }
 
-    override fun onAttach(activity: Activity?) {
-        super.onAttach(activity)
-        try {
-            //mScrollCallback = (activity as OnListenRecyclerScroll)
-        } catch (e: ClassCastException) {
-            throw ClassCastException(activity.toString() + " must implement OnListenRecyclerScroll and OnChangeItemVisible")
+    /**
+     * Recycler
+     */
+    class NoteListRecyclerAdapter(private var noteItemArray: ArrayList<NoteItem>, var recyclerView: RecyclerView, var activity: Activity) : RecyclerView.Adapter<NoteListRecyclerAdapter.ViewHolder>() {
+
+        private var deletedItem: NoteItem? = null
+        private lateinit var preferences: SharedPreferences
+        private lateinit var undoSnack: Snackbar
+
+        override fun onBindViewHolder(holder: ViewHolder?, position: Int) {
+            var title = noteItemArray[position].title
+            var note = noteItemArray[position].note
+            var positionToDelete: Int
+
+            if (title!!.length > 30)
+                title = title.substring(0, 30) + "..."
+            if (note!!.length > 260)
+                note = note.substring(0, 260) + "..."
+
+            EditorManager.ColorManager(activity).applyNoteTheme(arrayListOf(holder!!.title, holder.note, holder.card), arrayListOf(noteItemArray[position]))
+
+            holder.title.text = title
+            holder.note.text = note
+
+            holder.itemView.setOnClickListener {
+                val recyclerPosition = recyclerView.getChildAdapterPosition(holder.itemView)
+                val noteItem = noteItemArray[recyclerPosition]
+                FragmentAndObjectStates.currentNote = noteItem
+                FragmentAndObjectStates.itemPositionInRecycler = recyclerPosition
+                (activity as MainActivity).setFragmentInViewPager(2, null)
+            }
+
+            holder.itemView.setOnLongClickListener {
+                positionToDelete = holder.adapterPosition
+                preferences = PreferenceManager.getDefaultSharedPreferences(activity)
+                val flag = preferences.getBoolean(activity.getString(R.string.pref_key_archives), true)
+
+                /*
+               Make UNDO Snackbar after delete
+                 */
+
+                //Customize Snackbar
+                if (flag) {
+                    undoSnack = Snackbar.make((activity as MainActivity).binding.root, activity.getString(R.string.note_archived), Snackbar.LENGTH_SHORT)
+                    undoSnack.setActionTextColor(ContextCompat.getColor(activity, R.color.material_white))
+                } else if (!flag) {
+                    undoSnack = Snackbar.make((activity as MainActivity).binding.root, activity.getString(R.string.note_deleted), Snackbar.LENGTH_LONG)
+                    undoSnack.setActionTextColor(ContextCompat.getColor(activity, R.color.material_red))
+                }
+
+
+                @Suppress("DEPRECATION")
+                undoSnack.setAction(activity.getString(R.string.undo), {
+                    this.noteItemArray.add(positionToDelete, deletedItem!!)
+                    notifyItemInserted(positionToDelete)
+                    recyclerView.scrollToPosition(positionToDelete)
+                    FragmentAndObjectStates.itemPositionInRecycler = positionToDelete
+                    FragmentAndObjectStates.currentNote = deletedItem
+
+                    if (flag)
+                        ObjectToDatabaseOperations.addDeleteFlag(context = activity, noteObjects = arrayListOf(deletedItem!!), flag = false)
+                    else ObjectToDatabaseOperations.insertObject(activity, deletedItem!!)
+
+                }).show()
+
+                deletedItem = noteItemArray.removeAt(positionToDelete)
+                FragmentAndObjectStates.itemPositionInRecycler = null
+                FragmentAndObjectStates.currentNote = null
+                notifyItemRemoved(positionToDelete)
+                if (flag)
+                    ObjectToDatabaseOperations.addDeleteFlag(context = activity, noteObjects = arrayListOf(deletedItem!!), flag = true)
+                else ObjectToDatabaseOperations.deleteObjects(activity, arrayListOf(deletedItem!!))
+
+                true
+            }
         }
-    }
 
-    override fun onAttach(context: Context?) {
-        try {
-            mGetNotesCallback = (context as OnGetNotesFromParentActivity)
-        } catch (e: ClassCastException) {
-            throw ClassCastException("$context must implement OnGetNotesFromParentActivity")
+        override fun onCreateViewHolder(parent: ViewGroup?, viewType: Int): ViewHolder {
+            val view = LayoutInflater.from(parent?.context).inflate(R.layout.item_card, parent, false)
+            return ViewHolder(view)
         }
-        super.onAttach(context)
-    }
-    //TODO
-//    override fun onCreateAnimation(transit: Int, enter: Boolean, nextAnim: Int): Animation {
-//
-//        if (CurrentFragmentState.backPressed)
-//            return MoveAnimation.create(MoveAnimation.RIGHT, enter, CurrentFragmentState.FRAGMENT_ANIM_DURATION)
-//        else return MoveAnimation.create(MoveAnimation.LEFT, enter, CurrentFragmentState.FRAGMENT_ANIM_DURATION)
-//    }
 
-    override fun onStart() {
-        itemsObjectsArray = mGetNotesCallback.getNotes()
+        override fun getItemCount(): Int {
+            return noteItemArray.size
+        }
 
-        initRecyclerAdapter()
-        sortNotes()
-        recyclerScrollingListener()
-
-        super.onStart()
+        class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
+            val title = itemView.findViewById<TextView>(R.id.titleTextView)!!
+            val note = itemView.findViewById<TextView>(R.id.noteTextView)!!
+            val card = itemView.findViewById<CardView>(R.id.item_card_parent_card)!!
+        }
     }
 }
+
