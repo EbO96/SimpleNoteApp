@@ -39,7 +39,7 @@ class NotesListFragment : Fragment() {
     private val NOTES_ARRAY_KEY = "notes"
     private val LAYOUT_STYLE_KEY = "layout style"
 
-    lateinit var mScrollCallback: OnListenRecyclerScroll
+    //lateinit var mScrollCallback: OnListenRecyclerScroll
 
     interface OnListenRecyclerScroll {
         fun recyclerScrolling(dx: Int?, dy: Int?, newState: Int?)
@@ -66,7 +66,8 @@ class NotesListFragment : Fragment() {
         colorMng.changeColor(arrayListOf(EditorManager.ColorManager.ACTION_BAR_COLOR), Color.BLACK)
 
         if (savedInstanceState == null) {
-            itemsObjectsArray = arguments.getParcelableArrayList(MainActivity.DATABASE_NOTES_ARRAY)
+            //itemsObjectsArray = arguments.getParcelableArrayList(MainActivity.DATABASE_NOTES_ARRAY)
+            itemsObjectsArray = (activity as MainActivity).getNotes()
         } else {
             itemsObjectsArray = savedInstanceState.getParcelableArrayList<NoteItem>(NOTES_ARRAY_KEY)
         }
@@ -90,13 +91,13 @@ class NotesListFragment : Fragment() {
         itemsObjectsArray = myRecycler.getArray()
         outState?.putParcelableArrayList(NOTES_ARRAY_KEY, itemsObjectsArray)
     }
-
-    override fun onActivityCreated(savedInstanceState: Bundle?) {
-        super.onActivityCreated(savedInstanceState)
-
-        (activity as MainActivity).setTitleAndFab(ContextCompat.getDrawable(context, R.drawable.ic_add_white_24dp),
-                resources.getString(R.string.notes))
-    }
+//TODO
+//    override fun onActivityCreated(savedInstanceState: Bundle?) {
+//        super.onActivityCreated(savedInstanceState)
+//
+//        (activity as MainActivity).setTitleAndFab(ContextCompat.getDrawable(context, R.drawable.ic_add_white_24dp),
+//                resources.getString(R.string.notes))
+//    }
 
     /*
   Save Layout Manager style in SharedPreference file
@@ -152,11 +153,11 @@ class NotesListFragment : Fragment() {
     private fun recyclerScrollingListener() {
         binding.recyclerView.addOnScrollListener(object : RecyclerView.OnScrollListener() {
             override fun onScrolled(recyclerView: RecyclerView?, dx: Int, dy: Int) {
-                mScrollCallback.recyclerScrolling(dx, dy, null)
+               // mScrollCallback.recyclerScrolling(dx, dy, null)
             }
 
             override fun onScrollStateChanged(recyclerView: RecyclerView?, newState: Int) {
-                mScrollCallback.recyclerScrolling(null, null, newState)
+               // mScrollCallback.recyclerScrolling(null, null, newState)
             }
         })
     }
@@ -189,7 +190,7 @@ class NotesListFragment : Fragment() {
     override fun onAttach(activity: Activity?) {
         super.onAttach(activity)
         try {
-            mScrollCallback = (activity as OnListenRecyclerScroll)
+            //mScrollCallback = (activity as OnListenRecyclerScroll)
         } catch (e: ClassCastException) {
             throw ClassCastException(activity.toString() + " must implement OnListenRecyclerScroll and OnChangeItemVisible")
         }
@@ -203,13 +204,13 @@ class NotesListFragment : Fragment() {
         }
         super.onAttach(context)
     }
-
-    override fun onCreateAnimation(transit: Int, enter: Boolean, nextAnim: Int): Animation {
-
-        if (CurrentFragmentState.backPressed)
-            return MoveAnimation.create(MoveAnimation.RIGHT, enter, CurrentFragmentState.FRAGMENT_ANIM_DURATION)
-        else return MoveAnimation.create(MoveAnimation.LEFT, enter, CurrentFragmentState.FRAGMENT_ANIM_DURATION)
-    }
+    //TODO
+//    override fun onCreateAnimation(transit: Int, enter: Boolean, nextAnim: Int): Animation {
+//
+//        if (CurrentFragmentState.backPressed)
+//            return MoveAnimation.create(MoveAnimation.RIGHT, enter, CurrentFragmentState.FRAGMENT_ANIM_DURATION)
+//        else return MoveAnimation.create(MoveAnimation.LEFT, enter, CurrentFragmentState.FRAGMENT_ANIM_DURATION)
+//    }
 
     override fun onStart() {
         itemsObjectsArray = mGetNotesCallback.getNotes()

@@ -32,10 +32,11 @@ class NotePreviewFragment : Fragment() {
     @RequiresApi(Build.VERSION_CODES.LOLLIPOP)
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
-        (activity as MainActivity).setTitleAndFab(ContextCompat.getDrawable(context, R.drawable.ic_mode_edit_white_24dp),
-                resources.getString(R.string.preview))
+        //TODO
+//        (activity as MainActivity).setTitleAndFab(ContextCompat.getDrawable(context, R.drawable.ic_mode_edit_white_24dp),
+//                resources.getString(R.string.preview))
 
-        val noteObj: NoteItem = arguments.getParcelable(MainActivity.NOTE_TO_EDIT_EXTRA_KEY)
+        val noteObj: NoteItem = (activity as MainActivity).getNotes()[0]//arguments.getParcelable(MainActivity.NOTE_TO_EDIT_EXTRA_KEY)
 
         val titleView = binding.previewTitleField
         val noteView = binding.previewNoteField
@@ -49,13 +50,13 @@ class NotePreviewFragment : Fragment() {
         titleView.text = title
         noteView.text = note
     }
-
-    override fun onCreateAnimation(transit: Int, enter: Boolean, nextAnim: Int): Animation {
-        return if (CurrentFragmentState.backPressed) {
-            MoveAnimation.create(MoveAnimation.RIGHT, enter, CurrentFragmentState.FRAGMENT_ANIM_DURATION)
-
-        } else {
-            MoveAnimation.create(MoveAnimation.LEFT, enter, CurrentFragmentState.FRAGMENT_ANIM_DURATION)
-        }
-    }
+    //TODO
+//    override fun onCreateAnimation(transit: Int, enter: Boolean, nextAnim: Int): Animation {
+//        return if (CurrentFragmentState.backPressed) {
+//            MoveAnimation.create(MoveAnimation.RIGHT, enter, CurrentFragmentState.FRAGMENT_ANIM_DURATION)
+//
+//        } else {
+//            MoveAnimation.create(MoveAnimation.LEFT, enter, CurrentFragmentState.FRAGMENT_ANIM_DURATION)
+//        }
+//    }
 }

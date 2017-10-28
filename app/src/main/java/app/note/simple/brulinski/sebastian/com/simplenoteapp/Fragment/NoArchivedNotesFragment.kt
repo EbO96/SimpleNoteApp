@@ -20,10 +20,10 @@ class NoArchivedNotesFragment : Fragment() {
         Log.i("fromNoArchives", "Hello NoArchives")
         return root
     }
-
-    override fun onCreateAnimation(transit: Int, enter: Boolean, nextAnim: Int): Animation {
-        if (enter) return PushPullAnimation.create(MoveAnimation.DOWN, enter, CurrentFragmentState.FRAGMENT_ANIM_DURATION)
-        else return PushPullAnimation.create(MoveAnimation.UP, enter, CurrentFragmentState.FRAGMENT_ANIM_DURATION)
-
-    }
+    //TODO
+//    override fun onCreateAnimation(transit: Int, enter: Boolean, nextAnim: Int): Animation {
+//        if (enter) return PushPullAnimation.create(MoveAnimation.DOWN, enter, CurrentFragmentState.FRAGMENT_ANIM_DURATION)
+//        else return PushPullAnimation.create(MoveAnimation.UP, enter, CurrentFragmentState.FRAGMENT_ANIM_DURATION)
+//
+//    }
 }

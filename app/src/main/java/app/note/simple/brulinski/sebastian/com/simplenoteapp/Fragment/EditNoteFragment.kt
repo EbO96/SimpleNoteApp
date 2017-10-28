@@ -38,7 +38,7 @@ class EditNoteFragment : CreateNoteFragment() {
         val noteView = binding.createNoteNoteField
         val cardView = binding.createNoteParentCard
 
-        noteObject = arguments.getParcelable(MainActivity.NOTE_TO_EDIT_EXTRA_KEY)
+        noteObject = (activity as MainActivity).getNotes()[0]//arguments.getParcelable(MainActivity.NOTE_TO_EDIT_EXTRA_KEY)
 
         if (savedInstanceState != null) {
             noteObject = CreateNoteFragment.noteObject
@@ -63,7 +63,7 @@ class EditNoteFragment : CreateNoteFragment() {
         super.onDestroyView()
     }
 
-    private fun setNoteObject(): NoteItem {
+    fun setNoteObject(): NoteItem {
         return NoteItem(noteObject!!.id, binding.createNoteTitleField.text.toString().trim(), binding.createNoteNoteField.text.toString().trim(), getCurrentDateAndTime(),
                 ColorCreator.getColorFromCard(activity, binding.createNoteParentCard),
                 ColorCreator.getColorIntFromColorStateList(binding.createNoteTitleField.textColors), EditorManager.FontStyleManager.DEFAULT_FONT,
@@ -76,16 +76,16 @@ class EditNoteFragment : CreateNoteFragment() {
 
         outState!!.putParcelable("note_object", noteObject)
     }
-
-    override fun onCreateAnimation(transit: Int, enter: Boolean, nextAnim: Int): Animation {
-
-        return if (CurrentFragmentState.backPressed) {
-            MoveAnimation.create(MoveAnimation.RIGHT, enter, CurrentFragmentState.FRAGMENT_ANIM_DURATION)
-
-        } else {
-            MoveAnimation.create(MoveAnimation.LEFT, enter, CurrentFragmentState.FRAGMENT_ANIM_DURATION)
-        }
-    }
+    //TODO
+//    override fun onCreateAnimation(transit: Int, enter: Boolean, nextAnim: Int): Animation {
+//
+//        return if (CurrentFragmentState.backPressed) {
+//            MoveAnimation.create(MoveAnimation.RIGHT, enter, CurrentFragmentState.FRAGMENT_ANIM_DURATION)
+//
+//        } else {
+//            MoveAnimation.create(MoveAnimation.LEFT, enter, CurrentFragmentState.FRAGMENT_ANIM_DURATION)
+//        }
+//    }
 
     override fun onAttach(context: Context?) {
         try {
@@ -95,6 +95,5 @@ class EditNoteFragment : CreateNoteFragment() {
             throw ClassCastException(context.toString() + " must implement OnEditDestroy")
         }
         super.onAttach(context)
-
     }
 }

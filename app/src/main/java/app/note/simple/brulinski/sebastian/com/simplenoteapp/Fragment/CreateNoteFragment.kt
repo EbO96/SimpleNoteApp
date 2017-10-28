@@ -87,6 +87,15 @@ open class CreateNoteFragment : Fragment(), SaveNoteInterface, ChangeNoteLookInt
         }
 
         var noteObject: NoteItem? = null
+
+        /**
+         * KEY values to intent's and savedInstanceState and etc.
+         */
+        val NOTE_OBJECT_TO_COLOR_CREATOR = "note_object_to_color_creator"
+    }
+
+    fun getNoteObject(): NoteItem?{
+        return noteObject
     }
 
     @RequiresApi(Build.VERSION_CODES.LOLLIPOP)
@@ -161,20 +170,20 @@ open class CreateNoteFragment : Fragment(), SaveNoteInterface, ChangeNoteLookInt
             changeCounterColor(textLength)
         }
     }
-
-    override fun onActivityCreated(savedInstanceState: Bundle?) {
-        super.onActivityCreated(savedInstanceState)
-
-        val frag = activity.supportFragmentManager.findFragmentById(activity.findViewById<FrameLayout>(R.id.main_container).id)
-        if (frag is EditNoteFragment && frag.tag.equals(MainActivity.EDIT_NOTE_FRAGMENT_TAG)) {
-            (activity as MainActivity).setTitleAndFab(ContextCompat.getDrawable(context, R.drawable.ic_done_white_24dp),
-                    resources.getString(R.string.edit))
-        } else {
-            (activity as MainActivity).setTitleAndFab(ContextCompat.getDrawable(context, R.drawable.ic_done_white_24dp),
-                    resources.getString(R.string.create))
-        }
-
-    }
+        //TODO
+//    override fun onActivityCreated(savedInstanceState: Bundle?) {
+//        super.onActivityCreated(savedInstanceState)
+//
+//        val frag = activity.supportFragmentManager.findFragmentById(activity.findViewById<FrameLayout>(R.id.main_container).id)
+//        if (frag is EditNoteFragment && frag.tag.equals(MainActivity.EDIT_NOTE_FRAGMENT_TAG)) {
+//            (activity as MainActivity).setTitleAndFab(ContextCompat.getDrawable(context, R.drawable.ic_done_white_24dp),
+//                    resources.getString(R.string.edit))
+//        } else {
+//            (activity as MainActivity).setTitleAndFab(ContextCompat.getDrawable(context, R.drawable.ic_done_white_24dp),
+//                    resources.getString(R.string.create))
+//        }
+//
+//    }
 
     override fun onSaveNote() {
         noteObject!!.date = getCurrentDateAndTime()
@@ -405,16 +414,16 @@ open class CreateNoteFragment : Fragment(), SaveNoteInterface, ChangeNoteLookInt
             }
         }
     }
-
-    override fun onCreateAnimation(transit: Int, enter: Boolean, nextAnim: Int): Animation {
-
-        if (CurrentFragmentState.backPressed) {
-            return MoveAnimation.create(MoveAnimation.RIGHT, enter, CurrentFragmentState.FRAGMENT_ANIM_DURATION)
-
-        } else {
-            return MoveAnimation.create(MoveAnimation.LEFT, enter, CurrentFragmentState.FRAGMENT_ANIM_DURATION)
-        }
-    }
+        //TODO
+//    override fun onCreateAnimation(transit: Int, enter: Boolean, nextAnim: Int): Animation {
+//
+//        if (CurrentFragmentState.backPressed) {
+//            return MoveAnimation.create(MoveAnimation.RIGHT, enter, CurrentFragmentState.FRAGMENT_ANIM_DURATION)
+//
+//        } else {
+//            return MoveAnimation.create(MoveAnimation.LEFT, enter, CurrentFragmentState.FRAGMENT_ANIM_DURATION)
+//        }
+//    }
 }
 
 
