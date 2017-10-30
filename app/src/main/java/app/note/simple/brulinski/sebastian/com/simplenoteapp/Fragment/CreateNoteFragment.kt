@@ -23,13 +23,11 @@ import android.view.ViewGroup
 import android.widget.EditText
 import android.widget.Toast
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.Activity.MainActivity
-import app.note.simple.brulinski.sebastian.com.simplenoteapp.Database.ObjectToDatabaseOperations
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.Editor.ColorCreator
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.Editor.EditorManager
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.Fragment.BottomSheetFragments.BottomSheetColorFragment
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.Fragment.BottomSheetFragments.BottomSheetFontFragment
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.HelperClass.FragmentAndObjectStates
-import app.note.simple.brulinski.sebastian.com.simplenoteapp.Interfaces.ChangeNoteLookInterface
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.Model.NoteItem
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.R
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.databinding.CreateNoteFragmentBinding
@@ -40,7 +38,7 @@ import java.text.SimpleDateFormat
 import java.util.*
 
 
-open class CreateNoteFragment : Fragment(), ChangeNoteLookInterface {
+open class CreateNoteFragment : Fragment() {
 
     /**
      * Keys and final fields values
@@ -127,21 +125,26 @@ open class CreateNoteFragment : Fragment(), ChangeNoteLookInterface {
 
         //Listen FloatingActionButton action
         binding.createFab.setOnClickListener {
-            when ((activity as MainActivity).getViewPager().currentItem) {
+            val viewPager = (activity as MainActivity).getViewPager()
+            val pagerAdapter = (activity as MainActivity).getPagerAdapter()
+            val updateChannel = (activity as MainActivity).updateChannel
+
+            val position = viewPager.currentItem
+
+            //viewPager.currentItem = 1
+            when (position) {
                 0 -> { //Create
-                    ObjectToDatabaseOperations.insertObject(context, noteObject)
-                    (activity as MainActivity).setFragmentInViewPager(1, null)
-                    ((activity as MainActivity).getFragmentAdapter().getItem(1) as NotesListFragment).refreshRecyclerAfterCreate(noteObject)
-                    resetLayout()
+                    updateChannel.setupUpdate(context, noteObject)
+//                    FragmentAndObjectStates.currentNote = noteObject
+//                    ObjectToDatabaseOperations.insertObject(context, noteObject)
+//                    pagerAdapter.notifyDataSetChanged()
                 }
                 3 -> { //Edit
-                    ((activity as MainActivity)).setFragmentInViewPager(1, null)
-                    if (FragmentAndObjectStates.currentNote != null) {
-                        val noteAfterEdit = prepareAndGetNoteObject()
-                        val itemPosition = FragmentAndObjectStates.itemPositionInRecycler
-                        ((activity as MainActivity).getFragmentAdapter().getItem(1) as NotesListFragment).refreshRecyclerAfterEdit(noteAfterEdit, itemPosition)
-                        FragmentAndObjectStates.currentNote = noteAfterEdit
-                    }
+                    updateChannel.setupUpdate(context, prepareAndGetNoteObject(), true)
+//                    val note = prepareAndGetNoteObject()
+//                    FragmentAndObjectStates.currentNote = note
+//                    ObjectToDatabaseOperations.updateObject(context, arrayListOf(note))
+//                    pagerAdapter.notifyDataSetChanged()
                 }
             }
         }
@@ -162,8 +165,8 @@ open class CreateNoteFragment : Fragment(), ChangeNoteLookInterface {
     private fun resetLayout() {//Reset all values to default
         noteObject = FragmentAndObjectStates.getDefaultNote(context)
         EditorManager.ColorManager(activity).applyNoteTheme(arrayListOf(titleView, noteView, cardView, actionBar), arrayListOf(noteObject!!))
-        titleView.text = null
-        noteView.text = null
+        titleView.setText("")
+        noteView.setText("")
     }
 
     override fun onSaveInstanceState(outState: Bundle?) {
@@ -389,24 +392,24 @@ open class CreateNoteFragment : Fragment(), ChangeNoteLookInterface {
     /**
      * Apply note theme
      */
-    override fun changeFontStyle(whichFont: String) { //This is method brought by interface
-        applyFont(whichFont)
-    }
-
-    @RequiresApi(Build.VERSION_CODES.LOLLIPOP)
-    override fun changeNoteOrFontColors(colorOfWhat: String, color: Int) {
-        //Change color of font or background (CardView)
-        val viewsArray: ArrayList<Any>
-
-        if (colorOfWhat == (EditorManager.ColorManager.COLOR_OF_TEXT)) {
-            viewsArray = arrayListOf(binding.createNoteTitleField, binding.createNoteNoteField)
-            noteObject!!.TXTColor = color
-        } else {
-            viewsArray = arrayListOf(binding.createNoteParentCard, EditorManager.ColorManager.ACTION_BAR_COLOR)
-            noteObject!!.BGColor = color
-        }
-        EditorManager.ColorManager(activity).applyNoteTheme(viewsArray, arrayListOf(noteObject!!))
-    }
+//    fun changeFontStyle(whichFont: String) { //This is method brought by interface
+//        applyFont(whichFont)
+//    }
+//
+//    @RequiresApi(Build.VERSION_CODES.LOLLIPOP)
+//    fun changeNoteOrFontColors(colorOfWhat: String, color: Int) {
+//        //Change color of font or background (CardView)
+//        val viewsArray: ArrayList<Any>
+//
+//        if (colorOfWhat == (EditorManager.ColorManager.COLOR_OF_TEXT)) {
+//            viewsArray = arrayListOf(binding.createNoteTitleField, binding.createNoteNoteField)
+//            noteObject!!.TXTColor = color
+//        } else {
+//            viewsArray = arrayListOf(binding.createNoteParentCard, EditorManager.ColorManager.ACTION_BAR_COLOR)
+//            noteObject!!.BGColor = color
+//        }
+//        EditorManager.ColorManager(activity).applyNoteTheme(viewsArray, arrayListOf(noteObject!!))
+//    }
 
     private fun applyFont(whichFont: String) { //TODO implement better solution later
         var fontStyle = ""
@@ -449,5 +452,3 @@ open class CreateNoteFragment : Fragment(), ChangeNoteLookInterface {
     }
 
 }
-
-

@@ -11,7 +11,7 @@ class ObjectToDatabaseOperations {
 
     companion object {
         fun insertObject(context: Context, noteObject: NoteItem?) {
-
+            //TODO noteObject arrayList instead of single object
             if (noteObject != null) {
                 val title = Pair(LocalSQLAnkoDatabase.TITLE, noteObject.title!!.trim())
                 val note = Pair(LocalSQLAnkoDatabase.NOTE, noteObject.note!!.trim())

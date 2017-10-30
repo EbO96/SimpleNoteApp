@@ -8,43 +8,44 @@ import android.os.Handler
 import android.support.annotation.ColorInt
 import android.support.v4.view.ViewPager
 import android.support.v7.app.AppCompatActivity
+import android.util.Log
 import android.view.Menu
 import android.view.MenuInflater
 import android.view.MenuItem
-import android.view.View
 import android.widget.Toast
-import app.note.simple.brulinski.sebastian.com.simplenoteapp.Fragment.CreateNoteFragment
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.Fragment.EditNoteFragment
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.Fragment.FragmentPagerAdapter.FragmentAdapter
-import app.note.simple.brulinski.sebastian.com.simplenoteapp.Fragment.NotePreviewFragment
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.Fragment.NotesListFragment
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.HelperClass.FragmentAndObjectStates
-import app.note.simple.brulinski.sebastian.com.simplenoteapp.Interfaces.ChangeNoteLookInterface
-import app.note.simple.brulinski.sebastian.com.simplenoteapp.Interfaces.OnNotePropertiesClickListener
-import app.note.simple.brulinski.sebastian.com.simplenoteapp.Interfaces.RecyclerMainInterface
-import app.note.simple.brulinski.sebastian.com.simplenoteapp.Model.NoteItem
+import app.note.simple.brulinski.sebastian.com.simplenoteapp.HelperClass.UpdateFragmentsChannel
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.R
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.databinding.ActivityMainBinding
 import es.dmoral.toasty.Toasty
 
 
 @Suppress("DEPRECATION")
-class MainActivity : AppCompatActivity(), RecyclerMainInterface,
-        OnNotePropertiesClickListener {
+class MainActivity : AppCompatActivity() {
+
     /**
      * ViewPager object and Fragment Adapter object
      */
     private lateinit var fragmentAdapter: FragmentAdapter
     private lateinit var mViewPager: ViewPager
     /**
-     * Interfaces
+     * Key's values
      */
-    lateinit var mChangeNoteLookCallback: ChangeNoteLookInterface
+    private val AFTER_EDIT = "AFTER EDIT"
+    private val AFTER_CREATE = "AFTER CREATE"
+    private val NOT_REFRESH = "NOT REFRESH"
+    private var REFRESH_RECYCLER_AFTER = NOT_REFRESH
+    private val UPDATE_CHANNEL_KEY = "update_channel_key"
     /**
      * Others
      */
     var doubleTapToExit = false
     lateinit var binding: ActivityMainBinding
+    private lateinit var activityMain: MainActivity
+    lateinit var updateChannel: UpdateFragmentsChannel
     /**
     Toasty Toasts colors
      */
@@ -55,76 +56,95 @@ class MainActivity : AppCompatActivity(), RecyclerMainInterface,
     There we starts...
      */
     override fun onCreate(savedInstanceState: Bundle?) {
+        Log.i("interLog", "on create main")
+
         super.onCreate(savedInstanceState)
         binding = DataBindingUtil.setContentView(this, R.layout.activity_main)
         setSupportActionBar(binding.toolbar)
         Toasty.Config.getInstance().setErrorColor(ERROR_COLOR).apply()
         infoToastShowedAtStart = true
+        activityMain = this
+        if (savedInstanceState == null)
+            updateChannel = UpdateFragmentsChannel()
+        else updateChannel = savedInstanceState.getParcelable(UPDATE_CHANNEL_KEY)
+
         setupViewPager()
-        setViewPager()
+    }
+
+    override fun onSaveInstanceState(outState: Bundle?) {
+        Log.i("interLog", "save state main")
+        outState!!.putParcelable(UPDATE_CHANNEL_KEY, updateChannel)
+        super.onSaveInstanceState(outState)
     }
 
     /**
      *  END OF onCreate(...)
      */
 
-    /*
-    Method used to replace fragments in container (ViewPager)
-     */
-    private fun setViewPager() {
-        fragmentAdapter = FragmentAdapter(supportFragmentManager)
-
-        fragmentAdapter.addFragment(CreateNoteFragment(), getString(R.string.create))
-        fragmentAdapter.addFragment(NotesListFragment(), getString(R.string.notes))
-        fragmentAdapter.addFragment(NotePreviewFragment(), getString(R.string.preview))
-        fragmentAdapter.addFragment(EditNoteFragment(), getString(R.string.edit))
-
-        mViewPager.adapter = fragmentAdapter
-
-        setFragmentInViewPager(1, null) //switch to notes list
-    }
-
-    fun getFragmentAdapter(): FragmentAdapter {
-        return fragmentAdapter
-    }
-
-    fun getViewPager(): ViewPager{
+    fun getViewPager(): ViewPager {
         return mViewPager
+    }
+
+    fun getPagerAdapter(): FragmentAdapter {
+        return fragmentAdapter
     }
 
     private fun setupViewPager() {
         mViewPager = binding.mainContainer
-        //Set listener on ViewPager
-        mViewPager.addOnPageChangeListener(object : ViewPager.OnPageChangeListener {
-            override fun onPageScrolled(position: Int, positionOffset: Float, positionOffsetPixels: Int) {
+        fragmentAdapter = FragmentAdapter(supportFragmentManager, activityMain)
+        mViewPager.adapter = fragmentAdapter
+        mViewPager.currentItem = 1
+        supportActionBar!!.title = getString(R.string.notes)
 
-                FragmentAndObjectStates.currentFragment = position
+        mViewPager.addOnPageChangeListener(object : ViewPager.OnPageChangeListener {
+            override fun onPageSelected(position: Int) {
                 when (position) {
                     0 -> {
                         supportActionBar!!.title = getString(R.string.create)
+
+//                        if (FragmentAndObjectStates.currentNote != null)
+//                            EditorManager.ColorManager(activityMain).changeColor(arrayListOf(EditorManager.ColorManager.ACTION_BAR_COLOR),
+//                                    Color.BLACK)
                     }
                     1 -> {
                         supportActionBar!!.title = getString(R.string.notes)
+                        if (updateChannel.checkUpdate(fragmentAdapter.getItem(mViewPager.currentItem) as NotesListFragment)) {
+                            Log.i("interLog", "refresh")
+                            fragmentAdapter.notifyDataSetChanged()
+                            updateChannel.clearUpdate()
+                            //updateChannel.clearUpdate()
+                        }
+//                        EditorManager.ColorManager(activityMain).changeColor(arrayListOf(EditorManager.ColorManager.ACTION_BAR_COLOR),
+//                                Color.BLACK)
                     }
                     2 -> {
                         supportActionBar!!.title = getString(R.string.preview)
+//                        if (FragmentAndObjectStates.currentNote != null) {
+//                            EditorManager.ColorManager(activityMain).changeColor(arrayListOf(EditorManager.ColorManager.ACTION_BAR_COLOR),
+//                                    FragmentAndObjectStates.currentNote!!.BGColor)
+//                        } else
                     }
                     3 -> {
                         supportActionBar!!.title = getString(R.string.edit)
+//                        if (updateChannel.checkUpdate(fragmentAdapter.getItem(mViewPager.currentItem) as EditNoteFragment)) {
+//                            fragmentAdapter.notifyDataSetChanged()
+//                            updateChannel.noUpdateEdit()
+//                        }
+//                        if (FragmentAndObjectStates.currentNote != null) {
+//                            fragmentAdapter.notifyDataSetChanged()
+//                            EditorManager.ColorManager(activityMain).changeColor(arrayListOf(EditorManager.ColorManager.ACTION_BAR_COLOR),
+//                                    FragmentAndObjectStates.currentNote!!.BGColor)
+//                        }
                     }
                 }
             }
 
+            override fun onPageScrolled(position: Int, positionOffset: Float, positionOffsetPixels: Int) {
+            }
+
             override fun onPageScrollStateChanged(state: Int) {
             }
-
-            override fun onPageSelected(position: Int) {
-            }
         })
-    }
-
-    fun setFragmentInViewPager(fragmentNumber: Int, bundleData: Bundle?) {
-        mViewPager.currentItem = fragmentNumber
     }
 
     /**
@@ -172,43 +192,5 @@ class MainActivity : AppCompatActivity(), RecyclerMainInterface,
         Handler().postDelayed({
             doubleTapToExit = false
         }, 2000)
-    }
-
-    /**
-     * Change color listener
-     */
-    /*
-    Methods below are called in Editor in Create or Edit Mode when user want to change color of note and etc.
-     */
-    override fun inEditorColorClick(color: Int, colorOfWhat: String) {
-        val frag = supportFragmentManager.findFragmentById(binding.mainContainer.id)
-
-        if (frag is CreateNoteFragment)
-            mChangeNoteLookCallback = frag
-        else if (frag is EditNoteFragment)
-            mChangeNoteLookCallback = frag
-
-        mChangeNoteLookCallback.changeNoteOrFontColors(colorOfWhat, color)
-    }
-
-    override fun inEditorFontClick(whichFont: String) {
-        val frag = supportFragmentManager.findFragmentById(binding.mainContainer.id)
-
-        if (frag is CreateNoteFragment)
-            mChangeNoteLookCallback = frag
-        else if (frag is EditNoteFragment)
-            mChangeNoteLookCallback = frag
-
-        mChangeNoteLookCallback.changeFontStyle(whichFont)
-    }
-
-    override fun inEditorColorPickerClick() {
-        val intent = Intent(this, OwnColorCreatorActivity::class.java)
-        startActivity(intent)
-    }
-
-    override fun onNoteClicked(noteObject: NoteItem) {
-        FragmentAndObjectStates.currentNote = noteObject
-        setFragmentInViewPager(2, null)
     }
 }

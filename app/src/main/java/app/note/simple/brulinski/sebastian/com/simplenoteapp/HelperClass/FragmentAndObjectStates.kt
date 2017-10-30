@@ -15,6 +15,7 @@ class FragmentAndObjectStates {
         var currentNote: NoteItem? = null
         var currentFragment = 0
         var itemPositionInRecycler: Int? = null
+        var refreshPreview = false
         fun getDefaultNote(context: Context): NoteItem {
             return NoteItem(null, "", "", "", ContextCompat.getColor(context, R.color.material_white), ContextCompat.getColor(context, R.color.material_black), EditorManager.FontStyleManager.DEFAULT_FONT, false, false)
         }

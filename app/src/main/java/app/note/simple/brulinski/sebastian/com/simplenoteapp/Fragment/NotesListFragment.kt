@@ -4,13 +4,13 @@ import android.app.Activity
 import android.content.Context
 import android.content.SharedPreferences
 import android.databinding.DataBindingUtil
-import android.graphics.Color
 import android.os.Bundle
 import android.preference.PreferenceManager
 import android.support.design.widget.Snackbar
 import android.support.v4.app.Fragment
 import android.support.v4.content.ContextCompat
 import android.support.v7.widget.*
+import android.util.Log
 import android.view.*
 import android.widget.TextView
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.Activity.MainActivity
@@ -39,43 +39,39 @@ class NotesListFragment : Fragment() {
      */
     private val NOTES_ARRAY_KEY = "notes"
     private val LAYOUT_STYLE_KEY = "layout style"
-
     /**
-     * START
+     *
      */
     override fun onCreateView(inflater: LayoutInflater?, container: ViewGroup?, savedInstanceState: Bundle?): View? {
+        Log.d("FragOverMet", "$this - onCreateView()")
         binding = DataBindingUtil.inflate(inflater, R.layout.notes_list_fragment, container, false)
         setHasOptionsMenu(true)
-        /*
-        Change color of status bar
-         */
-        val colorMng = EditorManager.ColorManager(activity)
-        colorMng.changeColor(arrayListOf(EditorManager.ColorManager.ACTION_BAR_COLOR), Color.BLACK)
-
-        noteItemArrayList = if (savedInstanceState == null) {
-            ObjectToDatabaseOperations.getObjects(context, false)
-        } else {
-            savedInstanceState.getParcelableArrayList<NoteItem>(NOTES_ARRAY_KEY)
-        }
-
-        /*
-        Recycler related witch recycler
-         */
-        initRecyclerAdapter()
-        sortNotes() //Sort notes by date and time
 
         return binding.root
     }
 
+    override fun onViewCreated(view: View?, savedInstanceState: Bundle?) {
+        noteItemArrayList = ObjectToDatabaseOperations.getObjects(context, false)
+        initRecyclerAdapter()
+        sortNotes()
+        super.onViewCreated(view, savedInstanceState)
+    }
+
     override fun onSaveInstanceState(outState: Bundle?) {
         super.onSaveInstanceState(outState)
-        outState?.putBoolean(LAYOUT_STYLE_KEY, layoutStyle.flag) //Save layout style
+        //outState?.putBoolean(LAYOUT_STYLE_KEY, layoutStyle.flag) //Save layout style
         /*
         Save fragment state to Bundle and restore notes from it instead of
         getting this data from database
          */
-        outState?.putParcelableArrayList(NOTES_ARRAY_KEY, noteItemArrayList)
+        //outState?.putParcelableArrayList(NOTES_ARRAY_KEY, noteItemArrayList)
     }
+
+//    override fun onViewStateRestored(savedInstanceState: Bundle?) {
+//        if (savedInstanceState != null)
+//            noteItemArrayList = savedInstanceState.getParcelableArrayList<NoteItem>(NOTES_ARRAY_KEY)
+//        super.onViewStateRestored(savedInstanceState)
+//    }
 
     /*
   Save Layout Manager style in SharedPreference file
@@ -127,20 +123,6 @@ class NotesListFragment : Fragment() {
         myRecycler.notifyDataSetChanged()
     }
 
-    fun refreshRecyclerAfterCreate(noteItem: NoteItem?) {
-        if (noteItem != null)
-            noteItemArrayList.add(noteItem)
-        myRecycler.notifyDataSetChanged()
-    }
-
-    fun refreshRecyclerAfterEdit(noteItem: NoteItem?, position: Int?) {
-        if (noteItem != null && position != null) {
-            ObjectToDatabaseOperations.updateObject(context, arrayListOf(noteItem))
-            noteItemArrayList[position] = noteItem
-            myRecycler.notifyItemChanged(position)
-        }
-    }
-
     /*
     MENU
      */
@@ -163,6 +145,30 @@ class NotesListFragment : Fragment() {
         return super.onOptionsItemSelected(item)
     }
 
+    //Refresh recycler methods
+    fun refreshRecyclerAfterCreate() {
+        Log.i("interLog", "refreshRecyclerAfterCreate - NoteList")
+        val note = FragmentAndObjectStates.currentNote
+        if (note != null) {
+            ObjectToDatabaseOperations.insertObject(context, FragmentAndObjectStates.currentNote)
+            noteItemArrayList.add(FragmentAndObjectStates.currentNote!!)
+            myRecycler.notifyDataSetChanged()
+        }
+    }
+
+    //Refresh recycler methods
+    fun refreshRecyclerAfterEdit() {
+        Log.i("interLog", "refreshRecyclerAfterEdit - NoteList")
+        val note = FragmentAndObjectStates.currentNote
+        val position = FragmentAndObjectStates.itemPositionInRecycler
+
+        if (note != null && position != null) {
+            ObjectToDatabaseOperations.updateObject(context, arrayListOf(note))
+            noteItemArrayList[position] = note
+            myRecycler.notifyDataSetChanged()
+        }
+    }
+
     /**
      * Recycler
      */
@@ -173,6 +179,8 @@ class NotesListFragment : Fragment() {
         private lateinit var undoSnack: Snackbar
 
         override fun onBindViewHolder(holder: ViewHolder?, position: Int) {
+            Log.i("interLog", "onBindViewHolder - Recycler")
+
             var title = noteItemArray[position].title
             var note = noteItemArray[position].note
             var positionToDelete: Int
@@ -192,7 +200,13 @@ class NotesListFragment : Fragment() {
                 val noteItem = noteItemArray[recyclerPosition]
                 FragmentAndObjectStates.currentNote = noteItem
                 FragmentAndObjectStates.itemPositionInRecycler = recyclerPosition
-                (activity as MainActivity).setFragmentInViewPager(2, null)
+
+                val pagerAdapter = (activity as MainActivity).getPagerAdapter()
+                val viewPager = (activity as MainActivity).getViewPager()
+                (activity as MainActivity).updateChannel.setupUpdate() //Set update edit
+
+                viewPager.currentItem = 2
+                pagerAdapter.notifyDataSetChanged()
             }
 
             holder.itemView.setOnLongClickListener {
@@ -226,6 +240,14 @@ class NotesListFragment : Fragment() {
                         ObjectToDatabaseOperations.addDeleteFlag(context = activity, noteObjects = arrayListOf(deletedItem!!), flag = false)
                     else ObjectToDatabaseOperations.insertObject(activity, deletedItem!!)
 
+                }).addCallback(object : Snackbar.Callback() {
+                    override fun onDismissed(transientBottomBar: Snackbar?, event: Int) {
+                        if (FragmentAndObjectStates.currentNote != null) {
+                            FragmentAndObjectStates.refreshPreview = true
+                            (activity as MainActivity).updateChannel.setupUpdate()
+                        }
+                        super.onDismissed(transientBottomBar, event)
+                    }
                 }).show()
 
                 deletedItem = noteItemArray.removeAt(positionToDelete)
