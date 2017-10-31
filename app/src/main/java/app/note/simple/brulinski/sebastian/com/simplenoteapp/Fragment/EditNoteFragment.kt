@@ -3,6 +3,7 @@ package app.note.simple.brulinski.sebastian.com.simplenoteapp.Fragment
 import android.os.Build
 import android.os.Bundle
 import android.util.Log
+import app.note.simple.brulinski.sebastian.com.simplenoteapp.Activity.MainActivity
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.Editor.EditorManager
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.HelperClass.FragmentAndObjectStates
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.Model.NoteItem
@@ -21,6 +22,7 @@ class EditNoteFragment : CreateNoteFragment() {
             listenBarOptions()
         }
         setupEdit(FragmentAndObjectStates.currentNote)
+
         super.onActivityCreated(savedInstanceState)
     }
 
@@ -46,8 +48,9 @@ class EditNoteFragment : CreateNoteFragment() {
     }
 
     override fun setUserVisibleHint(isVisibleToUser: Boolean) {
-        if (isVisibleToUser)
+        if (isVisibleToUser) {
             setupEdit(FragmentAndObjectStates.currentNote)
+        }
         super.setUserVisibleHint(isVisibleToUser)
     }
 }

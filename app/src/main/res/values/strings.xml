@@ -144,5 +144,7 @@
     <string name="create_a_color_label">Create a color</string>
     <string name="add_color">Add color</string>
     <string name="apply_color">Apply color</string>
+    <string name="cancel_button">Cancel</string>
+    <string name="apply_button">Apply</string>
     <!--END-->
 </resources>

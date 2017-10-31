@@ -6,7 +6,6 @@ import android.content.ClipboardManager
 import android.content.Context
 import android.databinding.DataBindingUtil
 import android.graphics.Color
-import android.graphics.Typeface
 import android.os.Build
 import android.os.Bundle
 import android.os.Handler
@@ -25,7 +24,6 @@ import android.widget.Toast
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.Activity.MainActivity
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.Editor.ColorCreator
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.Editor.EditorManager
-import app.note.simple.brulinski.sebastian.com.simplenoteapp.Fragment.BottomSheetFragments.BottomSheetColorFragment
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.Fragment.BottomSheetFragments.BottomSheetFontFragment
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.HelperClass.FragmentAndObjectStates
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.Model.NoteItem
@@ -275,7 +273,7 @@ open class CreateNoteFragment : Fragment() {
 
     @RequiresApi(Build.VERSION_CODES.LOLLIPOP)
     fun listenBarOptions() {
-        val bottomSheetColors: BottomSheetDialogFragment = BottomSheetColorFragment()
+
         val bottomSheetFonts: BottomSheetDialogFragment = BottomSheetFontFragment()
 
         binding.selectAll.setOnClickListener {
@@ -297,24 +295,12 @@ open class CreateNoteFragment : Fragment() {
 //        }
 
         binding.textColor.setOnClickListener {
-            val args = Bundle()
-            args.putString(EditorManager.ColorManager.COLOR_OF_KEY, EditorManager.ColorManager.COLOR_OF_TEXT)
-            bottomSheetColors.arguments = args
-            if (!bottomSheetColors.isAdded) {
-                bottomSheetColors.show(activity.supportFragmentManager, bottomSheetColors.tag)
-            }
-
+            (activity as MainActivity).setColorBottomSheet()
         }
 
         binding.noteColor.setOnClickListener {
-            val args = Bundle()
-            args.putString(EditorManager.ColorManager.COLOR_OF_KEY, EditorManager.ColorManager.COLOR_OF_NOTE)
-            bottomSheetColors.arguments = args
-            if (!bottomSheetColors.isAdded) {
-                bottomSheetColors.show(activity.supportFragmentManager, bottomSheetColors.tag)
-            }
+            (activity as MainActivity).setColorBottomSheet(true)
         }
-
     }
 
     /*

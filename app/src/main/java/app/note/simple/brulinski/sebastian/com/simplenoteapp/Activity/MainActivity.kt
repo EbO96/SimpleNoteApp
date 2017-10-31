@@ -6,6 +6,7 @@ import android.graphics.Color
 import android.os.Bundle
 import android.os.Handler
 import android.support.annotation.ColorInt
+import android.support.design.widget.BottomSheetDialogFragment
 import android.support.v4.view.ViewPager
 import android.support.v7.app.AppCompatActivity
 import android.util.Log
@@ -13,6 +14,8 @@ import android.view.Menu
 import android.view.MenuInflater
 import android.view.MenuItem
 import android.widget.Toast
+import app.note.simple.brulinski.sebastian.com.simplenoteapp.Editor.EditorManager
+import app.note.simple.brulinski.sebastian.com.simplenoteapp.Fragment.BottomSheetFragments.BottomSheetColorFragment
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.Fragment.FragmentPagerAdapter.FragmentAdapter
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.Fragment.NotesListFragment
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.HelperClass.FragmentAndObjectStates
@@ -64,9 +67,12 @@ class MainActivity : AppCompatActivity() {
         Toasty.Config.getInstance().setErrorColor(ERROR_COLOR).apply()
         infoToastShowedAtStart = true
         activityMain = this
-        if (savedInstanceState == null)
+        if (savedInstanceState == null) {
             updateChannel = UpdateFragmentsChannel()
-        else updateChannel = savedInstanceState.getParcelable(UPDATE_CHANNEL_KEY)
+        } else {
+            updateChannel = savedInstanceState.getParcelable(UPDATE_CHANNEL_KEY)
+
+        }
 
         setupViewPager()
     }
@@ -101,7 +107,6 @@ class MainActivity : AppCompatActivity() {
                 when (position) {
                     0 -> {
                         supportActionBar!!.title = getString(R.string.create)
-
 //                        if (FragmentAndObjectStates.currentNote != null)
 //                            EditorManager.ColorManager(activityMain).changeColor(arrayListOf(EditorManager.ColorManager.ACTION_BAR_COLOR),
 //                                    Color.BLACK)
@@ -149,6 +154,29 @@ class MainActivity : AppCompatActivity() {
             override fun onPageScrollStateChanged(state: Int) {
             }
         })
+    }
+
+    fun setColorBottomSheet(forNoteBackground: Boolean) {
+        val bottomSheetColors: BottomSheetDialogFragment = BottomSheetColorFragment()
+
+        if (forNoteBackground) {
+            val args = Bundle()
+            args.putString(EditorManager.ColorManager.COLOR_OF_KEY, EditorManager.ColorManager.COLOR_OF_NOTE)
+            bottomSheetColors.arguments = args
+            if (!bottomSheetColors.isAdded) {
+                bottomSheetColors.show(supportFragmentManager, bottomSheetColors.tag)
+            }
+        } else setColorBottomSheet()
+    }
+
+    fun setColorBottomSheet() {
+        val bottomSheetColors: BottomSheetDialogFragment = BottomSheetColorFragment()
+        val args = Bundle()
+        args.putString(EditorManager.ColorManager.COLOR_OF_KEY, EditorManager.ColorManager.COLOR_OF_TEXT)
+        bottomSheetColors.arguments = args
+        if (!bottomSheetColors.isAdded) {
+            bottomSheetColors.show(supportFragmentManager, bottomSheetColors.tag)
+        }
     }
 
     /**

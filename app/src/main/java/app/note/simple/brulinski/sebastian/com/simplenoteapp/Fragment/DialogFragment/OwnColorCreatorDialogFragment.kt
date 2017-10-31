@@ -1,26 +1,29 @@
-package app.note.simple.brulinski.sebastian.com.simplenoteapp.Activity
+package app.note.simple.brulinski.sebastian.com.simplenoteapp.Fragment.DialogFragment
 
 import android.content.res.ColorStateList
 import android.databinding.DataBindingUtil
 import android.os.Bundle
-import android.support.v4.app.NavUtils
-import android.support.v7.app.AppCompatActivity
+import android.support.v4.app.DialogFragment
 import android.text.Editable
 import android.text.TextWatcher
-import android.view.Menu
-import android.view.MenuInflater
-import android.view.MenuItem
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
+import android.view.WindowManager
 import android.widget.SeekBar
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.Editor.ColorCreator
-import app.note.simple.brulinski.sebastian.com.simplenoteapp.HelperClass.FragmentAndObjectStates
-import app.note.simple.brulinski.sebastian.com.simplenoteapp.Model.NoteItem
+import app.note.simple.brulinski.sebastian.com.simplenoteapp.Editor.EditorManager
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.R
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.databinding.ActivityOwnColorCreatorBinding
 
-class OwnColorCreatorActivity : AppCompatActivity() {
 
-    lateinit var binding: ActivityOwnColorCreatorBinding
+class OwnColorCreatorDialogFragment : DialogFragment() {
 
+    /**
+     * Other's
+     */
+    private lateinit var binding: ActivityOwnColorCreatorBinding
+    private var COLOR_OF_TAG = EditorManager.ColorManager.COLOR_OF_NOTE
     /**
     RGB value range 0-255
      */
@@ -30,20 +33,22 @@ class OwnColorCreatorActivity : AppCompatActivity() {
      */
     private var isEditTextUnlocked = false
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        binding = DataBindingUtil.setContentView(this, R.layout.activity_own_color_creator)
-        setSupportActionBar(binding.ownColorCreatorToolbar)
-        supportActionBar!!.setDisplayHomeAsUpEnabled(true)
+    override fun onCreateView(inflater: LayoutInflater?, container: ViewGroup?, savedInstanceState: Bundle?): View? {
+        binding = DataBindingUtil.inflate(inflater, R.layout.activity_own_color_creator, container, false)
+        COLOR_OF_TAG = arguments.getString(EditorManager.ColorManager.COLOR_OF_KEY)
+        return binding.root
+    }
 
+    override fun onViewCreated(view: View?, savedInstanceState: Bundle?) {
         seekBarsListeners()
         rgbEditsListeners()
 
         setLayout()
+        super.onViewCreated(view, savedInstanceState)
     }
 
     private fun setLayout() { //This method gets the data from shared preferences and sets the RGB values at SeekBar's
-        val arrayOfRGB = ColorCreator.getRGBFromSharedPreferences(this)
+        val arrayOfRGB = ColorCreator.getRGBFromSharedPreferences(activity)
 
         val R = arrayOfRGB[0][ColorCreator.RED_KEY]!!.toInt()
         val G = arrayOfRGB[1][ColorCreator.GREEN_KEY]!!.toInt()
@@ -59,7 +64,7 @@ class OwnColorCreatorActivity : AppCompatActivity() {
         val G = binding.seekBarGreenValue.progress
         val B = binding.seekBarBlueValue.progress
 
-        val color = ColorCreator(R, G, B, this)
+        val color = ColorCreator(R, G, B, activity)
         color.saveToSharedPref()
 
         binding.hexValuePreview.text = color.hexColorValue
@@ -203,27 +208,53 @@ class OwnColorCreatorActivity : AppCompatActivity() {
         })
     }
 
-    override fun onCreateOptionsMenu(menu: Menu?): Boolean {
-        val menuInflater: MenuInflater = menuInflater
-        menuInflater.inflate(R.menu.own_color_menu, menu)
-        return super.onCreateOptionsMenu(menu)
+
+//    override fun onCreateOptionsMenu(menu: Menu?): Boolean {
+//        val menuInflater: MenuInflater = activity.menuInflater
+//        menuInflater.inflate(R.menu.own_color_menu, menu)
+//        return super.onCreateOptionsMenu(menu)
+//    }
+
+//    override fun onOptionsItemSelected(item: MenuItem?): Boolean {
+//        when (item!!.itemId) {
+//            R.id.home -> {
+//                navigateToParent()
+//            }
+//        }
+//        return super.onOptionsItemSelected(item)
+//    }
+
+//    override fun onBackPressed() {
+//        navigateToParent()
+//        super.onBackPressed()
+//    }
+
+//    private fun navigateToParent() {
+//        val intent = Intent(this, MainActivity::class.java)
+//        NavUtils.navigateUpTo(this, intent)
+//    }
+
+    override fun onResume() {
+        val params = dialog.window!!.attributes
+        params.width = WindowManager.LayoutParams.MATCH_PARENT
+        params.height = WindowManager.LayoutParams.MATCH_PARENT
+        dialog.window!!.attributes = params as android.view.WindowManager.LayoutParams
+
+        super.onResume()
     }
 
-    override fun onOptionsItemSelected(item: MenuItem?): Boolean {
-        when (item!!.itemId) {
-            R.id.home -> {
-                navigateToParent()
-            }
-        }
-        return super.onOptionsItemSelected(item)
-    }
+//    override fun onDismiss(dialog: DialogInterface?) {
+//        super.onDismiss(dialog)
+//        val main = (activity as MainActivity)
+//
+//        when (COLOR_OF_TAG) {
+//            EditorManager.ColorManager.COLOR_OF_TEXT -> {
+//                main.setColorBottomSheet()
+//            }
+//            EditorManager.ColorManager.COLOR_OF_NOTE -> {
+//                main.setColorBottomSheet(true)
+//            }
+//        }
+//    }
 
-    override fun onBackPressed() {
-        navigateToParent()
-        super.onBackPressed()
-    }
-
-    private fun navigateToParent() {
-        NavUtils.navigateUpFromSameTask(this)
-    }
 }
