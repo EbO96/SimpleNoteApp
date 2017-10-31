@@ -12,7 +12,6 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.Editor.EditorManager
-import app.note.simple.brulinski.sebastian.com.simplenoteapp.Interfaces.OnNotePropertiesClickListener
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.R
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.databinding.FontLayoutBinding
 
@@ -22,7 +21,6 @@ Fragment displayed in BottomSheet
 class BottomSheetFontFragment : BottomSheetDialogFragment() {
 
     private lateinit var binding: FontLayoutBinding
-    private lateinit var mNotePropertiesClickListener: OnNotePropertiesClickListener
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -34,46 +32,37 @@ class BottomSheetFontFragment : BottomSheetDialogFragment() {
         val ed = EditorManager.FontStyleManager
 
         binding.fontDefault.setOnClickListener {
-            mNotePropertiesClickListener.inEditorFontClick(ed.DEFAULT_FONT)
+
             dismiss()
         }
 
         binding.fontItalic.setOnClickListener {
-            mNotePropertiesClickListener.inEditorFontClick(ed.ITALIC_FONT)
+
             dismiss()
         }
 
         binding.fontBoldItalic.setOnClickListener {
-            mNotePropertiesClickListener.inEditorFontClick(ed.BOLD_ITALIC_FONT)
+
             dismiss()
         }
 
         binding.fontSerif.setOnClickListener {
-            mNotePropertiesClickListener.inEditorFontClick(ed.SERIF_FONT)
+
             dismiss()
         }
 
         binding.fontSansSerif.setOnClickListener {
-            mNotePropertiesClickListener.inEditorFontClick(ed.SANS_SERIF_FONT)
+
             dismiss()
         }
 
         binding.fontMonospace.setOnClickListener {
-            mNotePropertiesClickListener.inEditorFontClick(ed.MONOSPACE_FONT)
+
             dismiss()
         }
 
 
         return binding.root
-    }
-
-    override fun onAttach(context: Context?) {
-        try {
-            mNotePropertiesClickListener = (context as OnNotePropertiesClickListener)
-        } catch (e: ClassCastException) {
-            throw ClassCastException("$context must implement OnNotePropertiesClickListener")
-        }
-        super.onAttach(context)
     }
 
     private val mBottomSheetBehaviorCallback = object : BottomSheetBehavior.BottomSheetCallback() {

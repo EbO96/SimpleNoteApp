@@ -141,6 +141,8 @@ open class CreateNoteFragment : Fragment() {
                 }
                 3 -> { //Edit
                     updateChannel.setupUpdate(context, prepareAndGetNoteObject(), true)
+                    FragmentAndObjectStates.currentNote = prepareAndGetNoteObject()
+                    FragmentAndObjectStates.refreshPreview = true
 //                    val note = prepareAndGetNoteObject()
 //                    FragmentAndObjectStates.currentNote = note
 //                    ObjectToDatabaseOperations.updateObject(context, arrayListOf(note))
@@ -288,11 +290,11 @@ open class CreateNoteFragment : Fragment() {
             pasteText()
         }
 
-        binding.fontStyle.setOnClickListener {
-            if (!bottomSheetFonts.isAdded) {
-                bottomSheetFonts.show(activity.supportFragmentManager, bottomSheetFonts.tag)
-            }
-        }
+//        binding.fontStyle.setOnClickListener {
+////            if (!bottomSheetFonts.isAdded) {
+////                bottomSheetFonts.show(activity.supportFragmentManager, bottomSheetFonts.tag)
+////            }
+//        }
 
         binding.textColor.setOnClickListener {
             val args = Bundle()
@@ -411,38 +413,38 @@ open class CreateNoteFragment : Fragment() {
 //        EditorManager.ColorManager(activity).applyNoteTheme(viewsArray, arrayListOf(noteObject!!))
 //    }
 
-    private fun applyFont(whichFont: String) { //TODO implement better solution later
-        var fontStyle = ""
-        val editor = EditorManager.FontStyleManager
-
-        when (whichFont) {
-            editor.DEFAULT_FONT -> {
-                EditorManager.FontStyleManager.setUpFontStyle(Typeface.DEFAULT, binding.createNoteNoteField, binding.createNoteTitleField)
-                fontStyle = EditorManager.FontStyleManager.DEFAULT_FONT
-            }
-            editor.ITALIC_FONT -> {
-                EditorManager.FontStyleManager.setUpFontStyle(Typeface.ITALIC, binding.createNoteNoteField, binding.createNoteTitleField)
-                fontStyle = EditorManager.FontStyleManager.ITALIC_FONT
-            }
-            editor.BOLD_ITALIC_FONT -> {
-                EditorManager.FontStyleManager.setUpFontStyle(Typeface.BOLD_ITALIC, binding.createNoteNoteField, binding.createNoteTitleField)
-                fontStyle = EditorManager.FontStyleManager.BOLD_ITALIC_FONT
-            }
-            editor.SERIF_FONT -> {
-                EditorManager.FontStyleManager.setUpFontStyle(Typeface.SERIF, binding.createNoteNoteField, binding.createNoteTitleField)
-                fontStyle = EditorManager.FontStyleManager.SERIF_FONT
-            }
-            editor.SANS_SERIF_FONT -> {
-                EditorManager.FontStyleManager.setUpFontStyle(Typeface.SANS_SERIF, binding.createNoteNoteField, binding.createNoteTitleField)
-                fontStyle = EditorManager.FontStyleManager.SANS_SERIF_FONT
-            }
-            editor.MONOSPACE_FONT -> {
-                EditorManager.FontStyleManager.setUpFontStyle(Typeface.MONOSPACE, binding.createNoteNoteField, binding.createNoteTitleField)
-                fontStyle = EditorManager.FontStyleManager.MONOSPACE_FONT
-            }
-        }
-        noteObject!!.fontStyle = fontStyle
-    }
+//    private fun applyFont(whichFont: String) { //TODO implement better solution later
+//        var fontStyle = ""
+//        val editor = EditorManager.FontStyleManager
+//
+//        when (whichFont) {
+//            editor.DEFAULT_FONT -> {
+//                EditorManager.FontStyleManager.setUpFontStyle(Typeface.DEFAULT, binding.createNoteNoteField, binding.createNoteTitleField)
+//                fontStyle = EditorManager.FontStyleManager.DEFAULT_FONT
+//            }
+//            editor.ITALIC_FONT -> {
+//                EditorManager.FontStyleManager.setUpFontStyle(Typeface.ITALIC, binding.createNoteNoteField, binding.createNoteTitleField)
+//                fontStyle = EditorManager.FontStyleManager.ITALIC_FONT
+//            }
+//            editor.BOLD_ITALIC_FONT -> {
+//                EditorManager.FontStyleManager.setUpFontStyle(Typeface.BOLD_ITALIC, binding.createNoteNoteField, binding.createNoteTitleField)
+//                fontStyle = EditorManager.FontStyleManager.BOLD_ITALIC_FONT
+//            }
+//            editor.SERIF_FONT -> {
+//                EditorManager.FontStyleManager.setUpFontStyle(Typeface.SERIF, binding.createNoteNoteField, binding.createNoteTitleField)
+//                fontStyle = EditorManager.FontStyleManager.SERIF_FONT
+//            }
+//            editor.SANS_SERIF_FONT -> {
+//                EditorManager.FontStyleManager.setUpFontStyle(Typeface.SANS_SERIF, binding.createNoteNoteField, binding.createNoteTitleField)
+//                fontStyle = EditorManager.FontStyleManager.SANS_SERIF_FONT
+//            }
+//            editor.MONOSPACE_FONT -> {
+//                EditorManager.FontStyleManager.setUpFontStyle(Typeface.MONOSPACE, binding.createNoteNoteField, binding.createNoteTitleField)
+//                fontStyle = EditorManager.FontStyleManager.MONOSPACE_FONT
+//            }
+//        }
+//        noteObject!!.fontStyle = fontStyle
+//    }
 
     private fun changeCounterColor(charLength: Int) {
         //Method change counter color depending on the character characters limit

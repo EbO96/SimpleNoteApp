@@ -45,12 +45,4 @@ class NotePreviewFragment : Fragment() {
             noteView.text = note
         } else setupPreview(FragmentAndObjectStates.getDefaultNote(context))
     }
-
-    override fun setUserVisibleHint(isVisibleToUser: Boolean) { //When fragment is completely visible for user
-        if (isVisibleToUser && FragmentAndObjectStates.refreshPreview) {
-            (activity as MainActivity).getPagerAdapter().notifyDataSetChanged()
-            FragmentAndObjectStates.refreshPreview = false
-        }
-        super.setUserVisibleHint(isVisibleToUser)
-    }
 }

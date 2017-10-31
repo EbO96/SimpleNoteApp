@@ -242,10 +242,8 @@ class NotesListFragment : Fragment() {
 
                 }).addCallback(object : Snackbar.Callback() {
                     override fun onDismissed(transientBottomBar: Snackbar?, event: Int) {
-                        if (FragmentAndObjectStates.currentNote != null) {
-                            FragmentAndObjectStates.refreshPreview = true
-                            (activity as MainActivity).updateChannel.setupUpdate()
-                        }
+                        FragmentAndObjectStates.refreshPreview = true
+                        (activity as MainActivity).updateChannel.setupUpdate()
                         super.onDismissed(transientBottomBar, event)
                     }
                 }).show()

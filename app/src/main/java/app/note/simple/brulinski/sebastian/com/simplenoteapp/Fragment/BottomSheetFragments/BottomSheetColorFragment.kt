@@ -2,7 +2,6 @@ package app.note.simple.brulinski.sebastian.com.simplenoteapp.Fragment.BottomShe
 
 import android.annotation.SuppressLint
 import android.app.Dialog
-import android.content.Context
 import android.content.res.ColorStateList
 import android.databinding.DataBindingUtil
 import android.os.Build
@@ -14,18 +13,14 @@ import android.support.design.widget.CoordinatorLayout
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import app.note.simple.brulinski.sebastian.com.simplenoteapp.Activity.MainActivity
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.Editor.ColorCreator
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.Editor.EditorManager
-import app.note.simple.brulinski.sebastian.com.simplenoteapp.Fragment.CreateNoteFragment
-import app.note.simple.brulinski.sebastian.com.simplenoteapp.Interfaces.OnNotePropertiesClickListener
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.R
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.databinding.ColorsLayoutBinding
 
 
 class BottomSheetColorFragment : BottomSheetDialogFragment() {
     private lateinit var binding: ColorsLayoutBinding
-    private lateinit var mNotePropertiesClickListener: OnNotePropertiesClickListener
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)

@@ -13,13 +13,13 @@ import android.view.Menu
 import android.view.MenuInflater
 import android.view.MenuItem
 import android.widget.Toast
-import app.note.simple.brulinski.sebastian.com.simplenoteapp.Fragment.EditNoteFragment
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.Fragment.FragmentPagerAdapter.FragmentAdapter
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.Fragment.NotesListFragment
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.HelperClass.FragmentAndObjectStates
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.HelperClass.UpdateFragmentsChannel
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.R
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.databinding.ActivityMainBinding
+import com.google.firebase.crash.FirebaseCrash
 import es.dmoral.toasty.Toasty
 
 
@@ -57,8 +57,8 @@ class MainActivity : AppCompatActivity() {
      */
     override fun onCreate(savedInstanceState: Bundle?) {
         Log.i("interLog", "on create main")
-
         super.onCreate(savedInstanceState)
+        FirebaseCrash.setCrashCollectionEnabled(false)
         binding = DataBindingUtil.setContentView(this, R.layout.activity_main)
         setSupportActionBar(binding.toolbar)
         Toasty.Config.getInstance().setErrorColor(ERROR_COLOR).apply()
@@ -119,6 +119,10 @@ class MainActivity : AppCompatActivity() {
                     }
                     2 -> {
                         supportActionBar!!.title = getString(R.string.preview)
+                        if (FragmentAndObjectStates.refreshPreview) {
+                            fragmentAdapter.notifyDataSetChanged()
+                            FragmentAndObjectStates.refreshPreview = false
+                        }
 //                        if (FragmentAndObjectStates.currentNote != null) {
 //                            EditorManager.ColorManager(activityMain).changeColor(arrayListOf(EditorManager.ColorManager.ACTION_BAR_COLOR),
 //                                    FragmentAndObjectStates.currentNote!!.BGColor)
@@ -163,6 +167,7 @@ class MainActivity : AppCompatActivity() {
         when (item?.itemId) {
             R.id.search_main -> {
                 val intent = Intent(this, SearchActivity::class.java)
+                intent.putParcelableArrayListExtra(SearchActivity.UPDATE_CHANNEL_KEY, arrayListOf(updateChannel))
                 startActivity(intent)
             }
             R.id.archives -> {
@@ -178,7 +183,20 @@ class MainActivity : AppCompatActivity() {
     }
 
     override fun onBackPressed() {
-        doubleTapBackToExit()
+        val position = mViewPager.currentItem
+
+        when (position) {
+            3 -> {
+                mViewPager.setCurrentItem(2, true)
+            }
+            2 -> {
+                mViewPager.setCurrentItem(1, true)
+            }
+            0 -> {
+                mViewPager.setCurrentItem(1, true)
+            }
+            else -> doubleTapBackToExit()
+        }
     }
 
     private fun doubleTapBackToExit() {

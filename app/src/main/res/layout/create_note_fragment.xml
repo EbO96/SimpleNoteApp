@@ -55,14 +55,14 @@
                         android:minWidth="70dp"
                         android:src="@drawable/ic_content_paste_black_24dp" />
 
-                    <ImageButton
-                        android:id="@+id/font_style"
-                        android:layout_width="wrap_content"
-                        android:layout_height="?attr/actionBarSize"
-                        android:background="@android:color/transparent"
-                        android:contentDescription="@string/change_font_style"
-                        android:minWidth="70dp"
-                        android:src="@drawable/ic_font_download_black_24dp" />
+                    <!--<ImageButton-->
+                        <!--android:id="@+id/font_style"-->
+                        <!--android:layout_width="wrap_content"-->
+                        <!--android:layout_height="?attr/actionBarSize"-->
+                        <!--android:background="@android:color/transparent"-->
+                        <!--android:contentDescription="@string/change_font_style"-->
+                        <!--android:minWidth="70dp"-->
+                        <!--android:src="@drawable/ic_font_download_black_24dp" />-->
 
                     <ImageButton
                         android:id="@+id/text_color"
