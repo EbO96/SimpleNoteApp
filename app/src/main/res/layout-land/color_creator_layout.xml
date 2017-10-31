@@ -8,24 +8,28 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:background="@color/material_white"
-        tools:context="app.note.simple.brulinski.sebastian.com.simplenoteapp.Fragment.DialogFragment.OwnColorCreatorDialogFragment">
+        tools:context="app.note.simple.brulinski.sebastian.com.simplenoteapp.Fragment.DialogFragment.OwnColorCreatorDialogFragment"
+        tools:layout_editor_absoluteY="25dp">
 
         <android.support.v7.widget.CardView
             android:id="@+id/color_preview"
             android:layout_width="120dp"
             android:layout_height="120dp"
-            android:layout_below="@id/own_color_creator_toolbar"
-            android:layout_centerHorizontal="true"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentTop="true"
+            android:layout_marginLeft="16dp"
             android:layout_marginTop="16dp"
             app:cardBackgroundColor="@color/material_black"
-            app:cardCornerRadius="60dp" />
+            app:cardCornerRadius="60dp"
+            />
 
         <TextView
             android:id="@+id/hex_value_preview"
             android:layout_width="120dp"
             android:layout_height="37dp"
+            android:layout_alignParentLeft="true"
             android:layout_below="@id/color_preview"
-            android:layout_centerHorizontal="true"
+            android:layout_marginLeft="16dp"
             android:layout_marginTop="4dp"
             android:hint="#000000"
             android:textAlignment="center"
@@ -34,11 +38,11 @@
         <SeekBar
             android:id="@+id/seekBar_red_value"
             style="@style/Widget.AppCompat.SeekBar.Discrete"
-            android:layout_width="300dp"
+            android:layout_width="350dp"
             android:layout_height="22dp"
-            android:layout_below="@id/hex_value_preview"
-            android:layout_centerHorizontal="true"
-            android:layout_marginTop="30dp"
+            android:layout_marginLeft="16dp"
+            android:layout_marginTop="16dp"
+            android:layout_toRightOf="@id/color_preview"
             android:max="255"
             android:progress="1"
             android:theme="@style/SeekBarRed" />
@@ -46,11 +50,14 @@
         <SeekBar
             android:id="@+id/seekBar_green_value"
             style="@style/Widget.AppCompat.SeekBar.Discrete"
-            android:layout_width="300dp"
+            android:layout_width="350dp"
             android:layout_height="22dp"
             android:layout_below="@id/seekBar_red_value"
-            android:layout_centerHorizontal="true"
+            android:layout_marginLeft="16dp"
+            android:layout_marginStart="16dp"
             android:layout_marginTop="25dp"
+            android:layout_toEndOf="@id/color_preview"
+            android:layout_toRightOf="@id/color_preview"
             android:max="255"
             android:progress="1"
             android:theme="@style/SeekBarGreen" />
@@ -58,11 +65,14 @@
         <SeekBar
             android:id="@+id/seekBar_blue_value"
             style="@style/Widget.AppCompat.SeekBar.Discrete"
-            android:layout_width="300dp"
+            android:layout_width="350dp"
             android:layout_height="22dp"
             android:layout_below="@id/seekBar_green_value"
-            android:layout_centerHorizontal="true"
+            android:layout_marginLeft="16dp"
+            android:layout_marginStart="16dp"
             android:layout_marginTop="25dp"
+            android:layout_toEndOf="@id/color_preview"
+            android:layout_toRightOf="@id/color_preview"
             android:max="255"
             android:progress="1"
             android:theme="@style/SeekBarBlue" />
@@ -72,9 +82,11 @@
             android:layout_width="60dp"
             android:layout_height="37dp"
             android:layout_below="@id/seekBar_blue_value"
+            android:layout_marginEnd="20dp"
             android:layout_marginRight="20dp"
-            android:layout_marginTop="20dp"
+            android:layout_marginTop="16dp"
             android:layout_toLeftOf="@id/green_value_edit"
+            android:layout_toStartOf="@id/green_value_edit"
             android:hint="R"
             android:inputType="number"
             android:maxLength="3"
@@ -87,7 +99,7 @@
             android:layout_height="37dp"
             android:layout_below="@id/seekBar_blue_value"
             android:layout_centerHorizontal="true"
-            android:layout_marginTop="20dp"
+            android:layout_marginTop="16dp"
             android:hint="G"
             android:inputType="number"
             android:maxLength="3"
@@ -100,7 +112,9 @@
             android:layout_height="37dp"
             android:layout_below="@id/seekBar_blue_value"
             android:layout_marginLeft="20dp"
-            android:layout_marginTop="20dp"
+            android:layout_marginStart="20dp"
+            android:layout_marginTop="16dp"
+            android:layout_toEndOf="@id/green_value_edit"
             android:layout_toRightOf="@id/green_value_edit"
             android:hint="B"
             android:inputType="number"
@@ -108,21 +122,6 @@
             android:textAlignment="center"
             android:textAppearance="@style/Base.TextAppearance.AppCompat.Small" />
 
-        <android.support.v7.widget.CardView
-            android:id="@+id/colors_recycler_container"
-            android:layout_width="match_parent"
-            android:layout_height="120dp"
-            android:layout_above="@id/buttons_root_layout"
-            android:layout_marginBottom="3dp"
-            app:cardCornerRadius="0dp">
-
-            <android.support.v7.widget.RecyclerView
-                android:id="@+id/colors_recycler"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:padding="8dp" />
-
-        </android.support.v7.widget.CardView>
 
         <LinearLayout
             android:id="@+id/buttons_root_layout"
@@ -133,21 +132,45 @@
             android:layout_alignParentRight="true"
             android:orientation="horizontal">
 
-            <Button
-                android:id="@+id/cancel_button"
-                style="?android:attr/buttonBarButtonStyle"
+            <android.support.v7.widget.CardView
+                android:id="@+id/colors_recycler_container"
                 android:layout_width="0dp"
-                android:layout_height="64dp"
-                android:layout_weight="1"
-                android:text="@string/cancel_button" />
+                android:layout_height="120dp"
+                android:layout_weight="2"
+                app:cardCornerRadius="0dp"
+                app:cardElevation="3dp">
 
-            <Button
-                android:id="@+id/apply_button"
-                style="?android:attr/buttonBarButtonStyle"
-                android:layout_width="0dp"
-                android:layout_height="64dp"
+                <android.support.v7.widget.RecyclerView
+                    android:id="@+id/colors_recycler"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:padding="8dp" />
+
+            </android.support.v7.widget.CardView>
+
+            <LinearLayout
                 android:layout_weight="1"
-                android:text="@string/apply_button" />
+                android:orientation="vertical"
+                android:layout_width="0dp"
+                android:layout_height="match_parent">
+
+                <Button
+                    android:id="@+id/cancel_button"
+                    style="?android:attr/buttonBarButtonStyle"
+                    android:layout_width="match_parent"
+                    android:layout_height="64dp"
+                    android:layout_weight="1"
+                    android:text="@string/cancel_button" />
+
+                <Button
+                    android:id="@+id/apply_button"
+                    style="?android:attr/buttonBarButtonStyle"
+                    android:layout_width="match_parent"
+                    android:layout_height="64dp"
+                    android:layout_weight="1"
+                    android:text="@string/apply_button" />
+            </LinearLayout>
+
 
         </LinearLayout>
 

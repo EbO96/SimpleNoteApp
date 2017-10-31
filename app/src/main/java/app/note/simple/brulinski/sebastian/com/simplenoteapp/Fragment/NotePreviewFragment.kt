@@ -10,13 +10,12 @@ import android.view.ViewGroup
 import android.widget.TextView
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.Activity.MainActivity
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.Editor.EditorManager
-import app.note.simple.brulinski.sebastian.com.simplenoteapp.HelperClass.FragmentAndObjectStates
+import app.note.simple.brulinski.sebastian.com.simplenoteapp.Interfaces.OnRefreshPreviewListener
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.Model.NoteItem
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.R
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.databinding.PreviewCardBinding
 
-class NotePreviewFragment : Fragment() {
-
+class NotePreviewFragment : Fragment(), OnRefreshPreviewListener {
 
     lateinit var binding: PreviewCardBinding
     lateinit var titleView: TextView
@@ -30,7 +29,6 @@ class NotePreviewFragment : Fragment() {
         noteView = binding.previewNoteField
         cardView = binding.previewCardParentCard
 
-        setupPreview(FragmentAndObjectStates.currentNote)
         return binding.root
     }
 
@@ -39,10 +37,15 @@ class NotePreviewFragment : Fragment() {
             val title = noteItem.title
             val note = noteItem.note
 
-            EditorManager.ColorManager((activity as MainActivity)).applyNoteTheme(arrayListOf(titleView, noteView, cardView, EditorManager.ColorManager.ACTION_BAR_COLOR), arrayListOf(noteItem))
+            EditorManager.ColorManager((activity as MainActivity)).applyNoteTheme(arrayListOf(titleView, noteView, cardView), arrayListOf(noteItem))
 
             titleView.text = title
             noteView.text = note
-        } else setupPreview(FragmentAndObjectStates.getDefaultNote(context))
+        }
     }
+
+    override fun onRefresh(noteItem: NoteItem?) {
+        setupPreview(noteItem)
+    }
+
 }

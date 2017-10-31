@@ -13,6 +13,7 @@ import android.support.design.widget.CoordinatorLayout
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import app.note.simple.brulinski.sebastian.com.simplenoteapp.Activity.MainActivity
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.Editor.ColorCreator
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.Editor.EditorManager
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.Fragment.DialogFragment.OwnColorCreatorDialogFragment
@@ -59,40 +60,54 @@ class BottomSheetColorFragment : BottomSheetDialogFragment() {
             binding.textView.text = getString(R.string.note_color)
         else binding.textView.text = getString(R.string.font_color)
 
+        val main = (activity as MainActivity)
+
         binding.colorRedImage.setOnClickListener {
+            main.changeNoteColors(TAG, ColorCreator.getColorFromCard(activity, binding.colorRedImage))
             dismiss()
         }
         binding.colorPinkImage.setOnClickListener {
+            main.changeNoteColors(TAG, ColorCreator.getColorFromCard(activity, binding.colorPinkImage))
             dismiss()
         }
         binding.colorPurpleImage.setOnClickListener {
+            main.changeNoteColors(TAG, ColorCreator.getColorFromCard(activity, binding.colorPurpleImage))
             dismiss()
         }
         binding.colorBlueImage.setOnClickListener {
+            main.changeNoteColors(TAG, ColorCreator.getColorFromCard(activity, binding.colorBlueImage))
             dismiss()
         }
         binding.colorIndigoImage.setOnClickListener {
+            main.changeNoteColors(TAG, ColorCreator.getColorFromCard(activity, binding.colorIndigoImage))
             dismiss()
         }
         binding.colorGreenImage.setOnClickListener {
+            main.changeNoteColors(TAG, ColorCreator.getColorFromCard(activity, binding.colorGreenImage))
             dismiss()
         }
         binding.colorTealImage.setOnClickListener {
+            main.changeNoteColors(TAG, ColorCreator.getColorFromCard(activity, binding.colorTealImage))
             dismiss()
         }
         binding.colorYellowImage.setOnClickListener {
+            main.changeNoteColors(TAG, ColorCreator.getColorFromCard(activity, binding.colorYellowImage))
             dismiss()
         }
         binding.colorWhiteImage.setOnClickListener {
+            main.changeNoteColors(TAG, ColorCreator.getColorFromCard(activity, binding.colorWhiteImage))
             dismiss()
         }
         binding.colorBlueGreyImage.setOnClickListener {
+            main.changeNoteColors(TAG, ColorCreator.getColorFromCard(activity, binding.colorBlueGreyImage))
             dismiss()
         }
         binding.colorBlackImage.setOnClickListener {
+            main.changeNoteColors(TAG, ColorCreator.getColorFromCard(activity, binding.colorBlackImage))
             dismiss()
         }
         binding.colorBrownImage.setOnClickListener {
+            main.changeNoteColors(TAG, ColorCreator.getColorFromCard(activity, binding.colorBrownImage))
             dismiss()
         }
 
@@ -101,6 +116,7 @@ class BottomSheetColorFragment : BottomSheetDialogFragment() {
             showOwnColorPicker()
         }
         binding.customColorCard.setOnClickListener {
+            main.changeNoteColors(TAG, ColorCreator.getColorFromCard(activity, binding.customColorCard))
             dismiss()
         }
 

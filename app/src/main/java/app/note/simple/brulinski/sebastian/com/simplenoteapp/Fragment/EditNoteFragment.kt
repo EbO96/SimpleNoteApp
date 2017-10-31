@@ -3,28 +3,32 @@ package app.note.simple.brulinski.sebastian.com.simplenoteapp.Fragment
 import android.os.Build
 import android.os.Bundle
 import android.util.Log
-import app.note.simple.brulinski.sebastian.com.simplenoteapp.Activity.MainActivity
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.Editor.EditorManager
-import app.note.simple.brulinski.sebastian.com.simplenoteapp.HelperClass.FragmentAndObjectStates
+import app.note.simple.brulinski.sebastian.com.simplenoteapp.Interfaces.OnRefreshEditListener
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.Model.NoteItem
 
 @Suppress("DEPRECATION", "OverridingDeprecatedMember")
-class EditNoteFragment : CreateNoteFragment() {
-
+class EditNoteFragment : CreateNoteFragment(), OnRefreshEditListener {
     /**
      * Keys
      */
-    private val SAVE_INSTANCE_STATE_NOTE_OBJECT_KEY = "note_object"
+    private val SAVE_INSTANCE_STATE_POSITION_KEY = "note_object"
+
+    /**
+     * Others
+     */
+    companion object {
+        var noteObject: NoteItem? = null
+    }
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         Log.i("interLog", "$this, onActivityCreated()")
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
             listenBarOptions()
         }
-        setupEdit(FragmentAndObjectStates.currentNote)
-
         super.onActivityCreated(savedInstanceState)
     }
+
 
     fun setupEdit(noteItem: NoteItem?) {
         if (noteItem != null) {
@@ -38,19 +42,15 @@ class EditNoteFragment : CreateNoteFragment() {
 
             Log.i("interLog", "title = $title \n note = $note")
 
-            EditorManager.ColorManager(activity).applyNoteTheme(arrayListOf(titleView, noteView, cardView, EditorManager.ColorManager.ACTION_BAR_COLOR), arrayListOf(noteItem!!))
+            EditorManager.ColorManager(activity).applyNoteTheme(arrayListOf(titleView, noteView, cardView), arrayListOf(noteItem!!))
 
             titleView.setText(title)
             noteView.setText(note)
-        } else {
-            setupEdit(FragmentAndObjectStates.getDefaultNote(context))
         }
     }
 
-    override fun setUserVisibleHint(isVisibleToUser: Boolean) {
-        if (isVisibleToUser) {
-            setupEdit(FragmentAndObjectStates.currentNote)
-        }
-        super.setUserVisibleHint(isVisibleToUser)
+    override fun onRefresh(noteItem: NoteItem) {
+        noteObject = noteItem
+        setupEdit(noteItem)
     }
 }

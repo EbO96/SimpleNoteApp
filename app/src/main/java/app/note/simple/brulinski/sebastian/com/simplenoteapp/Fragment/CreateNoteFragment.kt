@@ -25,7 +25,7 @@ import app.note.simple.brulinski.sebastian.com.simplenoteapp.Activity.MainActivi
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.Editor.ColorCreator
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.Editor.EditorManager
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.Fragment.BottomSheetFragments.BottomSheetFontFragment
-import app.note.simple.brulinski.sebastian.com.simplenoteapp.HelperClass.FragmentAndObjectStates
+import app.note.simple.brulinski.sebastian.com.simplenoteapp.Interfaces.OnChangeColorListener
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.Model.NoteItem
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.R
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.databinding.CreateNoteFragmentBinding
@@ -36,7 +36,7 @@ import java.text.SimpleDateFormat
 import java.util.*
 
 
-open class CreateNoteFragment : Fragment() {
+open class CreateNoteFragment : Fragment(), OnChangeColorListener {
 
     /**
      * Keys and final fields values
@@ -86,10 +86,6 @@ open class CreateNoteFragment : Fragment() {
         val NOTE_OBJECT_TO_COLOR_CREATOR = "note_object_to_color_creator"
     }
 
-    fun getNoteObject(): NoteItem? {
-        return noteObject
-    }
-
     @RequiresApi(Build.VERSION_CODES.LOLLIPOP)
     override fun onCreateView(inflater: LayoutInflater?, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         binding = DataBindingUtil.inflate(inflater, R.layout.create_note_fragment, container, false)
@@ -125,28 +121,30 @@ open class CreateNoteFragment : Fragment() {
         binding.createFab.setOnClickListener {
             val viewPager = (activity as MainActivity).getViewPager()
             val pagerAdapter = (activity as MainActivity).getPagerAdapter()
-            val updateChannel = (activity as MainActivity).updateChannel
 
             val position = viewPager.currentItem
 
             //viewPager.currentItem = 1
             when (position) {
                 0 -> { //Create
-                    updateChannel.setupUpdate(context, noteObject)
-//                    FragmentAndObjectStates.currentNote = noteObject
+                    (activity as MainActivity).refreshNoteList(noteItem = noteObject!!)
+//                    updateChannel.setupUpdate(context, noteObject)
 //                    ObjectToDatabaseOperations.insertObject(context, noteObject)
 //                    pagerAdapter.notifyDataSetChanged()
                 }
                 3 -> { //Edit
-                    updateChannel.setupUpdate(context, prepareAndGetNoteObject(), true)
-                    FragmentAndObjectStates.currentNote = prepareAndGetNoteObject()
-                    FragmentAndObjectStates.refreshPreview = true
+                    if (EditNoteFragment.noteObject != null) {
+                        (activity as MainActivity).refreshNoteList(prepareAndGetNoteObject())
+                        EditNoteFragment.noteObject = null
+                    }
 //                    val note = prepareAndGetNoteObject()
 //                    FragmentAndObjectStates.currentNote = note
 //                    ObjectToDatabaseOperations.updateObject(context, arrayListOf(note))
 //                    pagerAdapter.notifyDataSetChanged()
                 }
             }
+            (activity as MainActivity).getViewPager().setCurrentItem(1, true)
+
         }
         return binding.root
     }
@@ -156,17 +154,10 @@ open class CreateNoteFragment : Fragment() {
      */
     fun prepareAndGetNoteObject(): NoteItem {
         return NoteItem(
-                FragmentAndObjectStates.currentNote!!.id, binding.createNoteTitleField.text.toString().trim(), binding.createNoteNoteField.text.toString().trim(),
+                EditNoteFragment.noteObject!!.id, binding.createNoteTitleField.text.toString().trim(), binding.createNoteNoteField.text.toString().trim(),
                 getCurrentDateAndTime(), ColorCreator.getColorFromCard(activity, binding.createNoteParentCard), ColorCreator.getColorIntFromColorStateList(binding.createNoteTitleField.textColors),
                 noteObject!!.fontStyle, false, false
         )
-    }
-
-    private fun resetLayout() {//Reset all values to default
-        noteObject = FragmentAndObjectStates.getDefaultNote(context)
-        EditorManager.ColorManager(activity).applyNoteTheme(arrayListOf(titleView, noteView, cardView, actionBar), arrayListOf(noteObject!!))
-        titleView.setText("")
-        noteView.setText("")
     }
 
     override fun onSaveInstanceState(outState: Bundle?) {
@@ -384,20 +375,6 @@ open class CreateNoteFragment : Fragment() {
 //        applyFont(whichFont)
 //    }
 //
-//    @RequiresApi(Build.VERSION_CODES.LOLLIPOP)
-//    fun changeNoteOrFontColors(colorOfWhat: String, color: Int) {
-//        //Change color of font or background (CardView)
-//        val viewsArray: ArrayList<Any>
-//
-//        if (colorOfWhat == (EditorManager.ColorManager.COLOR_OF_TEXT)) {
-//            viewsArray = arrayListOf(binding.createNoteTitleField, binding.createNoteNoteField)
-//            noteObject!!.TXTColor = color
-//        } else {
-//            viewsArray = arrayListOf(binding.createNoteParentCard, EditorManager.ColorManager.ACTION_BAR_COLOR)
-//            noteObject!!.BGColor = color
-//        }
-//        EditorManager.ColorManager(activity).applyNoteTheme(viewsArray, arrayListOf(noteObject!!))
-//    }
 
 //    private fun applyFont(whichFont: String) { //TODO implement better solution later
 //        var fontStyle = ""
@@ -431,6 +408,22 @@ open class CreateNoteFragment : Fragment() {
 //        }
 //        noteObject!!.fontStyle = fontStyle
 //    }
+
+    override fun onColorChange(colorOf: String, color: Int) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            //Change color of font or background (CardView)
+            val viewsArray: ArrayList<Any>
+
+            if (colorOf == (EditorManager.ColorManager.COLOR_OF_TEXT)) {
+                viewsArray = arrayListOf(binding.createNoteTitleField, binding.createNoteNoteField)
+                noteObject!!.TXTColor = color
+            } else {
+                viewsArray = arrayListOf(binding.createNoteParentCard)
+                noteObject!!.BGColor = color
+            }
+            EditorManager.ColorManager(activity).applyNoteTheme(viewsArray, arrayListOf(noteObject!!))
+        }
+    }
 
     private fun changeCounterColor(charLength: Int) {
         //Method change counter color depending on the character characters limit

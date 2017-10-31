@@ -41,18 +41,18 @@
             android:src="@drawable/ic_color_lens_black_24dp" />
 
         <android.support.v7.widget.CardView
-            android:id="@+id/color_red_image"
+            android:id="@+id/color_black_image"
             android:layout_width="46dp"
             android:layout_height="46dp"
             android:layout_below="@id/textView"
             android:layout_margin="8dp"
-            android:layout_toLeftOf="@id/color_pink_image"
+            android:layout_toLeftOf="@id/color_white_image"
             app:cardBackgroundColor="@color/material_black"
             app:cardCornerRadius="23dp"
             app:cardElevation="1dp" />
 
         <android.support.v7.widget.CardView
-            android:id="@+id/color_pink_image"
+            android:id="@+id/color_white_image"
             android:layout_width="46dp"
             android:layout_height="46dp"
             android:layout_below="@id/textView"
@@ -99,7 +99,7 @@
             android:id="@+id/color_green_image"
             android:layout_width="46dp"
             android:layout_height="46dp"
-            android:layout_below="@id/color_red_image"
+            android:layout_below="@id/color_black_image"
             android:layout_margin="8dp"
             android:layout_toLeftOf="@id/color_teal_image"
             app:cardBackgroundColor="@color/material_green"
@@ -110,7 +110,7 @@
             android:id="@+id/color_teal_image"
             android:layout_width="46dp"
             android:layout_height="46dp"
-            android:layout_below="@id/color_pink_image"
+            android:layout_below="@id/color_white_image"
             android:layout_margin="8dp"
             android:layout_toLeftOf="@id/color_yellow_image"
             app:cardBackgroundColor="@color/material_teal"
@@ -129,7 +129,7 @@
             app:cardElevation="1dp" />
 
         <android.support.v7.widget.CardView
-            android:id="@+id/color_white_image"
+            android:id="@+id/color_pink_image"
             android:layout_width="46dp"
             android:layout_height="46dp"
             android:layout_below="@id/color_blue_image"
@@ -145,13 +145,13 @@
             android:layout_height="46dp"
             android:layout_below="@id/color_indigo_image"
             android:layout_margin="8dp"
-            android:layout_toRightOf="@id/color_white_image"
+            android:layout_toRightOf="@id/color_pink_image"
             app:cardBackgroundColor="@color/material_blue_grey"
             app:cardCornerRadius="23dp"
             app:cardElevation="1dp" />
 
         <android.support.v7.widget.CardView
-            android:id="@+id/color_black_image"
+            android:id="@+id/color_red_image"
             android:layout_width="46dp"
             android:layout_height="46dp"
             android:layout_below="@id/color_green_image"
@@ -167,7 +167,7 @@
             android:layout_height="46dp"
             android:layout_below="@id/color_teal_image"
             android:layout_margin="8dp"
-            android:layout_toRightOf="@id/color_black_image"
+            android:layout_toRightOf="@id/color_red_image"
             app:cardBackgroundColor="@color/material_brown"
             app:cardCornerRadius="23dp"
             app:cardElevation="1dp" />

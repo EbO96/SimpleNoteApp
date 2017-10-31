@@ -16,10 +16,16 @@ import android.view.MenuItem
 import android.widget.Toast
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.Editor.EditorManager
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.Fragment.BottomSheetFragments.BottomSheetColorFragment
+import app.note.simple.brulinski.sebastian.com.simplenoteapp.Fragment.CreateNoteFragment
+import app.note.simple.brulinski.sebastian.com.simplenoteapp.Fragment.EditNoteFragment
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.Fragment.FragmentPagerAdapter.FragmentAdapter
+import app.note.simple.brulinski.sebastian.com.simplenoteapp.Fragment.NotePreviewFragment
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.Fragment.NotesListFragment
-import app.note.simple.brulinski.sebastian.com.simplenoteapp.HelperClass.FragmentAndObjectStates
-import app.note.simple.brulinski.sebastian.com.simplenoteapp.HelperClass.UpdateFragmentsChannel
+import app.note.simple.brulinski.sebastian.com.simplenoteapp.Interfaces.OnChangeColorListener
+import app.note.simple.brulinski.sebastian.com.simplenoteapp.Interfaces.OnRefreshEditListener
+import app.note.simple.brulinski.sebastian.com.simplenoteapp.Interfaces.OnRefreshNoteListListener
+import app.note.simple.brulinski.sebastian.com.simplenoteapp.Interfaces.OnRefreshPreviewListener
+import app.note.simple.brulinski.sebastian.com.simplenoteapp.Model.NoteItem
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.R
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.databinding.ActivityMainBinding
 import com.google.firebase.crash.FirebaseCrash
@@ -48,13 +54,19 @@ class MainActivity : AppCompatActivity() {
     var doubleTapToExit = false
     lateinit var binding: ActivityMainBinding
     private lateinit var activityMain: MainActivity
-    lateinit var updateChannel: UpdateFragmentsChannel
     /**
     Toasty Toasts colors
      */
     @ColorInt
     private val ERROR_COLOR = Color.parseColor("#D50000")
     private var infoToastShowedAtStart: Boolean = false
+    /**
+     * Interfaces
+     */
+    private lateinit var mOnChangeColorListener: OnChangeColorListener //To change color in edit or create note
+    private lateinit var mOnRefreshNoteListListener: OnRefreshNoteListListener //To refresh note list
+    private lateinit var mOnRefreshPreviewListener: OnRefreshPreviewListener //To refresh preview screen
+    private lateinit var mOnRefreshEditListener: OnRefreshEditListener //To refresh edit screen
     /**
     There we starts...
      */
@@ -67,20 +79,9 @@ class MainActivity : AppCompatActivity() {
         Toasty.Config.getInstance().setErrorColor(ERROR_COLOR).apply()
         infoToastShowedAtStart = true
         activityMain = this
-        if (savedInstanceState == null) {
-            updateChannel = UpdateFragmentsChannel()
-        } else {
-            updateChannel = savedInstanceState.getParcelable(UPDATE_CHANNEL_KEY)
 
-        }
 
         setupViewPager()
-    }
-
-    override fun onSaveInstanceState(outState: Bundle?) {
-        Log.i("interLog", "save state main")
-        outState!!.putParcelable(UPDATE_CHANNEL_KEY, updateChannel)
-        super.onSaveInstanceState(outState)
     }
 
     /**
@@ -100,6 +101,7 @@ class MainActivity : AppCompatActivity() {
         fragmentAdapter = FragmentAdapter(supportFragmentManager, activityMain)
         mViewPager.adapter = fragmentAdapter
         mViewPager.currentItem = 1
+        mViewPager.offscreenPageLimit = 4
         supportActionBar!!.title = getString(R.string.notes)
 
         mViewPager.addOnPageChangeListener(object : ViewPager.OnPageChangeListener {
@@ -107,43 +109,23 @@ class MainActivity : AppCompatActivity() {
                 when (position) {
                     0 -> {
                         supportActionBar!!.title = getString(R.string.create)
-//                        if (FragmentAndObjectStates.currentNote != null)
-//                            EditorManager.ColorManager(activityMain).changeColor(arrayListOf(EditorManager.ColorManager.ACTION_BAR_COLOR),
-//                                    Color.BLACK)
+                        EditorManager.ColorManager(activityMain).changeColor(arrayListOf(EditorManager.ColorManager.ACTION_BAR_COLOR),
+                                Color.BLACK)
                     }
                     1 -> {
                         supportActionBar!!.title = getString(R.string.notes)
-                        if (updateChannel.checkUpdate(fragmentAdapter.getItem(mViewPager.currentItem) as NotesListFragment)) {
-                            Log.i("interLog", "refresh")
-                            fragmentAdapter.notifyDataSetChanged()
-                            updateChannel.clearUpdate()
-                            //updateChannel.clearUpdate()
-                        }
-//                        EditorManager.ColorManager(activityMain).changeColor(arrayListOf(EditorManager.ColorManager.ACTION_BAR_COLOR),
-//                                Color.BLACK)
+                        EditorManager.ColorManager(activityMain).changeColor(arrayListOf(EditorManager.ColorManager.ACTION_BAR_COLOR),
+                                Color.BLACK)
                     }
                     2 -> {
                         supportActionBar!!.title = getString(R.string.preview)
-                        if (FragmentAndObjectStates.refreshPreview) {
-                            fragmentAdapter.notifyDataSetChanged()
-                            FragmentAndObjectStates.refreshPreview = false
-                        }
-//                        if (FragmentAndObjectStates.currentNote != null) {
-//                            EditorManager.ColorManager(activityMain).changeColor(arrayListOf(EditorManager.ColorManager.ACTION_BAR_COLOR),
-//                                    FragmentAndObjectStates.currentNote!!.BGColor)
-//                        } else
+                        EditorManager.ColorManager(activityMain).changeColor(arrayListOf(EditorManager.ColorManager.ACTION_BAR_COLOR),
+                                Color.BLACK)
                     }
                     3 -> {
                         supportActionBar!!.title = getString(R.string.edit)
-//                        if (updateChannel.checkUpdate(fragmentAdapter.getItem(mViewPager.currentItem) as EditNoteFragment)) {
-//                            fragmentAdapter.notifyDataSetChanged()
-//                            updateChannel.noUpdateEdit()
-//                        }
-//                        if (FragmentAndObjectStates.currentNote != null) {
-//                            fragmentAdapter.notifyDataSetChanged()
-//                            EditorManager.ColorManager(activityMain).changeColor(arrayListOf(EditorManager.ColorManager.ACTION_BAR_COLOR),
-//                                    FragmentAndObjectStates.currentNote!!.BGColor)
-//                        }
+                        EditorManager.ColorManager(activityMain).changeColor(arrayListOf(EditorManager.ColorManager.ACTION_BAR_COLOR),
+                                Color.BLACK)
                     }
                 }
             }
@@ -154,6 +136,19 @@ class MainActivity : AppCompatActivity() {
             override fun onPageScrollStateChanged(state: Int) {
             }
         })
+        initListeners()
+    }
+
+    private fun initListeners() {
+        val fragmentCreateNote = mViewPager.adapter.instantiateItem(mViewPager, 0)
+        val fragmentNoteList = mViewPager.adapter.instantiateItem(mViewPager, 1)
+        val fragmentPreview = mViewPager.adapter.instantiateItem(mViewPager, 2)
+        val fragmentEdit = mViewPager.adapter.instantiateItem(mViewPager, 3)
+
+        mOnRefreshNoteListListener = (fragmentNoteList as NotesListFragment)
+        mOnRefreshPreviewListener = (fragmentPreview as NotePreviewFragment)
+        mOnRefreshEditListener = (fragmentEdit as EditNoteFragment)
+        mOnChangeColorListener = (fragmentCreateNote as CreateNoteFragment)
     }
 
     fun setColorBottomSheet(forNoteBackground: Boolean) {
@@ -180,6 +175,44 @@ class MainActivity : AppCompatActivity() {
     }
 
     /**
+     * UPDATE PAGES
+     */
+    fun refreshNoteList(noteItem: NoteItem) {
+        when (mViewPager.currentItem) {
+            0 -> {
+                mOnRefreshNoteListListener.onNoteCreated(noteItem)
+            }
+            3 -> {
+                mOnRefreshNoteListListener.onNoteEdited(noteItem)
+            }
+        }
+    }
+
+    fun refreshPreview(noteItem: NoteItem) {
+        initListeners()
+        mOnRefreshPreviewListener.onRefresh(noteItem)
+    }
+
+    fun refreshEdit(noteItem: NoteItem) {
+        initListeners()
+        mOnRefreshEditListener.onRefresh(noteItem)
+    }
+
+    fun changeNoteColors(colorOf: String, color: Int) {
+        initListeners()
+        val fragmentEdit = mViewPager.adapter.instantiateItem(mViewPager, 3)
+        when (mViewPager.currentItem) {
+            0 -> { //From create
+                mOnChangeColorListener.onColorChange(colorOf, color)
+            }
+            3 -> { //From edit
+                mOnChangeColorListener = (fragmentEdit as EditNoteFragment)
+                mOnChangeColorListener.onColorChange(colorOf, color)
+            }
+        }
+    }
+
+    /**
      * MENU
      */
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
@@ -195,7 +228,6 @@ class MainActivity : AppCompatActivity() {
         when (item?.itemId) {
             R.id.search_main -> {
                 val intent = Intent(this, SearchActivity::class.java)
-                intent.putParcelableArrayListExtra(SearchActivity.UPDATE_CHANNEL_KEY, arrayListOf(updateChannel))
                 startActivity(intent)
             }
             R.id.archives -> {

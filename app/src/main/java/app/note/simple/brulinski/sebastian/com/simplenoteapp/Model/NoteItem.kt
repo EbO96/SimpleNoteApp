@@ -6,6 +6,7 @@ import android.os.Parcelable
 
 open class NoteItem(var id: Int?, var title: String?, var note: String?, var date: String?, var BGColor: Int?,
                     var TXTColor: Int?, var fontStyle: String?, var isDeleted: Boolean?, var isSelected: Boolean?) : Parcelable {
+
     constructor(parcel: Parcel) : this(
             parcel.readValue(Int::class.java.classLoader) as? Int,
             parcel.readString(),

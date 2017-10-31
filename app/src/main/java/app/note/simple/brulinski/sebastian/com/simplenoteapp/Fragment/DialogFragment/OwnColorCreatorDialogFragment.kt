@@ -11,10 +11,12 @@ import android.view.View
 import android.view.ViewGroup
 import android.view.WindowManager
 import android.widget.SeekBar
+import app.note.simple.brulinski.sebastian.com.simplenoteapp.Activity.MainActivity
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.Editor.ColorCreator
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.Editor.EditorManager
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.R
-import app.note.simple.brulinski.sebastian.com.simplenoteapp.databinding.ActivityOwnColorCreatorBinding
+
+import app.note.simple.brulinski.sebastian.com.simplenoteapp.databinding.ColorCreatorLayoutBinding
 
 
 class OwnColorCreatorDialogFragment : DialogFragment() {
@@ -22,7 +24,7 @@ class OwnColorCreatorDialogFragment : DialogFragment() {
     /**
      * Other's
      */
-    private lateinit var binding: ActivityOwnColorCreatorBinding
+    private lateinit var binding: ColorCreatorLayoutBinding
     private var COLOR_OF_TAG = EditorManager.ColorManager.COLOR_OF_NOTE
     /**
     RGB value range 0-255
@@ -34,17 +36,31 @@ class OwnColorCreatorDialogFragment : DialogFragment() {
     private var isEditTextUnlocked = false
 
     override fun onCreateView(inflater: LayoutInflater?, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        binding = DataBindingUtil.inflate(inflater, R.layout.activity_own_color_creator, container, false)
-        COLOR_OF_TAG = arguments.getString(EditorManager.ColorManager.COLOR_OF_KEY)
-        return binding.root
-    }
+        binding = DataBindingUtil.inflate(inflater, R.layout.color_creator_layout, container, false)
 
-    override fun onViewCreated(view: View?, savedInstanceState: Bundle?) {
         seekBarsListeners()
         rgbEditsListeners()
 
         setLayout()
-        super.onViewCreated(view, savedInstanceState)
+
+        binding.cancelButton.setOnClickListener {
+            dismiss()
+        }
+
+        binding.applyButton.setOnClickListener {
+            val main = (activity as MainActivity)
+            dismiss()
+            when (COLOR_OF_TAG) {
+                EditorManager.ColorManager.COLOR_OF_TEXT -> {
+                    main.setColorBottomSheet()
+                }
+                EditorManager.ColorManager.COLOR_OF_NOTE -> {
+                    main.setColorBottomSheet(true)
+                }
+            }
+        }
+        COLOR_OF_TAG = arguments.getString(EditorManager.ColorManager.COLOR_OF_KEY)
+        return binding.root
     }
 
     private fun setLayout() { //This method gets the data from shared preferences and sets the RGB values at SeekBar's
