@@ -21,10 +21,7 @@ import app.note.simple.brulinski.sebastian.com.simplenoteapp.Fragment.EditNoteFr
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.Fragment.FragmentPagerAdapter.FragmentAdapter
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.Fragment.NotePreviewFragment
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.Fragment.NotesListFragment
-import app.note.simple.brulinski.sebastian.com.simplenoteapp.Interfaces.OnChangeColorListener
-import app.note.simple.brulinski.sebastian.com.simplenoteapp.Interfaces.OnRefreshEditListener
-import app.note.simple.brulinski.sebastian.com.simplenoteapp.Interfaces.OnRefreshNoteListListener
-import app.note.simple.brulinski.sebastian.com.simplenoteapp.Interfaces.OnRefreshPreviewListener
+import app.note.simple.brulinski.sebastian.com.simplenoteapp.Interfaces.*
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.Model.NoteItem
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.R
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.databinding.ActivityMainBinding
@@ -67,6 +64,7 @@ class MainActivity : AppCompatActivity() {
     private lateinit var mOnRefreshNoteListListener: OnRefreshNoteListListener //To refresh note list
     private lateinit var mOnRefreshPreviewListener: OnRefreshPreviewListener //To refresh preview screen
     private lateinit var mOnRefreshEditListener: OnRefreshEditListener //To refresh edit screen
+    private lateinit var mOnResetCreateListener: OnResetCreateListener //To reset create screen
     /**
     There we starts...
      */
@@ -80,9 +78,9 @@ class MainActivity : AppCompatActivity() {
         infoToastShowedAtStart = true
         activityMain = this
 
-
         setupViewPager()
     }
+
 
     /**
      *  END OF onCreate(...)
@@ -101,7 +99,7 @@ class MainActivity : AppCompatActivity() {
         fragmentAdapter = FragmentAdapter(supportFragmentManager, activityMain)
         mViewPager.adapter = fragmentAdapter
         mViewPager.currentItem = 1
-        mViewPager.offscreenPageLimit = 4
+        mViewPager.offscreenPageLimit = 3
         supportActionBar!!.title = getString(R.string.notes)
 
         mViewPager.addOnPageChangeListener(object : ViewPager.OnPageChangeListener {
@@ -136,19 +134,6 @@ class MainActivity : AppCompatActivity() {
             override fun onPageScrollStateChanged(state: Int) {
             }
         })
-        initListeners()
-    }
-
-    private fun initListeners() {
-        val fragmentCreateNote = mViewPager.adapter.instantiateItem(mViewPager, 0)
-        val fragmentNoteList = mViewPager.adapter.instantiateItem(mViewPager, 1)
-        val fragmentPreview = mViewPager.adapter.instantiateItem(mViewPager, 2)
-        val fragmentEdit = mViewPager.adapter.instantiateItem(mViewPager, 3)
-
-        mOnRefreshNoteListListener = (fragmentNoteList as NotesListFragment)
-        mOnRefreshPreviewListener = (fragmentPreview as NotePreviewFragment)
-        mOnRefreshEditListener = (fragmentEdit as EditNoteFragment)
-        mOnChangeColorListener = (fragmentCreateNote as CreateNoteFragment)
     }
 
     fun setColorBottomSheet(forNoteBackground: Boolean) {
@@ -178,6 +163,9 @@ class MainActivity : AppCompatActivity() {
      * UPDATE PAGES
      */
     fun refreshNoteList(noteItem: NoteItem) {
+        val fragmentNoteList = mViewPager.adapter.instantiateItem(mViewPager, 1)
+        mOnRefreshNoteListListener = (fragmentNoteList as NotesListFragment)
+
         when (mViewPager.currentItem) {
             0 -> {
                 mOnRefreshNoteListListener.onNoteCreated(noteItem)
@@ -188,25 +176,53 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
+    fun resetList() {
+        val fragmentNoteList = mViewPager.adapter.instantiateItem(mViewPager, 1)
+        mOnRefreshNoteListListener = (fragmentNoteList as NotesListFragment)
+        mOnRefreshNoteListListener.onReset()
+    }
+
+    fun resetCreate() {
+        val fragmentCreate = mViewPager.adapter.instantiateItem(mViewPager, 0)
+        mOnResetCreateListener = fragmentCreate as CreateNoteFragment
+        mOnResetCreateListener.onReset()
+    }
+
     fun refreshPreview(noteItem: NoteItem) {
-        initListeners()
+        val fragmentPreview = mViewPager.adapter.instantiateItem(mViewPager, 2)
+        mOnRefreshPreviewListener = (fragmentPreview as NotePreviewFragment)
         mOnRefreshPreviewListener.onRefresh(noteItem)
     }
 
     fun refreshEdit(noteItem: NoteItem) {
-        initListeners()
+        val fragmentEdit = mViewPager.adapter.instantiateItem(mViewPager, 3)
+        mOnRefreshEditListener = (fragmentEdit as EditNoteFragment)
         mOnRefreshEditListener.onRefresh(noteItem)
     }
 
-    fun changeNoteColors(colorOf: String, color: Int) {
-        initListeners()
+    fun resetPreview() {
+        val fragmentPreview = mViewPager.adapter.instantiateItem(mViewPager, 2)
+        mOnRefreshPreviewListener = (fragmentPreview as NotePreviewFragment)
+        mOnRefreshPreviewListener.onReset()
+    }
+
+    fun resetEdit() {
         val fragmentEdit = mViewPager.adapter.instantiateItem(mViewPager, 3)
+        mOnRefreshEditListener = (fragmentEdit as EditNoteFragment)
+        mOnRefreshEditListener.onReset()
+    }
+
+    fun changeNoteColors(colorOf: String, color: Int) {
+
         when (mViewPager.currentItem) {
             0 -> { //From create
+                val fragmentCreateNote = mViewPager.adapter.instantiateItem(mViewPager, 0)
+                mOnChangeColorListener = (fragmentCreateNote as CreateNoteFragment)
                 mOnChangeColorListener.onColorChange(colorOf, color)
             }
             3 -> { //From edit
-                mOnChangeColorListener = (fragmentEdit as EditNoteFragment)
+                val fragmentCreateNote = mViewPager.adapter.instantiateItem(mViewPager, 3)
+                mOnChangeColorListener = (fragmentCreateNote as CreateNoteFragment)
                 mOnChangeColorListener.onColorChange(colorOf, color)
             }
         }
@@ -216,6 +232,8 @@ class MainActivity : AppCompatActivity() {
      * MENU
      */
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
+        Log.i("interLog", "menu main")
+
         val menuInflater: MenuInflater = menuInflater
         menuInflater.inflate(R.menu.main_menu, menu)
         return true

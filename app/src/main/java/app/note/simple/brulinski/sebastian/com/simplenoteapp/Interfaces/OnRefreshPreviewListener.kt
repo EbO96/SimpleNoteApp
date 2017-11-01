@@ -7,4 +7,5 @@ import app.note.simple.brulinski.sebastian.com.simplenoteapp.Model.NoteItem
  */
 interface OnRefreshPreviewListener {
     fun onRefresh(noteItem: NoteItem?)
+    fun onReset()
 }

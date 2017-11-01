@@ -7,6 +7,7 @@ import android.os.Parcelable
 open class NoteItem(var id: Int?, var title: String?, var note: String?, var date: String?, var BGColor: Int?,
                     var TXTColor: Int?, var fontStyle: String?, var isDeleted: Boolean?, var isSelected: Boolean?) : Parcelable {
 
+
     constructor(parcel: Parcel) : this(
             parcel.readValue(Int::class.java.classLoader) as? Int,
             parcel.readString(),
@@ -17,6 +18,11 @@ open class NoteItem(var id: Int?, var title: String?, var note: String?, var dat
             parcel.readString(),
             parcel.readValue(Boolean::class.java.classLoader) as? Boolean,
             parcel.readValue(Boolean::class.java.classLoader) as? Boolean) {
+    }
+
+    override fun toString(): String {
+        return "id = $id\n title = $title\n note = $note\n date = $date\n BGColor = $BGColor\n TXTColor = $TXTColor\n " +
+                "fontStyle = $fontStyle\n isDeleted = $isDeleted\n isSelected = $isSelected\n"
     }
 
     override fun writeToParcel(parcel: Parcel, flags: Int) {

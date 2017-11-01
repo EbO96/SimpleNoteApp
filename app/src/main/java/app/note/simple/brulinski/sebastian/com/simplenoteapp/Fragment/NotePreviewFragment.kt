@@ -12,6 +12,7 @@ import app.note.simple.brulinski.sebastian.com.simplenoteapp.Activity.MainActivi
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.Editor.EditorManager
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.Interfaces.OnRefreshPreviewListener
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.Model.NoteItem
+import app.note.simple.brulinski.sebastian.com.simplenoteapp.Model.Notes
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.R
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.databinding.PreviewCardBinding
 
@@ -46,6 +47,10 @@ class NotePreviewFragment : Fragment(), OnRefreshPreviewListener {
 
     override fun onRefresh(noteItem: NoteItem?) {
         setupPreview(noteItem)
+    }
+
+    override fun onReset() {
+        setupPreview(Notes.Note.default)
     }
 
 }

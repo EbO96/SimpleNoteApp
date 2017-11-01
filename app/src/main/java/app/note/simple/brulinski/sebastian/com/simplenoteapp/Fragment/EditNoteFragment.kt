@@ -6,6 +6,7 @@ import android.util.Log
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.Editor.EditorManager
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.Interfaces.OnRefreshEditListener
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.Model.NoteItem
+import app.note.simple.brulinski.sebastian.com.simplenoteapp.Model.Notes
 
 @Suppress("DEPRECATION", "OverridingDeprecatedMember")
 class EditNoteFragment : CreateNoteFragment(), OnRefreshEditListener {
@@ -52,5 +53,10 @@ class EditNoteFragment : CreateNoteFragment(), OnRefreshEditListener {
     override fun onRefresh(noteItem: NoteItem) {
         noteObject = noteItem
         setupEdit(noteItem)
+    }
+
+    override fun onReset() {
+        noteObject = null
+        setupEdit(Notes.Note.default)
     }
 }

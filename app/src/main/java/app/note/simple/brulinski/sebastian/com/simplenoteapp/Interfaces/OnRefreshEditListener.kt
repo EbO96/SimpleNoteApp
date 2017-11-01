@@ -8,4 +8,5 @@ import java.text.FieldPosition
  */
 interface OnRefreshEditListener {
     fun onRefresh(noteItem: NoteItem)
+    fun onReset()
 }

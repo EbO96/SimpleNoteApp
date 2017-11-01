@@ -1,7 +1,6 @@
 package app.note.simple.brulinski.sebastian.com.simplenoteapp.Fragment
 
 import android.app.Activity
-import android.content.Context
 import android.content.SharedPreferences
 import android.databinding.DataBindingUtil
 import android.os.Bundle
@@ -9,18 +8,23 @@ import android.preference.PreferenceManager
 import android.support.design.widget.Snackbar
 import android.support.v4.app.Fragment
 import android.support.v4.content.ContextCompat
-import android.support.v7.widget.*
+import android.support.v7.widget.CardView
+import android.support.v7.widget.DefaultItemAnimator
+import android.support.v7.widget.LinearLayoutManager
+import android.support.v7.widget.RecyclerView
 import android.util.Log
-import android.view.*
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
 import android.widget.TextView
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.Activity.MainActivity
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.Database.ObjectToDatabaseOperations
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.Editor.EditorManager
-import app.note.simple.brulinski.sebastian.com.simplenoteapp.HelperClass.LayoutManagerStyle
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.Interfaces.OnRefreshNoteListListener
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.Model.NoteItem
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.R
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.databinding.NotesListFragmentBinding
+import java.lang.reflect.Executable
 import java.util.*
 
 @Suppress("DEPRECATION", "OverridingDeprecatedMember")
@@ -40,6 +44,7 @@ class NotesListFragment : Fragment(), OnRefreshNoteListListener {
         }
     }
 
+
     override fun onNoteCreated(noteItem: NoteItem?) {
         if (noteItem != null) {
             ObjectToDatabaseOperations.insertObject(context, noteItem)
@@ -50,68 +55,30 @@ class NotesListFragment : Fragment(), OnRefreshNoteListListener {
 
     }
 
+    override fun onReset() {
+        (activity as MainActivity).getPagerAdapter().notifyDataSetChanged()
+    }
+
     lateinit var binding: NotesListFragmentBinding //Bind layout
     /**
     Values related with recycler
      */
     lateinit var myRecycler: NoteListRecyclerAdapter //Notes recycler
-    lateinit var layoutStyle: LayoutManagerStyle //Recycler items layout manager
-    var styleFlag: Boolean = true //Flag define what type of layout can be apply
     lateinit var noteItemArrayList: ArrayList<NoteItem> //Array of note object
     /**
      * Keys
      */
     private val NOTES_ARRAY_KEY = "notes"
     private val LAYOUT_STYLE_KEY = "layout style"
-    /**
-     *
-     */
+
     override fun onCreateView(inflater: LayoutInflater?, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        Log.d("FragOverMet", "$this - onCreateView()")
+        Log.i("interLog", "NOTELIST CREATE!")
         binding = DataBindingUtil.inflate(inflater, R.layout.notes_list_fragment, container, false)
         setHasOptionsMenu(true)
-
-        return binding.root
-    }
-
-    override fun onViewCreated(view: View?, savedInstanceState: Bundle?) {
         noteItemArrayList = ObjectToDatabaseOperations.getObjects(context, false)
         initRecyclerAdapter()
         sortNotes()
-        super.onViewCreated(view, savedInstanceState)
-    }
-
-    override fun onSaveInstanceState(outState: Bundle?) {
-        super.onSaveInstanceState(outState)
-        //outState?.putBoolean(LAYOUT_STYLE_KEY, layoutStyle.flag) //Save layout style
-        /*
-        Save fragment state to Bundle and restore notes from it instead of
-        getting this data from database
-         */
-        //outState?.putParcelableArrayList(NOTES_ARRAY_KEY, noteItemArrayList)
-    }
-
-//    override fun onViewStateRestored(savedInstanceState: Bundle?) {
-//        if (savedInstanceState != null)
-//            noteItemArrayList = savedInstanceState.getParcelableArrayList<NoteItem>(NOTES_ARRAY_KEY)
-//        super.onViewStateRestored(savedInstanceState)
-//    }
-
-    /*
-  Save Layout Manager style in SharedPreference file
-  true -> Linear layout
-  false -> StaggeredGridLayout
-   */
-    private fun setAndSaveLayoutManagerStyle(flag: Boolean) {
-        val sharedPref: SharedPreferences = activity.getPreferences(Context.MODE_PRIVATE)
-        val editor: SharedPreferences.Editor = sharedPref.edit()
-        editor.putBoolean(getString(R.string.layout_manager_key), flag)
-        editor.apply()
-
-        if (flag) {
-            styleFlag = flag
-            binding.recyclerView.layoutManager = LinearLayoutManager(context, LinearLayoutManager.VERTICAL, false)
-        } else binding.recyclerView.layoutManager = StaggeredGridLayoutManager(2, StaggeredGridLayoutManager.VERTICAL)
+        return binding.root
     }
 
     /*
@@ -120,14 +87,7 @@ class NotesListFragment : Fragment(), OnRefreshNoteListListener {
     private fun initRecyclerAdapter() { //Init recycler view
         binding.recyclerView.setHasFixedSize(true)
         binding.recyclerView.itemAnimator = DefaultItemAnimator()
-        layoutStyle = LayoutManagerStyle(this.activity)
-        styleFlag = layoutStyle.flag
-
-        //Recognize and set layout style
-        if (styleFlag)
-            binding.recyclerView.layoutManager = LinearLayoutManager(context, LinearLayoutManager.VERTICAL, false)
-        else binding.recyclerView.layoutManager = StaggeredGridLayoutManager(2, StaggeredGridLayoutManager.VERTICAL)
-
+        binding.recyclerView.layoutManager = LinearLayoutManager(context, LinearLayoutManager.VERTICAL, false)
         myRecycler = NoteListRecyclerAdapter(noteItemArrayList, binding.recyclerView, activity)
         binding.recyclerView.adapter = myRecycler
     }
@@ -147,38 +107,6 @@ class NotesListFragment : Fragment(), OnRefreshNoteListListener {
         myRecycler.notifyDataSetChanged()
     }
 
-    /*
-    MENU
-     */
-    override fun onCreateOptionsMenu(menu: Menu?, inflater: MenuInflater?) {
-        val menuInflater: MenuInflater = activity.menuInflater
-        menuInflater.inflate(R.menu.items_layout_style_menu, menu)
-        super.onCreateOptionsMenu(menu, inflater)
-    }
-
-    override fun onOptionsItemSelected(item: MenuItem?): Boolean {
-
-        when (item!!.itemId) {
-            R.id.main_menu_grid -> {
-                setAndSaveLayoutManagerStyle(false)
-            }
-            R.id.main_menu_linear -> {
-                setAndSaveLayoutManagerStyle(true)
-            }
-        }
-        return super.onOptionsItemSelected(item)
-    }
-
-    //Refresh recycler methods
-    fun refreshRecyclerAfterCreate(noteItem: NoteItem?) {
-
-    }
-
-    //Refresh recycler methods
-    fun refreshRecyclerAfterEdit(noteItem: NoteItem?, position: Int?) {
-
-    }
-
     /**
      * Recycler
      */
@@ -187,6 +115,10 @@ class NotesListFragment : Fragment(), OnRefreshNoteListListener {
         private var deletedItem: NoteItem? = null
         private lateinit var preferences: SharedPreferences
         private lateinit var undoSnack: Snackbar
+
+        fun getArray(): ArrayList<NoteItem> {
+            return noteItemArray
+        }
 
         override fun onBindViewHolder(holder: ViewHolder?, position: Int) {
             Log.i("interLog", "onBindViewHolder - Recycler")
@@ -245,6 +177,8 @@ class NotesListFragment : Fragment(), OnRefreshNoteListListener {
 
                 }).addCallback(object : Snackbar.Callback() {
                     override fun onDismissed(transientBottomBar: Snackbar?, event: Int) {
+                        (activity as MainActivity).resetPreview()
+                        (activity as MainActivity).resetEdit()
                         super.onDismissed(transientBottomBar, event)
                     }
                 }).show()

@@ -1,9 +1,16 @@
 package app.note.simple.brulinski.sebastian.com.simplenoteapp.Model
 
+import android.graphics.Color
+import app.note.simple.brulinski.sebastian.com.simplenoteapp.Editor.EditorManager
+
 
 class Notes {
 
     class Note {
+
+        companion object {
+            val default = NoteItem(null, "", "", "", Color.WHITE, Color.BLACK, EditorManager.FontStyleManager.DEFAULT_FONT, false, false)
+        }
 
         var id: Int? = null
 

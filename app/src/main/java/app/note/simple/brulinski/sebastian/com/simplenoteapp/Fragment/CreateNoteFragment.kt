@@ -26,6 +26,7 @@ import app.note.simple.brulinski.sebastian.com.simplenoteapp.Editor.ColorCreator
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.Editor.EditorManager
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.Fragment.BottomSheetFragments.BottomSheetFontFragment
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.Interfaces.OnChangeColorListener
+import app.note.simple.brulinski.sebastian.com.simplenoteapp.Interfaces.OnResetCreateListener
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.Model.NoteItem
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.R
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.databinding.CreateNoteFragmentBinding
@@ -36,7 +37,7 @@ import java.text.SimpleDateFormat
 import java.util.*
 
 
-open class CreateNoteFragment : Fragment(), OnChangeColorListener {
+open class CreateNoteFragment : Fragment(), OnChangeColorListener, OnResetCreateListener {
 
     /**
      * Keys and final fields values
@@ -104,10 +105,10 @@ open class CreateNoteFragment : Fragment(), OnChangeColorListener {
             noteObject = NoteItem(null, "", "", "", ContextCompat.getColor(context, R.color.material_white), ContextCompat.getColor(context, R.color.material_black), EditorManager.FontStyleManager.DEFAULT_FONT, false, false)
         } else {
             noteObject = savedInstanceState.getParcelable(NOTE_OBJECT_SAVE_INSTANCE_KEY)
-            noteStyleEditor.changeColor(arrayListOf(EditorManager.ColorManager.ACTION_BAR_COLOR), Color.parseColor("#000000"))
+            //noteStyleEditor.changeColor(arrayListOf(EditorManager.ColorManager.ACTION_BAR_COLOR), Color.parseColor("#000000"))
         }
 
-        EditorManager.ColorManager(activity).applyNoteTheme(arrayListOf(titleView, noteView, cardView, actionBar), arrayListOf(noteObject!!))
+        noteStyleEditor.applyNoteTheme(arrayListOf(titleView, noteView, cardView, actionBar), arrayListOf(noteObject!!))
 
         editListener()
 
@@ -124,10 +125,16 @@ open class CreateNoteFragment : Fragment(), OnChangeColorListener {
 
             val position = viewPager.currentItem
 
-            //viewPager.currentItem = 1
             when (position) {
                 0 -> { //Create
-                    (activity as MainActivity).refreshNoteList(noteItem = noteObject!!)
+                    noteObject!!.date = getCurrentDateAndTime()
+                    (activity as MainActivity).refreshNoteList(noteObject!!)
+                    (activity as MainActivity).getViewPager().setCurrentItem(1, true)
+                    Handler().postDelayed({
+                        onReset()
+                    }, 300)
+
+                    //(activity as MainActivity).resetCreate()
 //                    updateChannel.setupUpdate(context, noteObject)
 //                    ObjectToDatabaseOperations.insertObject(context, noteObject)
 //                    pagerAdapter.notifyDataSetChanged()
@@ -136,6 +143,7 @@ open class CreateNoteFragment : Fragment(), OnChangeColorListener {
                     if (EditNoteFragment.noteObject != null) {
                         (activity as MainActivity).refreshNoteList(prepareAndGetNoteObject())
                         EditNoteFragment.noteObject = null
+                        (activity as MainActivity).getViewPager().setCurrentItem(1, true)
                     }
 //                    val note = prepareAndGetNoteObject()
 //                    FragmentAndObjectStates.currentNote = note
@@ -143,10 +151,19 @@ open class CreateNoteFragment : Fragment(), OnChangeColorListener {
 //                    pagerAdapter.notifyDataSetChanged()
                 }
             }
-            (activity as MainActivity).getViewPager().setCurrentItem(1, true)
 
         }
         return binding.root
+    }
+
+    override fun onReset() {
+        (activity as MainActivity).getPagerAdapter().notifyDataSetChanged()
+//        noteObject = Notes.Note.default
+//        titleView.setText(noteObject!!.title)
+//        noteView.setText(noteObject!!.note)
+//        titleView.textColor = noteObject!!.TXTColor!!
+//        noteView.textColor = noteObject!!.TXTColor!!
+//        cardView.cardBackgroundColor = ColorStateList.valueOf(noteObject!!.BGColor!!)
     }
 
     /*
