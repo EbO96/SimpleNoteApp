@@ -172,6 +172,8 @@ class MainActivity : AppCompatActivity() {
             }
             3 -> {
                 mOnRefreshNoteListListener.onNoteEdited(noteItem)
+                refreshEdit(noteItem)
+                refreshPreview(noteItem)
             }
         }
     }

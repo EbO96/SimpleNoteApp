@@ -175,12 +175,9 @@ class NotesListFragment : Fragment(), OnRefreshNoteListListener {
                         ObjectToDatabaseOperations.addDeleteFlag(context = activity, noteObjects = arrayListOf(deletedItem!!), flag = false)
                     else ObjectToDatabaseOperations.insertObject(activity, deletedItem!!)
 
-                }).addCallback(object : Snackbar.Callback() {
-                    override fun onDismissed(transientBottomBar: Snackbar?, event: Int) {
-                        (activity as MainActivity).resetPreview()
-                        (activity as MainActivity).resetEdit()
-                        super.onDismissed(transientBottomBar, event)
-                    }
+                    (activity as MainActivity).refreshPreview(deletedItem!!)
+                    (activity as MainActivity).refreshEdit(deletedItem!!)
+
                 }).show()
 
                 deletedItem = noteItemArray.removeAt(positionToDelete)
@@ -188,6 +185,9 @@ class NotesListFragment : Fragment(), OnRefreshNoteListListener {
                 if (flag)
                     ObjectToDatabaseOperations.addDeleteFlag(context = activity, noteObjects = arrayListOf(deletedItem!!), flag = true)
                 else ObjectToDatabaseOperations.deleteObjects(activity, arrayListOf(deletedItem!!))
+
+                (activity as MainActivity).resetPreview()
+                (activity as MainActivity).resetEdit()
 
                 true
             }
