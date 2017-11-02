@@ -84,8 +84,8 @@ class ColorCreator(private val R: Int, private val G: Int, private val B: Int, p
             return cardView.cardBackgroundColor.getColorForState(states, defaultColor)
         }
 
-        fun getColorIntFromColorStateList(colorStateList: ColorStateList): Int{
-            return colorStateList.getColorForState(states, rgb(255,255,255))
+        fun getColorIntFromColorStateList(colorStateList: ColorStateList): Int {
+            return colorStateList.getColorForState(states, rgb(255, 255, 255))
         }
     }
 }

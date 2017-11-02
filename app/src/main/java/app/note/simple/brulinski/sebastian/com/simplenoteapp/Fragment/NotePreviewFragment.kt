@@ -25,16 +25,16 @@ class NotePreviewFragment : Fragment(), OnSetupPreview {
      * Others
      */
     private lateinit var binding: PreviewCardBinding
-    private lateinit var titleView: TextView
-    private lateinit var noteView: TextView
+    private lateinit var title: TextView
+    private lateinit var note: TextView
     private lateinit var cardView: CardView
     private var noteObject: NoteItem = Notes.Note.default
 
     override fun onCreateView(inflater: LayoutInflater?, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         setHasOptionsMenu(true)
         binding = DataBindingUtil.inflate(inflater, R.layout.preview_card, container, false)
-        titleView = binding.previewTitleField
-        noteView = binding.previewNoteField
+        title = binding.previewTitleField
+        note = binding.previewNoteField
         cardView = binding.previewCardParentCard
 
         if (savedInstanceState != null)
@@ -52,9 +52,9 @@ class NotePreviewFragment : Fragment(), OnSetupPreview {
         val title = noteItem.title
         val note = noteItem.note
 
-        EditorManager.ColorManager((activity as MainActivity)).applyNoteTheme(arrayListOf(titleView, noteView, cardView), arrayListOf(noteItem))
+        EditorManager.ColorManager((activity as MainActivity)).applyNoteTheme(arrayListOf(this.title, this.note, cardView), arrayListOf(noteItem))
 
-        titleView.text = title
-        noteView.text = note
+        this.title.text = title
+        this.note.text = note
     }
 }

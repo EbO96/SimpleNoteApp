@@ -4,6 +4,7 @@ import android.content.Intent
 import android.databinding.DataBindingUtil
 import android.graphics.Color
 import android.os.Bundle
+import android.os.Debug
 import android.os.Handler
 import android.support.annotation.ColorInt
 import android.support.design.widget.BottomSheetDialogFragment

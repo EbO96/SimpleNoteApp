@@ -12,7 +12,6 @@
     <string name="note_deleted">Note deleted</string>
     <string name="note_archived">Note archived</string>
     <string name="undo">UNDO</string>
-    <string name="title">Title</string>
     <string name="search">Search</string>
     <string name="search_hint">Search for notes...</string>
     <string name="delete_all">Delete all</string>
@@ -54,7 +53,6 @@
     <string name="search_for_notes">Search for notes</string>
     <string name="archives">Archives</string>
     <string name="note_title">Note title</string>
-    <string name="note">Note</string>
     <string name="delete_this_note">Delete this note?</string>
     <string name="yes">Yes</string>
     <string name="no">No</string>
@@ -146,5 +144,7 @@
     <string name="apply_color">Apply color</string>
     <string name="cancel_button">Cancel</string>
     <string name="apply_button">Apply</string>
+    <string name="title">Title</string>
+    <string name="note">Note</string>
     <!--END-->
 </resources>

@@ -45,8 +45,8 @@ open class CreateNoteFragment : Fragment(), OnChangeColorListener, OnSetEditMode
      */
     private val STATUS_BAR_COLOR_KEY = "status_bar_color"
     private val NOTE_OBJECT_SAVE_INSTANCE_KEY = "note_object_save_instance_key"
-    private val noteCharactersLimit = 1000
-    private val titleCharactersLimit = 50
+    private val noteCharactersLimit = 5000
+    private val titleCharactersLimit = 500
     /**
      * Others
      */
@@ -67,7 +67,6 @@ open class CreateNoteFragment : Fragment(), OnChangeColorListener, OnSetEditMode
      */
     @ColorInt
     private val INFO_COLOR = Color.parseColor("#3F51B5")
-    private var infoToastShowedAtStart: Boolean = false
     private val delayBetweenToasts = 1500L
 
     /**
@@ -102,13 +101,11 @@ open class CreateNoteFragment : Fragment(), OnChangeColorListener, OnSetEditMode
         } else {
             noteObject = savedInstanceState.getParcelable(NOTE_OBJECT_SAVE_INSTANCE_KEY)
         }
-        noteStyleEditor.applyNoteTheme(arrayListOf(titleView, noteView, cardView, actionBar), arrayListOf(noteObject!!))
+        noteStyleEditor.applyNoteTheme(arrayListOf(titleView, noteView, cardView), arrayListOf(noteObject!!))
 
         editListener()
 
         Toasty.Config.getInstance().setInfoColor(INFO_COLOR).apply()
-
-        infoToastShowedAtStart = true
 
         onTitleAndNoteFieldFocusListener()
 
@@ -299,11 +296,10 @@ open class CreateNoteFragment : Fragment(), OnChangeColorListener, OnSetEditMode
             }
 
             afterTextChanged { text ->
-                noteObject!!.title = text.toString().trim()
+                noteObject.title = text.toString().trim()
                 if (checkLength(noteObject!!.title!!.length)) {
-                    if (!infoToastShowedAtStart)
+                    if (title.isFocused)
                         showLimitCharacterToast() //Show Toast when user type under 1000 characters
-                    infoToastShowedAtStart = false
                 }
             }
         }
@@ -315,11 +311,10 @@ open class CreateNoteFragment : Fragment(), OnChangeColorListener, OnSetEditMode
             }
 
             afterTextChanged { text ->
-                noteObject!!.note = text.toString().trim()
+                noteObject.note = text.toString().trim()
                 if (checkLength(noteObject!!.note!!.length)) {
-                    if (!infoToastShowedAtStart)
+                    if (note.isFocused)
                         showLimitCharacterToast() //Show Toast when user type under 1000 characters
-                    infoToastShowedAtStart = false
                 }
             }
         }

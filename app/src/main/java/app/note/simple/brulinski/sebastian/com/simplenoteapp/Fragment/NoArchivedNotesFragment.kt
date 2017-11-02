@@ -13,7 +13,6 @@ class NoArchivedNotesFragment : Fragment() {
     override fun onCreateView(inflater: LayoutInflater?, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         val root = layoutInflater.inflate(R.layout.no_notes_fragment, container, false)
 
-        Log.i("fromNoArchives", "Hello NoArchives")
         return root
     }
     //TODO

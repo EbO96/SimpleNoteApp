@@ -105,8 +105,6 @@ class NotesListFragment : Fragment(), OnRefreshNoteList {
         }
 
         override fun onBindViewHolder(holder: ViewHolder?, position: Int) {
-            Log.i("interLog", "onBindViewHolder - Recycler")
-
             var title = noteItemArray[position].title
             var note = noteItemArray[position].note
             var positionToDelete: Int
