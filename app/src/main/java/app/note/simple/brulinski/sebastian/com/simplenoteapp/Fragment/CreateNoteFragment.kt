@@ -26,6 +26,7 @@ import app.note.simple.brulinski.sebastian.com.simplenoteapp.Activity.MainActivi
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.Editor.ColorCreator
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.Editor.EditorManager
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.Fragment.BottomSheetFragments.BottomSheetFontFragment
+import app.note.simple.brulinski.sebastian.com.simplenoteapp.HelperClass.InputMethodsManager
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.Interfaces.OnChangeColorListener
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.Interfaces.OnSetEditMode
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.Model.NoteItem
@@ -55,6 +56,7 @@ open class CreateNoteFragment : Fragment(), OnChangeColorListener, OnSetEditMode
     private lateinit var colorManager: EditorManager.ColorManager
     private var showToastFlag = true
     private lateinit var noteObject: NoteItem
+    private val timeDelay = 250L
     /**
      * Layout
      */
@@ -112,13 +114,16 @@ open class CreateNoteFragment : Fragment(), OnChangeColorListener, OnSetEditMode
         //Listen FloatingActionButton action
         binding.createFab.setOnClickListener {
             //Refresh note list
-            val main = (activity as MainActivity) //Main activity statement
-            val currentPositionInViewPager = main.getViewPager().currentItem
-            val note = prepareAndGetNoteObject(currentPositionInViewPager)
-            main.refreshNoteList(note)
-            if (currentPositionInViewPager == 3)
-                main.setupPreview(note)
-            main.getViewPager().setCurrentItem(1, true) //Switch to NoteListFragment
+            InputMethodsManager.hideKeyboard(activity)//Hide keyboard
+            Handler().postDelayed({ //Hide keyboard before code executed in postDelayed() and switch to NoteListFragment
+                val main = (activity as MainActivity) //Main activity statement
+                val currentPositionInViewPager = main.getViewPager().currentItem
+                val note = prepareAndGetNoteObject(currentPositionInViewPager)
+                main.refreshNoteList(note)
+                if (currentPositionInViewPager == 3)
+                    main.setupPreview(note)
+                main.getViewPager().setCurrentItem(1, true) //Switch to NoteListFragment
+            }, timeDelay)
         }
         return binding.root
     }
