@@ -33,6 +33,8 @@ import app.note.simple.brulinski.sebastian.com.simplenoteapp.Model.NoteItem
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.R
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.databinding.CreateNoteFragmentBinding
 import es.dmoral.toasty.Toasty
+import net.yslibrary.android.keyboardvisibilityevent.KeyboardVisibilityEvent
+import net.yslibrary.android.keyboardvisibilityevent.KeyboardVisibilityEventListener
 import org.jetbrains.anko.sdk25.coroutines.textChangedListener
 import org.jetbrains.anko.textColor
 import java.text.SimpleDateFormat
@@ -103,7 +105,7 @@ open class CreateNoteFragment : Fragment(), OnChangeColorListener, OnSetEditMode
         } else {
             noteObject = savedInstanceState.getParcelable(NOTE_OBJECT_SAVE_INSTANCE_KEY)
         }
-        noteStyleEditor.applyNoteTheme(arrayListOf(titleView, noteView, cardView), arrayListOf(noteObject!!))
+        noteStyleEditor.applyNoteTheme(arrayListOf(titleView, noteView, cardView), arrayListOf(noteObject))
 
         editListener()
 
@@ -115,7 +117,13 @@ open class CreateNoteFragment : Fragment(), OnChangeColorListener, OnSetEditMode
         binding.createFab.setOnClickListener {
             //Refresh note list
             InputMethodsManager.hideKeyboard(activity)//Hide keyboard
-            Handler().postDelayed({ //Hide keyboard before code executed in postDelayed() and switch to NoteListFragment
+
+            var timeDelay_ = 0L
+            if (InputMethodsManager.isKeyboardOpen(activity)) //Wait only when keyboard is visible
+                timeDelay_ = timeDelay
+
+            Handler().postDelayed({
+                //Hide keyboard before code executed in postDelayed() and switch to NoteListFragment
                 val main = (activity as MainActivity) //Main activity statement
                 val currentPositionInViewPager = main.getViewPager().currentItem
                 val note = prepareAndGetNoteObject(currentPositionInViewPager)
@@ -123,7 +131,16 @@ open class CreateNoteFragment : Fragment(), OnChangeColorListener, OnSetEditMode
                 if (currentPositionInViewPager == 3)
                     main.setupPreview(note)
                 main.getViewPager().setCurrentItem(1, true) //Switch to NoteListFragment
-            }, timeDelay)
+            }, timeDelay_)
+        }
+
+        //Add listener to keyboard
+        KeyboardVisibilityEvent.setEventListener(activity) { isOpen ->
+            if(isOpen){
+
+            } else {
+
+            }
         }
         return binding.root
     }
@@ -173,7 +190,7 @@ open class CreateNoteFragment : Fragment(), OnChangeColorListener, OnSetEditMode
     private fun onTitleAndNoteFieldFocusListener() {//Listen for changes in note and title EditText
         var textLength: Int
 
-        binding.createNoteTitleField.setOnFocusChangeListener { _, _ ->
+        binding.createNoteTitleField.setOnFocusChangeListener { _, isFocused ->
             textLength = binding.createNoteTitleField.text.length
 
             actualLimit = titleCharactersLimit
@@ -302,7 +319,7 @@ open class CreateNoteFragment : Fragment(), OnChangeColorListener, OnSetEditMode
 
             afterTextChanged { text ->
                 noteObject.title = text.toString().trim()
-                if (checkLength(noteObject!!.title!!.length)) {
+                if (checkLength(noteObject.title!!.length)) {
                     if (title.isFocused)
                         showLimitCharacterToast() //Show Toast when user type under 1000 characters
                 }
@@ -317,12 +334,13 @@ open class CreateNoteFragment : Fragment(), OnChangeColorListener, OnSetEditMode
 
             afterTextChanged { text ->
                 noteObject.note = text.toString().trim()
-                if (checkLength(noteObject!!.note!!.length)) {
+                if (checkLength(noteObject.note!!.length)) {
                     if (note.isFocused)
                         showLimitCharacterToast() //Show Toast when user type under 1000 characters
                 }
             }
         }
+
     }
 
     private fun showLimitCharacterToast() { //To display character limit toast when user type under 1000 characters
@@ -406,12 +424,12 @@ open class CreateNoteFragment : Fragment(), OnChangeColorListener, OnSetEditMode
 
             if (colorOf == (EditorManager.ColorManager.COLOR_OF_TEXT)) {
                 viewsArray = arrayListOf(binding.createNoteTitleField, binding.createNoteNoteField)
-                noteObject!!.TXTColor = color
+                noteObject.TXTColor = color
             } else {
                 viewsArray = arrayListOf(binding.createNoteParentCard)
-                noteObject!!.BGColor = color
+                noteObject.BGColor = color
             }
-            EditorManager.ColorManager(activity).applyNoteTheme(viewsArray, arrayListOf(noteObject!!))
+            EditorManager.ColorManager(activity).applyNoteTheme(viewsArray, arrayListOf(noteObject))
         }
     }
 

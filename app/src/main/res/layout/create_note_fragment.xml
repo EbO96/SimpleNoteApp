@@ -105,39 +105,39 @@
 
                 <ScrollView
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content">
+                    android:layout_height="match_parent">
 
-                    <EditText
-                        android:id="@+id/create_note_title_field"
+                    <LinearLayout
+                        android:orientation="vertical"
                         android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:background="@android:color/transparent"
-                        android:hint="@string/title"
-                        android:inputType="textShortMessage"
-                        android:maxLength="500"
-                        android:maxLines="1"
-                        android:padding="8dp"
-                        android:textSize="24sp"
-                        android:textStyle="bold" />
-                </ScrollView>
+                        android:layout_height="wrap_content">
 
-                <ScrollView
-                    android:id="@+id/create_note_note_scroll_view"
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:paddingTop="8dp">
+                        <EditText
+                            android:id="@+id/create_note_title_field"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:background="@android:color/transparent"
+                            android:hint="@string/title"
+                            android:maxLength="500"
+                            android:padding="8dp"
+                            android:textSize="24sp"
+                            android:textStyle="bold" />
 
-                    <EditText
-                        android:id="@+id/create_note_note_field"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:gravity="top|start"
-                        android:hint="@string/note"
-                        android:maxLength="5000"
-                        android:padding="6dp"
-                        android:textAlignment="gravity"
-                        android:textSize="18sp"
-                        app:met_maxCharacters="1000" />
+                        <EditText
+                            android:id="@+id/create_note_note_field"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:gravity="top|start"
+                            android:hint="@string/note"
+                            android:maxLength="5000"
+                            android:padding="6dp"
+                            android:textAlignment="gravity"
+                            android:textSize="18sp"
+                            app:met_maxCharacters="1000" />
+
+                    </LinearLayout>
+
+
                 </ScrollView>
 
             </LinearLayout>

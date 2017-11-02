@@ -4,8 +4,7 @@ import android.app.Activity
 import android.content.Context
 import android.util.Log
 import android.view.inputmethod.InputMethodManager
-import android.view.inputmethod.InputMethodManager.HIDE_NOT_ALWAYS
-
+import net.yslibrary.android.keyboardvisibilityevent.KeyboardVisibilityEvent
 
 
 /**
@@ -23,6 +22,10 @@ class InputMethodsManager {
                 Log.e("KeyBoardUtil", e.toString(), e)
             }
 
+        }
+
+        fun isKeyboardOpen(activity: Activity): Boolean {
+            return KeyboardVisibilityEvent.isKeyboardVisible(activity)
         }
     }
 }
