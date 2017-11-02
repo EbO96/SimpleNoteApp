@@ -17,11 +17,13 @@ import android.widget.Toast
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.Editor.EditorManager
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.Fragment.BottomSheetFragments.BottomSheetColorFragment
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.Fragment.CreateNoteFragment
-import app.note.simple.brulinski.sebastian.com.simplenoteapp.Fragment.EditNoteFragment
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.Fragment.FragmentPagerAdapter.FragmentAdapter
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.Fragment.NotePreviewFragment
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.Fragment.NotesListFragment
-import app.note.simple.brulinski.sebastian.com.simplenoteapp.Interfaces.*
+import app.note.simple.brulinski.sebastian.com.simplenoteapp.Interfaces.OnChangeColorListener
+import app.note.simple.brulinski.sebastian.com.simplenoteapp.Interfaces.OnRefreshNoteList
+import app.note.simple.brulinski.sebastian.com.simplenoteapp.Interfaces.OnSetEditMode
+import app.note.simple.brulinski.sebastian.com.simplenoteapp.Interfaces.OnSetupPreview
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.Model.NoteItem
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.R
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.databinding.ActivityMainBinding
@@ -61,10 +63,9 @@ class MainActivity : AppCompatActivity() {
      * Interfaces
      */
     private lateinit var mOnChangeColorListener: OnChangeColorListener //To change color in edit or create note
-    private lateinit var mOnRefreshNoteListListener: OnRefreshNoteListListener //To refresh note list
-    private lateinit var mOnRefreshPreviewListener: OnRefreshPreviewListener //To refresh preview screen
-    private lateinit var mOnRefreshEditListener: OnRefreshEditListener //To refresh edit screen
-    private lateinit var mOnResetCreateListener: OnResetCreateListener //To reset create screen
+    private lateinit var mOnRefreshNoteList: OnRefreshNoteList //To refresh note list
+    private lateinit var mOnSetEditMode: OnSetEditMode //To set object to edition in edit mode (CreateNoteFragment)
+    private lateinit var mOnSetupPreview: OnSetupPreview //To setup note preview screen
     /**
     There we starts...
      */
@@ -162,58 +163,51 @@ class MainActivity : AppCompatActivity() {
     /**
      * UPDATE PAGES
      */
+    //Note list
     fun refreshNoteList(noteItem: NoteItem) {
         val fragmentNoteList = mViewPager.adapter.instantiateItem(mViewPager, 1)
-        mOnRefreshNoteListListener = (fragmentNoteList as NotesListFragment)
-
-        when (mViewPager.currentItem) {
-            0 -> {
-                mOnRefreshNoteListListener.onNoteCreated(noteItem)
-            }
-            3 -> {
-                mOnRefreshNoteListListener.onNoteEdited(noteItem)
-                refreshEdit(noteItem)
-                refreshPreview(noteItem)
-            }
-        }
+        mOnRefreshNoteList = (fragmentNoteList as NotesListFragment)
+        mOnRefreshNoteList.onRefreshList(noteItem)
     }
 
-    fun resetList() {
-        val fragmentNoteList = mViewPager.adapter.instantiateItem(mViewPager, 1)
-        mOnRefreshNoteListListener = (fragmentNoteList as NotesListFragment)
-        mOnRefreshNoteListListener.onReset()
+    //Edit mode
+    fun setEditMode(noteItem: NoteItem) {
+        val fragmentCreate = mViewPager.adapter.instantiateItem(mViewPager, 3)
+        mOnSetEditMode = (fragmentCreate as CreateNoteFragment)
+        mOnSetEditMode.onSetNoteObjectInEditMode(noteItem)
     }
 
-    fun resetCreate() {
-        val fragmentCreate = mViewPager.adapter.instantiateItem(mViewPager, 0)
-        mOnResetCreateListener = fragmentCreate as CreateNoteFragment
-        mOnResetCreateListener.onReset()
+    //Preview mode
+    fun setupPreview(noteItem: NoteItem) {
+        val fragmentSetup = mViewPager.adapter.instantiateItem(mViewPager, 2)
+        mOnSetupPreview = (fragmentSetup as NotePreviewFragment)
+        mOnSetupPreview.onSetup(noteItem)
     }
 
-    fun refreshPreview(noteItem: NoteItem) {
-        val fragmentPreview = mViewPager.adapter.instantiateItem(mViewPager, 2)
-        mOnRefreshPreviewListener = (fragmentPreview as NotePreviewFragment)
-        mOnRefreshPreviewListener.onRefresh(noteItem)
-    }
-
-    fun refreshEdit(noteItem: NoteItem) {
-        val fragmentEdit = mViewPager.adapter.instantiateItem(mViewPager, 3)
-        mOnRefreshEditListener = (fragmentEdit as EditNoteFragment)
-        mOnRefreshEditListener.onRefresh(noteItem)
-    }
-
-    fun resetPreview() {
-        val fragmentPreview = mViewPager.adapter.instantiateItem(mViewPager, 2)
-        mOnRefreshPreviewListener = (fragmentPreview as NotePreviewFragment)
-        mOnRefreshPreviewListener.onReset()
-    }
-
-    fun resetEdit() {
-        val fragmentEdit = mViewPager.adapter.instantiateItem(mViewPager, 3)
-        mOnRefreshEditListener = (fragmentEdit as EditNoteFragment)
-        mOnRefreshEditListener.onReset()
-    }
-
+    //    fun resetList() {
+//        val fragmentNoteList = mViewPager.adapter.instantiateItem(mViewPager, 1)
+//        mOnRefreshNoteListListener = (fragmentNoteList as NotesListFragment)
+//        mOnRefreshNoteListListener.onReset()
+//    }
+//    //Create
+//    fun refreshCreate(noteItem: NoteItem?) {
+//
+//    }
+//
+//    //Preview
+//    fun refreshPreview(noteItem: NoteItem) {
+//        val fragmentPreview = mViewPager.adapter.instantiateItem(mViewPager, 2)
+//        mOnRefreshPreviewListener = (fragmentPreview as NotePreviewFragment)
+//        mOnRefreshPreviewListener.onRefresh(noteItem)
+//    }
+//
+//    fun resetPreview() {
+//        val fragmentPreview = mViewPager.adapter.instantiateItem(mViewPager, 2)
+//        mOnRefreshPreviewListener = (fragmentPreview as NotePreviewFragment)
+//        mOnRefreshPreviewListener.onReset()
+//    }
+//
+//
     fun changeNoteColors(colorOf: String, color: Int) {
 
         when (mViewPager.currentItem) {

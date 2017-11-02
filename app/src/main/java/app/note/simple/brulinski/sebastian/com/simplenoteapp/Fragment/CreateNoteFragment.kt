@@ -4,6 +4,7 @@ import android.annotation.SuppressLint
 import android.content.ClipData
 import android.content.ClipboardManager
 import android.content.Context
+import android.content.res.ColorStateList
 import android.databinding.DataBindingUtil
 import android.graphics.Color
 import android.os.Build
@@ -26,7 +27,7 @@ import app.note.simple.brulinski.sebastian.com.simplenoteapp.Editor.ColorCreator
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.Editor.EditorManager
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.Fragment.BottomSheetFragments.BottomSheetFontFragment
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.Interfaces.OnChangeColorListener
-import app.note.simple.brulinski.sebastian.com.simplenoteapp.Interfaces.OnResetCreateListener
+import app.note.simple.brulinski.sebastian.com.simplenoteapp.Interfaces.OnSetEditMode
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.Model.NoteItem
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.R
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.databinding.CreateNoteFragmentBinding
@@ -37,7 +38,7 @@ import java.text.SimpleDateFormat
 import java.util.*
 
 
-open class CreateNoteFragment : Fragment(), OnChangeColorListener, OnResetCreateListener {
+open class CreateNoteFragment : Fragment(), OnChangeColorListener, OnSetEditMode {
 
     /**
      * Keys and final fields values
@@ -53,6 +54,7 @@ open class CreateNoteFragment : Fragment(), OnChangeColorListener, OnResetCreate
     private var actualLimit = titleCharactersLimit
     private lateinit var colorManager: EditorManager.ColorManager
     private var showToastFlag = true
+    private lateinit var noteObject: NoteItem
     /**
      * Layout
      */
@@ -72,19 +74,13 @@ open class CreateNoteFragment : Fragment(), OnChangeColorListener, OnResetCreate
      * Static fields
      */
     companion object {
-        var noteObject: NoteItem? = null //Singe note object
-
         @SuppressLint("SimpleDateFormat")
         fun getCurrentDateAndTime(): String { //Get current time from system
-            val calendar = Calendar.getInstance()
-
-            return SimpleDateFormat("yyyy-MM-dd 'at' HH:mm:ss a").format(calendar.time)
+            return SimpleDateFormat("yyyy-MM-dd 'at' HH:mm:ss a").format(Calendar.getInstance().time)
         }
-
         /**
          * KEY values
          */
-        val NOTE_OBJECT_TO_COLOR_CREATOR = "note_object_to_color_creator"
     }
 
     @RequiresApi(Build.VERSION_CODES.LOLLIPOP)
@@ -105,9 +101,7 @@ open class CreateNoteFragment : Fragment(), OnChangeColorListener, OnResetCreate
             noteObject = NoteItem(null, "", "", "", ContextCompat.getColor(context, R.color.material_white), ContextCompat.getColor(context, R.color.material_black), EditorManager.FontStyleManager.DEFAULT_FONT, false, false)
         } else {
             noteObject = savedInstanceState.getParcelable(NOTE_OBJECT_SAVE_INSTANCE_KEY)
-            //noteStyleEditor.changeColor(arrayListOf(EditorManager.ColorManager.ACTION_BAR_COLOR), Color.parseColor("#000000"))
         }
-
         noteStyleEditor.applyNoteTheme(arrayListOf(titleView, noteView, cardView, actionBar), arrayListOf(noteObject!!))
 
         editListener()
@@ -120,69 +114,48 @@ open class CreateNoteFragment : Fragment(), OnChangeColorListener, OnResetCreate
 
         //Listen FloatingActionButton action
         binding.createFab.setOnClickListener {
-            val viewPager = (activity as MainActivity).getViewPager()
-            val pagerAdapter = (activity as MainActivity).getPagerAdapter()
-
-            val position = viewPager.currentItem
-
-            when (position) {
-                0 -> { //Create
-                    noteObject!!.date = getCurrentDateAndTime()
-                    (activity as MainActivity).refreshNoteList(noteObject!!)
-                    (activity as MainActivity).getViewPager().setCurrentItem(1, true)
-                    Handler().postDelayed({
-                        onReset()
-                    }, 300)
-
-                    //(activity as MainActivity).resetCreate()
-//                    updateChannel.setupUpdate(context, noteObject)
-//                    ObjectToDatabaseOperations.insertObject(context, noteObject)
-//                    pagerAdapter.notifyDataSetChanged()
-                }
-                3 -> { //Edit
-                    if (EditNoteFragment.noteObject != null) {
-                        (activity as MainActivity).refreshNoteList(prepareAndGetNoteObject())
-                        EditNoteFragment.noteObject = null
-                        (activity as MainActivity).getViewPager().setCurrentItem(1, true)
-                    }
-//                    val note = prepareAndGetNoteObject()
-//                    FragmentAndObjectStates.currentNote = note
-//                    ObjectToDatabaseOperations.updateObject(context, arrayListOf(note))
-//                    pagerAdapter.notifyDataSetChanged()
-                }
-            }
-
+            //Refresh note list
+            val main = (activity as MainActivity) //Main activity statement
+            val currentPositionInViewPager = main.getViewPager().currentItem
+            val note = prepareAndGetNoteObject(currentPositionInViewPager)
+            main.refreshNoteList(note)
+            if (currentPositionInViewPager == 3)
+                main.setupPreview(note)
+            main.getViewPager().setCurrentItem(1, true) //Switch to NoteListFragment
         }
         return binding.root
-    }
-
-    override fun onReset() {
-        (activity as MainActivity).getPagerAdapter().notifyDataSetChanged()
-//        noteObject = Notes.Note.default
-//        titleView.setText(noteObject!!.title)
-//        noteView.setText(noteObject!!.note)
-//        titleView.textColor = noteObject!!.TXTColor!!
-//        noteView.textColor = noteObject!!.TXTColor!!
-//        cardView.cardBackgroundColor = ColorStateList.valueOf(noteObject!!.BGColor!!)
     }
 
     /*
     Make object after edit
      */
-    fun prepareAndGetNoteObject(): NoteItem {
+    fun prepareAndGetNoteObject(position: Int): NoteItem {
+        val id: Int? = if (position == 0)
+            null
+        else noteObject.id
+
         return NoteItem(
-                EditNoteFragment.noteObject!!.id, binding.createNoteTitleField.text.toString().trim(), binding.createNoteNoteField.text.toString().trim(),
+                id, binding.createNoteTitleField.text.toString().trim(), binding.createNoteNoteField.text.toString().trim(),
                 getCurrentDateAndTime(), ColorCreator.getColorFromCard(activity, binding.createNoteParentCard), ColorCreator.getColorIntFromColorStateList(binding.createNoteTitleField.textColors),
-                noteObject!!.fontStyle, false, false
+                EditorManager.FontStyleManager.DEFAULT_FONT, false, false
         )
+    }
+
+    override fun onSetNoteObjectInEditMode(noteItem: NoteItem) {
+        noteObject = noteItem
+
+        binding.createNoteTitleField.setText(noteItem.title)
+        binding.createNoteNoteField.setText(noteItem.note)
+        binding.createNoteTitleField.setHintTextColor(noteItem.TXTColor!!)
+        binding.createNoteNoteField.setHintTextColor(noteItem.TXTColor!!)
+        binding.createNoteTitleField.setTextColor(noteItem.TXTColor!!)
+        binding.createNoteNoteField.setTextColor(noteItem.TXTColor!!)
+        binding.createNoteParentCard.cardBackgroundColor = ColorStateList.valueOf(noteItem.BGColor!!)
     }
 
     override fun onSaveInstanceState(outState: Bundle?) {
         super.onSaveInstanceState(outState)
         outState!!.putParcelable(NOTE_OBJECT_SAVE_INSTANCE_KEY, noteObject)
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            outState.putInt(STATUS_BAR_COLOR_KEY, activity.window.statusBarColor)
-        }
     }
 
     @RequiresApi(Build.VERSION_CODES.LOLLIPOP)

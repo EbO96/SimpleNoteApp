@@ -6,7 +6,6 @@ import android.support.v4.app.FragmentManager
 import android.support.v4.app.FragmentPagerAdapter
 import android.support.v4.view.PagerAdapter
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.Fragment.CreateNoteFragment
-import app.note.simple.brulinski.sebastian.com.simplenoteapp.Fragment.EditNoteFragment
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.Fragment.NotePreviewFragment
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.Fragment.NotesListFragment
 
@@ -15,6 +14,7 @@ class FragmentAdapter(fm: FragmentManager?, var activity: Activity) : FragmentPa
 
 
     override fun getItem(position: Int): Fragment {
+
         return when (position) {
             0 -> {
                 CreateNoteFragment()
@@ -26,7 +26,7 @@ class FragmentAdapter(fm: FragmentManager?, var activity: Activity) : FragmentPa
                 NotePreviewFragment()
             }
             3 -> {
-                EditNoteFragment()
+                CreateNoteFragment()
             }
             else -> CreateNoteFragment()
         }

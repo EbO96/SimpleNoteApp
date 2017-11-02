@@ -4,12 +4,11 @@ import android.os.Build
 import android.os.Bundle
 import android.util.Log
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.Editor.EditorManager
-import app.note.simple.brulinski.sebastian.com.simplenoteapp.Interfaces.OnRefreshEditListener
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.Model.NoteItem
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.Model.Notes
 
 @Suppress("DEPRECATION", "OverridingDeprecatedMember")
-class EditNoteFragment : CreateNoteFragment(), OnRefreshEditListener {
+class EditNoteFragment : CreateNoteFragment() {
     /**
      * Keys
      */
@@ -19,7 +18,7 @@ class EditNoteFragment : CreateNoteFragment(), OnRefreshEditListener {
      * Others
      */
     companion object {
-        var noteObject: NoteItem? = null
+        var noteObject: NoteItem = Notes.Note.default
     }
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
@@ -27,7 +26,14 @@ class EditNoteFragment : CreateNoteFragment(), OnRefreshEditListener {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
             listenBarOptions()
         }
+        if (savedInstanceState != null)
+            setupEdit(savedInstanceState.getParcelable(SAVE_INSTANCE_STATE_POSITION_KEY))
         super.onActivityCreated(savedInstanceState)
+    }
+
+    override fun onSaveInstanceState(outState: Bundle?) {
+        outState!!.putParcelable(SAVE_INSTANCE_STATE_POSITION_KEY, noteObject)
+        super.onSaveInstanceState(outState)
     }
 
 
@@ -48,15 +54,5 @@ class EditNoteFragment : CreateNoteFragment(), OnRefreshEditListener {
             titleView.setText(title)
             noteView.setText(note)
         }
-    }
-
-    override fun onRefresh(noteItem: NoteItem) {
-        noteObject = noteItem
-        setupEdit(noteItem)
-    }
-
-    override fun onReset() {
-        noteObject = null
-        setupEdit(Notes.Note.default)
     }
 }

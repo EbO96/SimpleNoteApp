@@ -10,18 +10,25 @@ import android.view.ViewGroup
 import android.widget.TextView
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.Activity.MainActivity
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.Editor.EditorManager
-import app.note.simple.brulinski.sebastian.com.simplenoteapp.Interfaces.OnRefreshPreviewListener
+import app.note.simple.brulinski.sebastian.com.simplenoteapp.Interfaces.OnSetupPreview
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.Model.NoteItem
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.Model.Notes
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.R
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.databinding.PreviewCardBinding
 
-class NotePreviewFragment : Fragment(), OnRefreshPreviewListener {
-
-    lateinit var binding: PreviewCardBinding
-    lateinit var titleView: TextView
-    lateinit var noteView: TextView
-    lateinit var cardView: CardView
+class NotePreviewFragment : Fragment(), OnSetupPreview {
+    /**
+     * Key's values
+     */
+    private val NOTE_KEY = "note_object"
+    /**
+     * Others
+     */
+    private lateinit var binding: PreviewCardBinding
+    private lateinit var titleView: TextView
+    private lateinit var noteView: TextView
+    private lateinit var cardView: CardView
+    private var noteObject: NoteItem = Notes.Note.default
 
     override fun onCreateView(inflater: LayoutInflater?, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         setHasOptionsMenu(true)
@@ -30,27 +37,24 @@ class NotePreviewFragment : Fragment(), OnRefreshPreviewListener {
         noteView = binding.previewNoteField
         cardView = binding.previewCardParentCard
 
+        if (savedInstanceState != null)
+            onSetup(savedInstanceState.getParcelable(NOTE_KEY))
         return binding.root
     }
 
-    fun setupPreview(noteItem: NoteItem?) {
-        if (noteItem != null) {
-            val title = noteItem.title
-            val note = noteItem.note
-
-            EditorManager.ColorManager((activity as MainActivity)).applyNoteTheme(arrayListOf(titleView, noteView, cardView), arrayListOf(noteItem))
-
-            titleView.text = title
-            noteView.text = note
-        }
+    override fun onSaveInstanceState(outState: Bundle?) {
+        outState!!.putParcelable(NOTE_KEY, noteObject)
+        super.onSaveInstanceState(outState)
     }
 
-    override fun onRefresh(noteItem: NoteItem?) {
-        setupPreview(noteItem)
-    }
+    override fun onSetup(noteItem: NoteItem) {
+        noteObject = noteItem
+        val title = noteItem.title
+        val note = noteItem.note
 
-    override fun onReset() {
-        setupPreview(Notes.Note.default)
-    }
+        EditorManager.ColorManager((activity as MainActivity)).applyNoteTheme(arrayListOf(titleView, noteView, cardView), arrayListOf(noteItem))
 
+        titleView.text = title
+        noteView.text = note
+    }
 }

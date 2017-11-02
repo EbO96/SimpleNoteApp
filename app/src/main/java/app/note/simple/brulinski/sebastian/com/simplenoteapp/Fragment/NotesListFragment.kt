@@ -20,44 +20,15 @@ import android.widget.TextView
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.Activity.MainActivity
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.Database.ObjectToDatabaseOperations
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.Editor.EditorManager
-import app.note.simple.brulinski.sebastian.com.simplenoteapp.Interfaces.OnRefreshNoteListListener
+import app.note.simple.brulinski.sebastian.com.simplenoteapp.Interfaces.OnRefreshNoteList
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.Model.NoteItem
+import app.note.simple.brulinski.sebastian.com.simplenoteapp.Model.Notes
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.R
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.databinding.NotesListFragmentBinding
-import java.lang.reflect.Executable
 import java.util.*
 
 @Suppress("DEPRECATION", "OverridingDeprecatedMember")
-class NotesListFragment : Fragment(), OnRefreshNoteListListener {
-
-    override fun onNoteEdited(noteItem: NoteItem?) {
-        if (noteItem != null) {
-            for (x in 0 until noteItemArrayList.size) {
-                if (noteItemArrayList[x].id == noteItem.id) {
-                    noteItemArrayList[x] = noteItem
-                    myRecycler.notifyDataSetChanged()
-                    break
-                }
-            }
-            ObjectToDatabaseOperations.updateObject(context, arrayListOf(noteItem))
-            sortNotes()
-        }
-    }
-
-
-    override fun onNoteCreated(noteItem: NoteItem?) {
-        if (noteItem != null) {
-            ObjectToDatabaseOperations.insertObject(context, noteItem)
-            noteItemArrayList.add(noteItem)
-            myRecycler.notifyDataSetChanged()
-            sortNotes()
-        }
-
-    }
-
-    override fun onReset() {
-        (activity as MainActivity).getPagerAdapter().notifyDataSetChanged()
-    }
+class NotesListFragment : Fragment(), OnRefreshNoteList {
 
     lateinit var binding: NotesListFragmentBinding //Bind layout
     /**
@@ -107,6 +78,19 @@ class NotesListFragment : Fragment(), OnRefreshNoteListListener {
         myRecycler.notifyDataSetChanged()
     }
 
+    /*
+    Refresh note list
+     */
+    override fun onRefreshList(noteItem: NoteItem) {
+        if (noteItem.id != null)
+            ObjectToDatabaseOperations.updateObject(context, arrayListOf(noteItem))
+        else ObjectToDatabaseOperations.insertObject(context, noteItem)
+
+        noteItemArrayList = ObjectToDatabaseOperations.getObjects(context, false)
+        initRecyclerAdapter()
+        sortNotes()
+    }
+
     /**
      * Recycler
      */
@@ -138,19 +122,18 @@ class NotesListFragment : Fragment(), OnRefreshNoteListListener {
             holder.note.text = note
 
             holder.itemView.setOnClickListener {
-                val recyclerPosition = recyclerView.getChildAdapterPosition(holder.itemView)
-                val noteItem = noteItemArray[recyclerPosition]
+                val noteItem = noteItemArray[recyclerView.getChildAdapterPosition(holder.itemView)] //Get clicked object
 
-                (activity as MainActivity).refreshPreview(noteItem)
-                (activity as MainActivity).refreshEdit(noteItem)
-                (activity as MainActivity).getViewPager().setCurrentItem(2, true) //Switch to preview
+                val main = (activity as MainActivity)//main statement
+                main.setupPreview(noteItem) //Setup preview screen
+                main.setEditMode(noteItem) //Fill title field, note field and background color in edit mode (CreateNoteFragment)
+                main.getViewPager().setCurrentItem(2, true) //Switch to preview
             }
 
             holder.itemView.setOnLongClickListener {
                 positionToDelete = holder.adapterPosition
                 preferences = PreferenceManager.getDefaultSharedPreferences(activity)
                 val flag = preferences.getBoolean(activity.getString(R.string.pref_key_archives), true)
-
                 /*
                Make UNDO Snackbar after delete
                  */
@@ -175,8 +158,9 @@ class NotesListFragment : Fragment(), OnRefreshNoteListListener {
                         ObjectToDatabaseOperations.addDeleteFlag(context = activity, noteObjects = arrayListOf(deletedItem!!), flag = false)
                     else ObjectToDatabaseOperations.insertObject(activity, deletedItem!!)
 
-                    (activity as MainActivity).refreshPreview(deletedItem!!)
-                    (activity as MainActivity).refreshEdit(deletedItem!!)
+                    val main = activity as MainActivity
+                    main.setupPreview(deletedItem!!)
+                    main.setEditMode(deletedItem!!)
 
                 }).show()
 
@@ -186,8 +170,9 @@ class NotesListFragment : Fragment(), OnRefreshNoteListListener {
                     ObjectToDatabaseOperations.addDeleteFlag(context = activity, noteObjects = arrayListOf(deletedItem!!), flag = true)
                 else ObjectToDatabaseOperations.deleteObjects(activity, arrayListOf(deletedItem!!))
 
-                (activity as MainActivity).resetPreview()
-                (activity as MainActivity).resetEdit()
+                val main = activity as MainActivity
+                main.setupPreview(Notes.Note.default)
+                main.setEditMode(Notes.Note.default)
 
                 true
             }
