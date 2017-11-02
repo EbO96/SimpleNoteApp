@@ -74,7 +74,7 @@ class ObjectToDatabaseOperations {
                     NoteItem(
                             notes[it][it].id, notes[it][it].title, notes[it][it].note, notes[it][it].date,
                             notes[it][it].BGColor!!, notes[it][it].TXTColor!!, notes[it][it].fontStyle,
-                            notes[it][it].isDeleted, notes[it][it].isSelected)
+                            notes[it][it].isDeleted, false)
                 }
             }
             return array

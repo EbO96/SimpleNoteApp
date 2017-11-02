@@ -4,7 +4,6 @@ import android.content.Intent
 import android.databinding.DataBindingUtil
 import android.graphics.Color
 import android.os.Bundle
-import android.os.Debug
 import android.os.Handler
 import android.support.annotation.ColorInt
 import android.support.design.widget.BottomSheetDialogFragment
@@ -83,7 +82,6 @@ class MainActivity : AppCompatActivity() {
         setupViewPager()
     }
 
-
     /**
      *  END OF onCreate(...)
      */
@@ -100,6 +98,7 @@ class MainActivity : AppCompatActivity() {
         mViewPager = binding.mainContainer
         fragmentAdapter = FragmentAdapter(supportFragmentManager, activityMain)
         mViewPager.adapter = fragmentAdapter
+        binding.mainTabLayout.setupWithViewPager(mViewPager, true)
         mViewPager.currentItem = 1
         mViewPager.offscreenPageLimit = 3
         supportActionBar!!.title = getString(R.string.notes)

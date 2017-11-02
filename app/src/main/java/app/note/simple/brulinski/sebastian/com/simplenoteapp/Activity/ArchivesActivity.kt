@@ -30,7 +30,6 @@ class ArchivesActivity : AppCompatActivity() {
         setToolbarTitle(getString(R.string.archives))
 
         val notes = ObjectToDatabaseOperations.getObjects(context = this, isDeletedWhereClause = true) //Get deleted notes from database
-
         val args = Bundle()
         if (savedInstanceState == null)
             args.putParcelableArrayList(ArchivedNotesFragment.BUNDLE_KEY, notes)
