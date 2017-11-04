@@ -1,15 +1,16 @@
 package app.note.simple.brulinski.sebastian.com.simplenoteapp.Database
 
+import android.content.ContentValues
 import android.content.Context
 import android.database.sqlite.SQLiteDatabase
 import android.database.sqlite.SQLiteOpenHelper
-import android.content.ContentValues.TAG
 import android.util.Log
 
 
 /**
  * Created by sebas on 11/4/2017.
  */
+
 class SearchDatabaseTable {
 
     private val mDatabaseOpenHelper: DatabaseOpenHelper? = null
@@ -26,11 +27,12 @@ class SearchDatabaseTable {
         private val DATABASE_VERSION = 1
 
         private class DatabaseOpenHelper internal constructor(private val mHelperContext: Context) : SQLiteOpenHelper(mHelperContext, DATABASE_NAME, null, DATABASE_VERSION) {
-            private var mDatabase: SQLiteDatabase? = null
+            private lateinit var mDatabase: SQLiteDatabase
 
             override fun onCreate(db: SQLiteDatabase) {
                 mDatabase = db
-                mDatabase!!.execSQL(FTS_TABLE_CREATE)
+                mDatabase.execSQL(FTS_TABLE_CREATE)
+                loadNotes()
             }
 
             override fun onUpgrade(db: SQLiteDatabase, oldVersion: Int, newVersion: Int) {
@@ -38,6 +40,21 @@ class SearchDatabaseTable {
                         + newVersion + ", which will destroy all old data")
                 db.execSQL("DROP TABLE IF EXISTS " + FTS_VIRTUAL_TABLE)
                 onCreate(db)
+            }
+
+            private fun loadNotes() {
+                val notes = ObjectToDatabaseOperations.getObjects(mHelperContext, false)
+
+                for (x in 0 until notes.size) {
+                    addNote(notes[x].title!!, notes[x].note!!)
+                }
+            }
+
+            private fun addNote(title: String, note: String): Long {
+                val initialValues = ContentValues()
+                initialValues.put(COL_TITLE, title)
+                initialValues.put(COL_NOTE, note)
+                return mDatabase.insert(FTS_VIRTUAL_TABLE, null, initialValues)
             }
 
             companion object {
