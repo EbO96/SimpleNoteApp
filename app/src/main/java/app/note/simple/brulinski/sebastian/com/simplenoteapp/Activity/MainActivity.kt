@@ -1,5 +1,7 @@
 package app.note.simple.brulinski.sebastian.com.simplenoteapp.Activity
 
+import android.app.SearchManager
+import android.content.Context
 import android.content.Intent
 import android.databinding.DataBindingUtil
 import android.graphics.Color
@@ -13,6 +15,7 @@ import android.util.Log
 import android.view.Menu
 import android.view.MenuInflater
 import android.view.MenuItem
+import android.widget.SearchView
 import android.widget.Toast
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.Editor.EditorManager
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.Fragment.BottomSheetFragments.BottomSheetColorFragment
@@ -232,6 +235,12 @@ class MainActivity : AppCompatActivity() {
 
         val menuInflater: MenuInflater = menuInflater
         menuInflater.inflate(R.menu.main_menu, menu)
+
+        //Associate searchable configuration with the SearchView
+        val searchManager = getSystemService(Context.SEARCH_SERVICE) as SearchManager
+        val searchView = menu!!.findItem(R.id.search).actionView as SearchView
+        searchView.setSearchableInfo(searchManager.getSearchableInfo(componentName))
+
         return true
     }
 
@@ -240,10 +249,10 @@ class MainActivity : AppCompatActivity() {
      */
     override fun onOptionsItemSelected(item: MenuItem?): Boolean {
         when (item?.itemId) {
-            R.id.search_main -> {
-                val intent = Intent(this, SearchActivity::class.java)
-                startActivity(intent)
-            }
+//            R.id.search_main -> {
+//                val intent = Intent(this, SearchActivity::class.java)
+//                startActivity(intent)
+//            }
             R.id.archives -> {
                 val intent = Intent(this, ArchivesActivity::class.java)
                 startActivity(intent)
