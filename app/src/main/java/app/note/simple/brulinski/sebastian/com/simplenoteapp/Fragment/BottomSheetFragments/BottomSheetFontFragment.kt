@@ -29,8 +29,6 @@ class BottomSheetFontFragment : BottomSheetDialogFragment() {
     override fun onCreateView(inflater: LayoutInflater?, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         binding = DataBindingUtil.inflate(inflater, R.layout.font_layout, container, false)
 
-        val ed = EditorManager.FontStyleManager
-
         binding.fontDefault.setOnClickListener {
 
             dismiss()

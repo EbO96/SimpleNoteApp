@@ -9,7 +9,9 @@
         android:roundIcon="@mipmap/ic_launcher"
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
-        tools:ignore="AllowBackup,GoogleAppIndexingWarning">
+        tools:ignore="AllowBackup,GoogleAppIndexingWarning"
+        android:name="android.support.multidex.MultiDexApplication"
+        android:allowBackup="true">
         <activity
             android:name=".Activity.MainActivity"
             android:launchMode="singleTop"

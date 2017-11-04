@@ -15,7 +15,6 @@ import app.note.simple.brulinski.sebastian.com.simplenoteapp.Activity.MainActivi
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.Editor.ColorCreator
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.Editor.EditorManager
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.R
-
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.databinding.ColorCreatorLayoutBinding
 
 
@@ -254,7 +253,7 @@ class OwnColorCreatorDialogFragment : DialogFragment() {
         val params = dialog.window!!.attributes
         params.width = WindowManager.LayoutParams.MATCH_PARENT
         params.height = WindowManager.LayoutParams.MATCH_PARENT
-        dialog.window!!.attributes = params as android.view.WindowManager.LayoutParams
+        dialog.window!!.attributes = params
 
         super.onResume()
     }

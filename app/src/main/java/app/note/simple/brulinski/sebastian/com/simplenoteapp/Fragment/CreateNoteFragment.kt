@@ -190,7 +190,7 @@ open class CreateNoteFragment : Fragment(), OnChangeColorListener, OnSetEditMode
     private fun onTitleAndNoteFieldFocusListener() {//Listen for changes in note and title EditText
         var textLength: Int
 
-        binding.createNoteTitleField.setOnFocusChangeListener { _, isFocused ->
+        binding.createNoteTitleField.setOnFocusChangeListener { _, _ ->
             textLength = binding.createNoteTitleField.text.length
 
             actualLimit = titleCharactersLimit
@@ -274,8 +274,6 @@ open class CreateNoteFragment : Fragment(), OnChangeColorListener, OnSetEditMode
     @RequiresApi(Build.VERSION_CODES.LOLLIPOP)
     fun listenBarOptions() {
 
-        val bottomSheetFonts: BottomSheetDialogFragment = BottomSheetFontFragment()
-
         binding.selectAll.setOnClickListener {
             selectAllText()
         }
@@ -287,12 +285,6 @@ open class CreateNoteFragment : Fragment(), OnChangeColorListener, OnSetEditMode
         binding.paste.setOnClickListener {
             pasteText()
         }
-
-//        binding.fontStyle.setOnClickListener {
-////            if (!bottomSheetFonts.isAdded) {
-////                bottomSheetFonts.show(activity.supportFragmentManager, bottomSheetFonts.tag)
-////            }
-//        }
 
         binding.textColor.setOnClickListener {
             (activity as MainActivity).setColorBottomSheet()

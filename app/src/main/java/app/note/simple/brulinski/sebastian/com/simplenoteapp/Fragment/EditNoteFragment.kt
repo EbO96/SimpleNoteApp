@@ -49,7 +49,7 @@ class EditNoteFragment : CreateNoteFragment() {
 
             Log.i("interLog", "title = $title \n note = $note")
 
-            EditorManager.ColorManager(activity).applyNoteTheme(arrayListOf(titleView, noteView, cardView), arrayListOf(noteItem!!))
+            EditorManager.ColorManager(activity).applyNoteTheme(arrayListOf(titleView, noteView, cardView), arrayListOf(noteItem))
 
             titleView.setText(title)
             noteView.setText(note)

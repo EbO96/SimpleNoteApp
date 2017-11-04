@@ -123,7 +123,7 @@ class ArchivedNotesFragment : Fragment() {
     }
 
     override fun onOptionsItemSelected(item: MenuItem?): Boolean {
-        var message = ""
+        var message: String
         val itemsSize = itemsToDeleteOrRestore.size
 
         when (item!!.itemId) {
@@ -162,13 +162,13 @@ class ArchivedNotesFragment : Fragment() {
         alert.setIcon(ContextCompat.getDrawable(context, icon))
         alert.setTitle(title)
 
-        alert.setButton(AlertDialog.BUTTON_POSITIVE, getString(R.string.yes), { _, i ->
+        alert.setButton(AlertDialog.BUTTON_POSITIVE, getString(R.string.yes), { _, _ ->
             if (isDeleteOrRestore) //Delete items
                 deleteSelectedItems(itemsToDeleteOrRestore)
             else restoreSelectedItems(itemsToDeleteOrRestore) //Restore items
         })
 
-        alert.setButton(AlertDialog.BUTTON_NEGATIVE, getString(R.string.no), { _, i ->
+        alert.setButton(AlertDialog.BUTTON_NEGATIVE, getString(R.string.no), { _, _ ->
             //Do nothing
         })
         alert.show()
@@ -253,7 +253,7 @@ class ArchivedNotesFragment : Fragment() {
                 alert.setIcon(ContextCompat.getDrawable(activity, R.drawable.ic_delete_black_24dp))
                 alert.setTitle(activity.getString(R.string.delete_this_note))
 
-                alert.setButton(android.support.v7.app.AlertDialog.BUTTON_POSITIVE, activity.getString(R.string.yes), { _, i ->
+                alert.setButton(android.support.v7.app.AlertDialog.BUTTON_POSITIVE, activity.getString(R.string.yes), { _, _ ->
                     ObjectToDatabaseOperations.deleteObjects(context = activity, noteObjects = arrayListOf(noteObject))//Update object ( delete flag )
 
                     notesArrayList.removeAt(positionToDelete)
@@ -284,7 +284,7 @@ class ArchivedNotesFragment : Fragment() {
                     mSizeCallback.recyclerSize(notesArrayList.size)
                 })
 
-                alert.setButton(android.support.v7.app.AlertDialog.BUTTON_NEGATIVE, activity.getString(R.string.no), { _, i ->
+                alert.setButton(android.support.v7.app.AlertDialog.BUTTON_NEGATIVE, activity.getString(R.string.no), { _, _ ->
                     //Do nothing
                 })
                 alert.show()
