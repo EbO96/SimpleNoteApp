@@ -44,10 +44,13 @@ class NotesListFragment : Fragment(), OnRefreshNoteList, OnSetFilter {
      */
     private val NOTES_ARRAY_KEY = "notes"
     private val LAYOUT_STYLE_KEY = "layout style"
+
     /**
      * Others values
      */
-    private var searchQuery = ""
+    companion object {
+        private var searchQuery = ""
+    }
 
     override fun onCreateView(inflater: LayoutInflater?, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         Log.i("interLog", "NOTELIST CREATE!")
@@ -172,19 +175,26 @@ class NotesListFragment : Fragment(), OnRefreshNoteList, OnSetFilter {
 
                 @Suppress("DEPRECATION")
                 undoSnack.setAction(activity.getString(R.string.undo), {
-                    this.noteItemArray.add(positionToDelete, deletedItem!!)
-                    notifyItemInserted(positionToDelete)
-                    recyclerView.scrollToPosition(positionToDelete)
 
-                    if (flag)
-                        ObjectToDatabaseOperations.addDeleteFlag(context = activity, noteObjects = arrayListOf(deletedItem!!), flag = false)
-                    else ObjectToDatabaseOperations.insertObject(activity, deletedItem!!)
+                    //Check whether note already exist in array
+                    val notExistInArrayFlag = (0 until noteItemArray.size).none { noteItemArray[it] == deletedItem }
 
-                    (activity as MainActivity).loadDataToRecycler()
+                    if (notExistInArrayFlag) { //If deletedItem not exist in array then put deleted into array and notify recycler 
+                        this.noteItemArray.add(positionToDelete, deletedItem!!)
+                        notifyItemInserted(positionToDelete)
+                        recyclerView.scrollToPosition(positionToDelete)
 
-                    val main = activity as MainActivity
-                    main.setupPreview(deletedItem!!)
-                    main.setEditMode(deletedItem!!)
+                        if (flag)
+                            ObjectToDatabaseOperations.addDeleteFlag(context = activity, noteObjects = arrayListOf(deletedItem!!), flag = false)
+                        else ObjectToDatabaseOperations.insertObject(activity, deletedItem!!)
+
+                        if (NotesListFragment.searchQuery.isNotEmpty())
+                            (activity as MainActivity).loadDataToRecycler()
+
+                        val main = activity as MainActivity
+                        main.setupPreview(deletedItem!!)
+                        main.setEditMode(deletedItem!!)
+                    }
 
                 }).show()
 
@@ -194,7 +204,8 @@ class NotesListFragment : Fragment(), OnRefreshNoteList, OnSetFilter {
                     ObjectToDatabaseOperations.addDeleteFlag(context = activity, noteObjects = arrayListOf(deletedItem!!), flag = true)
                 else ObjectToDatabaseOperations.deleteObjects(activity, arrayListOf(deletedItem!!))
 
-                (activity as MainActivity).loadDataToRecycler()
+                if (NotesListFragment.searchQuery.isNotEmpty())
+                    (activity as MainActivity).loadDataToRecycler()
 
                 val main = activity as MainActivity
                 main.setupPreview(Notes.Note.default)

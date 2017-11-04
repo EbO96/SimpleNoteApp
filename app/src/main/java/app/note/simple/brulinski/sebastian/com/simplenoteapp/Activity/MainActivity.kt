@@ -239,6 +239,7 @@ class MainActivity : AppCompatActivity(), SearchView.OnQueryTextListener {
         searchViewMenuItem = menu!!.findItem(R.id.search_view)
         val searchView = searchViewMenuItem.actionView as SearchView
         searchView.setSearchableInfo(searchManager.getSearchableInfo(componentName))
+        searchView.queryHint = getString(R.string.search_hint)
         searchView.setOnQueryTextListener(this)
 
         //Listen for current page in ViewPager and set menu item SearchView visible or not
