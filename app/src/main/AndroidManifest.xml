@@ -19,7 +19,8 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
 
-            <meta-data android:name="android.app.searchable"
+            <meta-data
+                android:name="android.app.searchable"
                 android:resource="@xml/searchable" />
         </activity>
         <activity
@@ -48,14 +49,19 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value=".Activity.MainActivity" />
         </activity>
+        <activity android:name=".Activity.SearchResultActivity">
+            <intent-filter>
+                <action android:name="android.intent.action.SEARCH" />
+            </intent-filter>
+        </activity>
         <!--<activity-->
-            <!--android:name=".ActivOwnColorCreatorDialogFragmentvity"-->
-            <!--android:label=""-->
-            <!--android:parentActivityName=".Activity.MainActivity"-->
-            <!--android:windowSoftInputMode="adjustPan|adjustResize">-->
-            <!--<meta-data-->
-                <!--android:name="android.support.PARENT_ACTIVITY"-->
-                <!--android:value=".Activity.MainActivity" />-->
+        <!--android:name=".ActivOwnColorCreatorDialogFragmentvity"-->
+        <!--android:label=""-->
+        <!--android:parentActivityName=".Activity.MainActivity"-->
+        <!--android:windowSoftInputMode="adjustPan|adjustResize">-->
+        <!--<meta-data-->
+        <!--android:name="android.support.PARENT_ACTIVITY"-->
+        <!--android:value=".Activity.MainActivity" />-->
         <!--</activity>-->
     </application>
 
