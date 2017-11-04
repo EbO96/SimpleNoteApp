@@ -54,6 +54,7 @@ class MainActivity : AppCompatActivity(), SearchView.OnQueryTextListener {
     lateinit var binding: ActivityMainBinding
     private lateinit var activityMain: MainActivity
     private lateinit var searchViewMenuItem: MenuItem //SearchView menu item
+    private val OPEN_ARCHIVES_ACTIVITY = 1
     /**
     Toasty Toasts colors
      */
@@ -82,6 +83,11 @@ class MainActivity : AppCompatActivity(), SearchView.OnQueryTextListener {
         activityMain = this
 
         setupViewPager()
+    }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        if (requestCode == OPEN_ARCHIVES_ACTIVITY) //Detect back from ArchivesActivity and in NoteListFragment load data to recycler again
+            loadDataToRecycler()
     }
 
     /**
@@ -172,7 +178,7 @@ class MainActivity : AppCompatActivity(), SearchView.OnQueryTextListener {
         mOnRefreshNoteList.onRefreshList(noteItem)
     }
 
-    fun loadDataToRecycler(){
+    fun loadDataToRecycler() {
         val fragmentNoteList = mViewPager.adapter.instantiateItem(mViewPager, 1)
         mOnRefreshNoteList = (fragmentNoteList as NotesListFragment)
         mOnRefreshNoteList.loadDataToRecycler()
@@ -198,7 +204,7 @@ class MainActivity : AppCompatActivity(), SearchView.OnQueryTextListener {
     fun setFilterAtRecycler(query: String?) {
         val fragmentNoteList = mViewPager.adapter.instantiateItem(mViewPager, 1)
         mOnSetFilter = fragmentNoteList as NotesListFragment
-        if(query != null)
+        if (query != null)
             mOnSetFilter.setFilter(query)
     }
 
@@ -270,7 +276,7 @@ class MainActivity : AppCompatActivity(), SearchView.OnQueryTextListener {
 //            }
             R.id.archives -> {
                 val intent = Intent(this, ArchivesActivity::class.java)
-                startActivity(intent)
+                startActivityForResult(intent, OPEN_ARCHIVES_ACTIVITY)
             }
             R.id.settings -> {
                 val intent = Intent(this, SettingsActivity::class.java)
