@@ -35,7 +35,7 @@ import es.dmoral.toasty.Toasty
 
 
 @Suppress("DEPRECATION")
-class MainActivity : AppCompatActivity() {
+class MainActivity : AppCompatActivity(), SearchView.OnQueryTextListener {
 
     /**
      * ViewPager object and Fragment Adapter object
@@ -243,12 +243,28 @@ class MainActivity : AppCompatActivity() {
         searchViewMenuItem = menu!!.findItem(R.id.search_view)
         val searchView = searchViewMenuItem.actionView as SearchView
         searchView.setSearchableInfo(searchManager.getSearchableInfo(componentName))
+        searchView.setOnQueryTextListener(this)
 
         //Listen for current page in ViewPager and set menu item SearchView visible or not
-        when(mViewPager.currentItem){
+        when (mViewPager.currentItem) {
             1 -> searchViewMenuItem.isVisible = true//Make search item invisible default
             else -> searchViewMenuItem.isVisible = false//Make search item invisible default
         }
+        return true
+    }
+
+    /*
+    Listen for search query
+     */
+    override fun onQueryTextSubmit(query: String?): Boolean {
+        val intent = Intent(this, SearchResultActivity::class.java)
+        intent.action = Intent.ACTION_SEARCH
+        intent.putExtra(SearchManager.QUERY, query)
+        startActivity(intent)
+        return true
+    }
+
+    override fun onQueryTextChange(newText: String?): Boolean {
         return true
     }
 
