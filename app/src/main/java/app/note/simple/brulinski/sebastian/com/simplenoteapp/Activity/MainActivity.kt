@@ -11,11 +11,11 @@ import android.support.annotation.ColorInt
 import android.support.design.widget.BottomSheetDialogFragment
 import android.support.v4.view.ViewPager
 import android.support.v7.app.AppCompatActivity
+import android.support.v7.widget.SearchView
 import android.util.Log
 import android.view.Menu
 import android.view.MenuInflater
 import android.view.MenuItem
-import android.widget.SearchView
 import android.widget.Toast
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.Editor.EditorManager
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.Fragment.BottomSheetFragments.BottomSheetColorFragment
@@ -56,6 +56,7 @@ class MainActivity : AppCompatActivity() {
     var doubleTapToExit = false
     lateinit var binding: ActivityMainBinding
     private lateinit var activityMain: MainActivity
+    private lateinit var searchViewMenuItem: MenuItem //SearchView menu item
     /**
     Toasty Toasts colors
      */
@@ -231,16 +232,23 @@ class MainActivity : AppCompatActivity() {
      * MENU
      */
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
-        Log.i("interLog", "menu main")
 
         val menuInflater: MenuInflater = menuInflater
         menuInflater.inflate(R.menu.main_menu, menu)
+        Log.i("searchItemLog", "onCreateOptionsMenu")
 
         //Associate searchable configuration with the SearchView
         val searchManager = getSystemService(Context.SEARCH_SERVICE) as SearchManager
-        val searchView = menu!!.findItem(R.id.search).actionView as SearchView
+        //Find search menu item
+        searchViewMenuItem = menu!!.findItem(R.id.search_view)
+        val searchView = searchViewMenuItem.actionView as SearchView
         searchView.setSearchableInfo(searchManager.getSearchableInfo(componentName))
 
+        //Listen for current page in ViewPager and set menu item SearchView visible or not
+        when(mViewPager.currentItem){
+            1 -> searchViewMenuItem.isVisible = true//Make search item invisible default
+            else -> searchViewMenuItem.isVisible = false//Make search item invisible default
+        }
         return true
     }
 
