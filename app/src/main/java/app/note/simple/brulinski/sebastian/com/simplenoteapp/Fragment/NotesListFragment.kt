@@ -21,14 +21,16 @@ import app.note.simple.brulinski.sebastian.com.simplenoteapp.Activity.MainActivi
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.Database.ObjectToDatabaseOperations
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.Editor.EditorManager
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.Interfaces.OnRefreshNoteList
+import app.note.simple.brulinski.sebastian.com.simplenoteapp.Interfaces.OnSetFilter
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.Model.NoteItem
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.Model.Notes
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.R
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.databinding.NotesListFragmentBinding
 import java.util.*
+import kotlin.collections.ArrayList
 
 @Suppress("DEPRECATION", "OverridingDeprecatedMember")
-class NotesListFragment : Fragment(), OnRefreshNoteList {
+class NotesListFragment : Fragment(), OnRefreshNoteList, OnSetFilter {
 
     lateinit var binding: NotesListFragmentBinding //Bind layout
     /**
@@ -36,11 +38,16 @@ class NotesListFragment : Fragment(), OnRefreshNoteList {
      */
     lateinit var myRecycler: NoteListRecyclerAdapter //Notes recycler
     lateinit var noteItemArrayList: ArrayList<NoteItem> //Array of note object
+
     /**
      * Keys
      */
     private val NOTES_ARRAY_KEY = "notes"
     private val LAYOUT_STYLE_KEY = "layout style"
+    /**
+     * Others values
+     */
+    private var searchQuery = ""
 
     override fun onCreateView(inflater: LayoutInflater?, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         Log.i("interLog", "NOTELIST CREATE!")
@@ -61,6 +68,22 @@ class NotesListFragment : Fragment(), OnRefreshNoteList {
         binding.recyclerView.layoutManager = LinearLayoutManager(context, LinearLayoutManager.VERTICAL, false)
         myRecycler = NoteListRecyclerAdapter(noteItemArrayList, binding.recyclerView, activity)
         binding.recyclerView.adapter = myRecycler
+    }
+
+    //Set filter at recycler
+    override fun setFilter(query: String) {
+        searchQuery = query
+        val filterArrayList = ArrayList<NoteItem>()
+
+        (0 until noteItemArrayList.size)
+                .filter {
+                    noteItemArrayList[it].title!!.toLowerCase().contains(query.toLowerCase()) ||
+                            noteItemArrayList[it].note!!.toLowerCase().contains(query.toLowerCase())
+                }
+                .mapTo(filterArrayList) { noteItemArrayList[it] }
+
+        myRecycler.noteItemArray = filterArrayList
+        myRecycler.notifyDataSetChanged()
     }
 
     //Sort items in recycler by date
@@ -86,23 +109,24 @@ class NotesListFragment : Fragment(), OnRefreshNoteList {
             ObjectToDatabaseOperations.updateObject(context, arrayListOf(noteItem))
         else ObjectToDatabaseOperations.insertObject(context, noteItem)
 
+        loadDataToRecycler()
+    }
+
+    override fun loadDataToRecycler() {
         noteItemArrayList = ObjectToDatabaseOperations.getObjects(context, false)
         initRecyclerAdapter()
         sortNotes()
+        setFilter(searchQuery)
     }
 
     /**
      * Recycler
      */
-    class NoteListRecyclerAdapter(private var noteItemArray: ArrayList<NoteItem>, var recyclerView: RecyclerView, var activity: Activity) : RecyclerView.Adapter<NoteListRecyclerAdapter.ViewHolder>() {
+    class NoteListRecyclerAdapter(var noteItemArray: ArrayList<NoteItem>, var recyclerView: RecyclerView, var activity: Activity) : RecyclerView.Adapter<NoteListRecyclerAdapter.ViewHolder>() {
 
         private var deletedItem: NoteItem? = null
         private lateinit var preferences: SharedPreferences
         private lateinit var undoSnack: Snackbar
-
-        fun getArray(): ArrayList<NoteItem> {
-            return noteItemArray
-        }
 
         override fun onBindViewHolder(holder: ViewHolder?, position: Int) {
             var title = noteItemArray[position].title
@@ -156,6 +180,8 @@ class NotesListFragment : Fragment(), OnRefreshNoteList {
                         ObjectToDatabaseOperations.addDeleteFlag(context = activity, noteObjects = arrayListOf(deletedItem!!), flag = false)
                     else ObjectToDatabaseOperations.insertObject(activity, deletedItem!!)
 
+                    (activity as MainActivity).loadDataToRecycler()
+
                     val main = activity as MainActivity
                     main.setupPreview(deletedItem!!)
                     main.setEditMode(deletedItem!!)
@@ -167,6 +193,8 @@ class NotesListFragment : Fragment(), OnRefreshNoteList {
                 if (flag)
                     ObjectToDatabaseOperations.addDeleteFlag(context = activity, noteObjects = arrayListOf(deletedItem!!), flag = true)
                 else ObjectToDatabaseOperations.deleteObjects(activity, arrayListOf(deletedItem!!))
+
+                (activity as MainActivity).loadDataToRecycler()
 
                 val main = activity as MainActivity
                 main.setupPreview(Notes.Note.default)
@@ -189,12 +217,6 @@ class NotesListFragment : Fragment(), OnRefreshNoteList {
             val title = itemView.findViewById<TextView>(R.id.titleTextView)!!
             val note = itemView.findViewById<TextView>(R.id.noteTextView)!!
             val card = itemView.findViewById<CardView>(R.id.item_card_parent_card)!!
-        }
-
-        //Set filter based on search query
-        fun setFilter(noteItemArray: ArrayList<NoteItem>){
-            this.noteItemArray = noteItemArray
-            notifyDataSetChanged()
         }
     }
 }

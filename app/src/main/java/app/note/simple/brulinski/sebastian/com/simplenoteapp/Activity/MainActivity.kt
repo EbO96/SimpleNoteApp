@@ -23,10 +23,7 @@ import app.note.simple.brulinski.sebastian.com.simplenoteapp.Fragment.CreateNote
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.Fragment.FragmentPagerAdapter.FragmentAdapter
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.Fragment.NotePreviewFragment
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.Fragment.NotesListFragment
-import app.note.simple.brulinski.sebastian.com.simplenoteapp.Interfaces.OnChangeColorListener
-import app.note.simple.brulinski.sebastian.com.simplenoteapp.Interfaces.OnRefreshNoteList
-import app.note.simple.brulinski.sebastian.com.simplenoteapp.Interfaces.OnSetEditMode
-import app.note.simple.brulinski.sebastian.com.simplenoteapp.Interfaces.OnSetupPreview
+import app.note.simple.brulinski.sebastian.com.simplenoteapp.Interfaces.*
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.Model.NoteItem
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.R
 import app.note.simple.brulinski.sebastian.com.simplenoteapp.databinding.ActivityMainBinding
@@ -70,6 +67,7 @@ class MainActivity : AppCompatActivity(), SearchView.OnQueryTextListener {
     private lateinit var mOnRefreshNoteList: OnRefreshNoteList //To refresh note list
     private lateinit var mOnSetEditMode: OnSetEditMode //To set object to edition in edit mode (CreateNoteFragment)
     private lateinit var mOnSetupPreview: OnSetupPreview //To setup note preview screen
+    private lateinit var mOnSetFilter: OnSetFilter //To set filter at notes list
     /**
     There we starts...
      */
@@ -174,6 +172,12 @@ class MainActivity : AppCompatActivity(), SearchView.OnQueryTextListener {
         mOnRefreshNoteList.onRefreshList(noteItem)
     }
 
+    fun loadDataToRecycler(){
+        val fragmentNoteList = mViewPager.adapter.instantiateItem(mViewPager, 1)
+        mOnRefreshNoteList = (fragmentNoteList as NotesListFragment)
+        mOnRefreshNoteList.loadDataToRecycler()
+    }
+
     //Edit mode
     fun setEditMode(noteItem: NoteItem) {
         val fragmentCreate = mViewPager.adapter.instantiateItem(mViewPager, 3)
@@ -188,30 +192,16 @@ class MainActivity : AppCompatActivity(), SearchView.OnQueryTextListener {
         mOnSetupPreview.onSetup(noteItem)
     }
 
-    //    fun resetList() {
-//        val fragmentNoteList = mViewPager.adapter.instantiateItem(mViewPager, 1)
-//        mOnRefreshNoteListListener = (fragmentNoteList as NotesListFragment)
-//        mOnRefreshNoteListListener.onReset()
-//    }
-//    //Create
-//    fun refreshCreate(noteItem: NoteItem?) {
-//
-//    }
-//
-//    //Preview
-//    fun refreshPreview(noteItem: NoteItem) {
-//        val fragmentPreview = mViewPager.adapter.instantiateItem(mViewPager, 2)
-//        mOnRefreshPreviewListener = (fragmentPreview as NotePreviewFragment)
-//        mOnRefreshPreviewListener.onRefresh(noteItem)
-//    }
-//
-//    fun resetPreview() {
-//        val fragmentPreview = mViewPager.adapter.instantiateItem(mViewPager, 2)
-//        mOnRefreshPreviewListener = (fragmentPreview as NotePreviewFragment)
-//        mOnRefreshPreviewListener.onReset()
-//    }
-//
-//
+    /**
+     * SearchView
+     */
+    fun setFilterAtRecycler(query: String?) {
+        val fragmentNoteList = mViewPager.adapter.instantiateItem(mViewPager, 1)
+        mOnSetFilter = fragmentNoteList as NotesListFragment
+        if(query != null)
+            mOnSetFilter.setFilter(query)
+    }
+
     fun changeNoteColors(colorOf: String, color: Int) {
 
         when (mViewPager.currentItem) {
@@ -265,6 +255,7 @@ class MainActivity : AppCompatActivity(), SearchView.OnQueryTextListener {
     }
 
     override fun onQueryTextChange(newText: String?): Boolean {
+        setFilterAtRecycler(newText)
         return true
     }
 
