@@ -190,6 +190,12 @@ class NotesListFragment : Fragment(), OnRefreshNoteList {
             val note = itemView.findViewById<TextView>(R.id.noteTextView)!!
             val card = itemView.findViewById<CardView>(R.id.item_card_parent_card)!!
         }
+
+        //Set filter based on search query
+        fun setFilter(noteItemArray: ArrayList<NoteItem>){
+            this.noteItemArray = noteItemArray
+            notifyDataSetChanged()
+        }
     }
 }
 
