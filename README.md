@@ -6,7 +6,7 @@ Simple app to create notes.
 
 Aplikacja powstała w ramach nauki i jest dostępna w [Sklepie Play](https://play.google.com/store/apps/details?id=app.note.simple.brulinski.sebastian.com.simplenoteapp&hl=en)
 
-Used libraries:
+## Użyte biblioteki
 
 - [For databases](https://github.com/Kotlin/anko/wiki/Anko-SQLite)</br>
 - [For keyboard events](https://github.com/yshrsmz/KeyboardVisibilityEvent)</br>
